@@ -103,7 +103,7 @@ h1 .u{display:inline-block;margin-top:8px;font-family:var(--f-display);font-weig
 .znew{font-size:12px;font-weight:700;background:var(--sign);border:2px solid var(--ink);border-radius:3px;padding:4px 8px;line-height:1.5}
 
 /* 図鑑 */
-#zukanOv{align-items:flex-start;background:rgba(18,19,22,.93)}
+#zukanOv,#rankOv{align-items:flex-start;background:rgba(18,19,22,.96)}
 .zcard{width:100%;max-width:660px;display:flex;flex-direction:column;gap:12px;margin:0 auto}
 .zhead{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .zhead h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:24px;color:var(--sign);text-shadow:0 3px 0 var(--ink);line-height:1.2}
@@ -127,6 +127,50 @@ h1 .u{display:inline-block;margin-top:8px;font-family:var(--f-display);font-weig
 .zst{font-size:11px;color:#5d6066;font-weight:700;display:flex;flex-wrap:wrap;gap:4px 12px}
 .zst b{font-family:var(--f-num);font-size:14px;color:var(--ink);font-variant-numeric:tabular-nums}
 .hint span{color:var(--sign);font-weight:900}
+.zhead{flex-wrap:wrap}
+.zbtns{display:flex;gap:8px}
+
+/* モード */
+.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%}
+.mode{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px 9px;border-radius:6px;border:3px solid #55585f;background:rgba(20,21,24,.7);color:var(--plate);cursor:pointer;font-family:var(--f-body)}
+.mode b{font-family:var(--f-display);font-weight:400;font-size:17px}
+.mode span{font-size:11px;font-weight:700;color:var(--dim)}
+.mode[aria-checked="true"]{border-color:var(--ink);background:var(--plate);color:var(--ink);box-shadow:0 4px 0 var(--ink)}
+.mode[aria-checked="true"] span{color:#4a4d52}
+.mode.hell[aria-checked="true"]{background:var(--stop);color:var(--plate)}
+.mode.hell[aria-checked="true"] span{color:#ffd9d4}
+.mode.silver[aria-checked="true"]{background:#e8742a;color:var(--ink)}
+.chip{align-self:center;font-family:var(--f-display);font-size:13px;padding:3px 8px 4px;border-radius:4px;border:2px solid var(--ink);background:var(--stop);color:var(--plate)}
+.rmode{text-align:center;font-size:12px;font-weight:900;color:#5d6066;letter-spacing:.1em}
+
+/* 登録 */
+.entry{width:100%;display:flex;flex-direction:column;gap:6px;background:rgba(20,21,24,.8);border:2px solid #55585f;border-radius:6px;padding:10px}
+.entry label{font-size:12px;font-weight:700;color:var(--dim)}
+.erow{display:flex;gap:8px}
+.erow input{flex:1;min-width:0;font:700 16px var(--f-body);padding:8px 10px;border-radius:4px;border:2px solid var(--plate);background:var(--ink);color:var(--plate)}
+.ebtn{flex:none;font:900 14px var(--f-body);padding:8px 12px;border-radius:4px;border:2px solid var(--ink);background:var(--sign);color:var(--ink);cursor:pointer}
+.ebtn:disabled{opacity:.55;cursor:default}
+.est{font-size:12px;font-weight:700;color:var(--sign);min-height:1em}
+.btns .btn.sub{font-size:14px;padding:12px 6px 13px}
+
+/* ランキング */
+.rcard{max-width:480px}
+.rtabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.rtab{font:900 14px var(--f-body);padding:8px 4px;border-radius:4px;border:2px solid #55585f;background:transparent;color:var(--dim);cursor:pointer}
+.rtab[aria-selected="true"]{background:var(--sign);border-color:var(--ink);color:var(--ink)}
+.rnote{margin:0;font-size:12px;color:var(--dim);font-weight:700}
+.rmsg{margin:0;padding:16px;text-align:center;background:var(--plate);color:var(--ink);border:3px solid var(--ink);border-radius:4px;font-weight:700;font-size:14px}
+#rList{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.rrow{display:grid;grid-template-columns:2.6em minmax(0,1fr) auto 4.8em;gap:8px;align-items:baseline;background:var(--plate);color:var(--ink);border-radius:4px;padding:7px 10px;font-weight:700;font-size:14px}
+.rno{font-family:var(--f-num);font-variant-numeric:tabular-nums;color:#6a6d72}
+.rnm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rsp{font-size:11px;color:#5d6066}
+.rsp b{font-family:var(--f-num);font-size:18px;color:var(--ink);margin-right:2px;font-variant-numeric:tabular-nums}
+.rds{font-family:var(--f-num);font-size:13px;text-align:right;color:#4a4d52;font-variant-numeric:tabular-nums}
+.rrow.top1{background:var(--sign);border:2px solid var(--ink)}
+.rrow.top1 .rno,.rrow.top2 .rno,.rrow.top3 .rno{color:var(--ink);font-size:16px}
+.rrow.top2{background:#dfe3e8}
+.rrow.top3{background:#efd2b4}
 @media (prefers-reduced-motion:reduce){#warn.show,#toast.on{animation-duration:.01s}}
 </style>
 <style>
@@ -143,6 +187,7 @@ body{margin:0;font-size:14px}
 <div id="hud" hidden>
   <div class="meter" id="distBox"><div class="lbl">生存距離</div><div class="val"><span id="distV">0</span><small>m</small></div></div>
   <div class="hudR">
+    <div class="chip" id="modeChip" hidden></div>
     <div class="meter" id="spdBox"><div class="lbl">速度</div><div class="val"><span id="spdV">40</span><small>km/h</small></div></div>
     <button id="muteBtn" aria-label="音のオンオフ">音</button>
   </div>
@@ -165,8 +210,13 @@ body{margin:0;font-size:14px}
         <li>速度はどんどん上がる。<b>何m生き残れるか</b>を競う</li>
       </ul>
     </div>
+    <div class="modes" role="radiogroup" aria-label="モード">
+      <button class="mode" role="radio" data-m="normal" aria-checked="true"><b>ふつう</b><span>若葉マーク</span></button>
+      <button class="mode hell" role="radio" data-m="hell" aria-checked="false"><b>ヘル</b><span>警告なし</span></button>
+      <button class="mode silver" role="radio" data-m="silver" aria-checked="false"><b>シルバー</b><span>反応が遅い</span></button>
+    </div>
     <div class="btns"><button class="btn" id="startBtn">発進する</button></div>
-    <div class="btns"><button class="btn sub" id="zukanBtn1">かもしれない図鑑</button></div>
+    <div class="btns"><button class="btn sub" id="zukanBtn1">かもしれない図鑑</button><button class="btn sub" id="rankBtn1">ランキング</button></div>
     <div class="bestline">自己ベスト <b id="bestV">0</b> m</div>
   </div>
 </div>
@@ -176,6 +226,7 @@ body{margin:0;font-size:14px}
     <div class="res">
       <div class="head">事故発生</div>
       <div class="body">
+        <div class="rmode" id="rMode">ふつうモード</div>
         <div class="dist"><span id="rDist">0</span><small>m</small></div>
         <div class="newrec" id="rNew" hidden>自己ベスト更新</div>
         <div class="rank">あなたの免許<span id="rRank">若葉マーク</span></div>
@@ -187,17 +238,34 @@ body{margin:0;font-size:14px}
         </div>
       </div>
     </div>
-    <div class="btns"><button class="btn" id="againBtn">もう一度</button><button class="btn sub" id="copyBtn">結果をコピー</button></div>
-    <div class="btns"><button class="btn sub" id="zukanBtn2">かもしれない図鑑</button></div>
+    <form class="entry" id="entryForm" hidden>
+      <label for="nameIn">名前（10文字まで）</label>
+      <div class="erow"><input id="nameIn" maxlength="10" autocomplete="nickname" placeholder="ななしのドライバー"><button class="ebtn" id="entryBtn" type="submit">ランキングに登録</button></div>
+      <div class="est" id="entrySt" aria-live="polite"></div>
+    </form>
+    <div class="btns"><button class="btn" id="againBtn">もう一度</button><button class="btn sub" id="titleBtn">タイトルに戻る</button></div>
+    <div class="btns"><button class="btn sub" id="zukanBtn2">図鑑</button><button class="btn sub" id="rankBtn2">ランキング</button><button class="btn sub" id="copyBtn">結果をコピー</button></div>
     <div id="shareTxt"></div>
   </div>
 </div>
 
 <div class="ov" id="zukanOv" hidden>
   <div class="zcard">
-    <div class="zhead"><h2>かもしれない図鑑</h2><button class="zclose" id="zClose">閉じる</button></div>
+    <div class="zhead"><h2>かもしれない図鑑</h2><div class="zbtns"><button class="zclose" id="zClose">閉じる</button><button class="zclose" id="zTitle">タイトルに戻る</button></div></div>
     <div class="zprog">登録 <b id="zCount">0</b> / <b id="zTotal">14</b><div class="zbar"><i id="zBar"></i></div></div>
     <div id="zList"></div>
+  </div>
+</div>
+
+<div class="ov" id="rankOv" hidden>
+  <div class="zcard rcard">
+    <div class="zhead"><h2>最高速度ランキング</h2><div class="zbtns"><button class="zclose" id="rClose">閉じる</button><button class="zclose" id="rTitle">タイトルに戻る</button></div></div>
+    <div class="rtabs" role="tablist">
+      <button class="rtab" role="tab" data-m="normal">ふつう</button><button class="rtab" role="tab" data-m="hell">ヘル</button><button class="rtab" role="tab" data-m="silver">シルバー</button>
+    </div>
+    <p class="rnote">上位100名・同じ速度なら距離の長い順</p>
+    <p class="rmsg" id="rMsg"></p>
+    <ol id="rList"></ol>
   </div>
 </div>
 
@@ -209,7 +277,14 @@ const rand=(a,b)=>a+Math.random()*(b-a), clamp=(v,a,b)=>v<a?a:v>b?b:v;
 const pick=a=>a[(Math.random()*a.length)|0];
 let W=0,H=0,DPR=1,roadL=0,rw=0,laneW=0,swW=0;
 const P={x:0,y:0,w:0,h:0,tx:0,vx:0,ice:false};
-let g=null, mode='title', best=0, muted=false;
+let g=null, mode='title', best=0, muted=false, inTx=0;
+/* ===== ランキング用 Firebase 設定（Firebaseコンソールの値を貼る） ===== */
+const FIREBASE={apiKey:'AIzaSyDDR-4nuugeyakM9Zf9WbR1oarwpIOjRYU', projectId:'zirihinit-games'};
+/* ===================================================================== */
+const MODES={normal:{name:'ふつう',col:'rank_normal'},hell:{name:'ヘル',col:'rank_hell'},silver:{name:'シルバー',col:'rank_silver'}};
+const SILVER_LAG=.3;
+let gm='normal';
+try{const m=localStorage.getItem('kamo.mode');if(MODES[m])gm=m}catch(e){}
 try{best=+localStorage.getItem('kamo.best')||0}catch(e){}
 try{muted=localStorage.getItem('kamo.mute')==='1'}catch(e){}
 $('bestV').textContent=Math.floor(best);
@@ -325,7 +400,7 @@ const DEFS=[
 function newGame(){
   g={dist:0,v:40,vmax:40,t:0,scroll:0,sm:1,off:g?g.off:0,ents:[],decor:g?g.decor:[],pending:null,nextEv:2,ambT:1.5,oncT:.5,decT:0,
      shake:0,flash:0,hiyari:0,cause:null,crashT:0,timers:[],parts:[],last:null,newZ:[]};
-  P.x=P.tx=laneX(1);P.vx=0;P.ice=false;
+  P.x=P.tx=inTx=laneX(1);P.vx=0;P.ice=false;g.hist=[];
 }
 function idle(){newGame();g.nextEv=1e9}
 
@@ -337,7 +412,7 @@ function startEvent(){
   const isNew=zHit(def.id,'seen');if(isNew)g.newZ.push(def.warn);$('warnNew').hidden=!isNew;
   const wt=Math.max(.55,1.5-(g.v-40)/260)+(def.extra||0);
   g.pending={def,p:def.plan(),t:wt,T:wt};
-  showWarn(def.warn);sfx.warn();
+  if(gm==='hell'){g.pending.p.ix=null}else{showWarn(def.warn);sfx.warn()}
 }
 
 function box(e,s=.85){const hw=e.w*s/2,hh=e.h*s/2;return[e.x-hw,e.y-hh,e.x+hw,e.y+hh]}
@@ -369,12 +444,12 @@ function crash(cause,x,y){
 /* ---------- input ---------- */
 let lastPx=null;const keys={l:false,r:false};
 stage.addEventListener('pointerdown',e=>{lastPx=e.clientX;try{stage.setPointerCapture(e.pointerId)}catch(err){}});
-stage.addEventListener('pointermove',e=>{if(lastPx==null)return;const dx=e.clientX-lastPx;lastPx=e.clientX;if(mode==='play'&&!P.ice)P.tx=clamp(P.tx+dx*1.3,pmin(),pmax())});
+stage.addEventListener('pointermove',e=>{if(lastPx==null)return;const dx=e.clientX-lastPx;lastPx=e.clientX;if(mode==='play'&&!P.ice)inTx=clamp(inTx+dx*1.3,pmin(),pmax())});
 const up=()=>{lastPx=null};stage.addEventListener('pointerup',up);stage.addEventListener('pointercancel',up);
 addEventListener('keydown',e=>{
   if(e.key==='ArrowLeft'||e.key==='a')keys.l=true;
   if(e.key==='ArrowRight'||e.key==='d')keys.r=true;
-  if((e.key===' '||e.key==='Enter')&&mode==='title'&&$('zukanOv').hidden){e.preventDefault();start()}
+  if((e.key===' '||e.key==='Enter')&&mode==='title'&&$('zukanOv').hidden&&$('rankOv').hidden&&!(e.target.closest&&e.target.closest('button'))){e.preventDefault();start()}
 });
 addEventListener('keyup',e=>{if(e.key==='ArrowLeft'||e.key==='a')keys.l=false;if(e.key==='ArrowRight'||e.key==='d')keys.r=false});
 
@@ -387,16 +462,86 @@ function toast(t){toastEl.textContent=t;toastEl.classList.remove('on');void toas
 
 function start(){
   ensureAudio();newGame();mode='play';
-  $('titleOv').hidden=true;$('overOv').hidden=true;$('hud').hidden=false;warnEl.hidden=true;
+  $('titleOv').hidden=true;$('overOv').hidden=true;$('zukanOv').hidden=true;$('rankOv').hidden=true;$('hud').hidden=false;warnEl.hidden=true;
+  $('modeChip').textContent=MODES[gm].name;$('modeChip').hidden=gm==='normal';
 }
 $('startBtn').addEventListener('click',start);
 $('againBtn').addEventListener('click',start);
+function goTitle(){
+  mode='title';idle();
+  for(const id of['overOv','zukanOv','rankOv','hud'])$(id).hidden=true;
+  warnEl.hidden=true;$('titleOv').hidden=false;
+}
+$('titleBtn').addEventListener('click',goTitle);
+function setMode(m){gm=m;try{localStorage.setItem('kamo.mode',m)}catch(e){}
+  document.querySelectorAll('.mode').forEach(b=>b.setAttribute('aria-checked',String(b.dataset.m===m)));
+  $('bestV').textContent=Math.floor(bestOf(m))}
+document.querySelectorAll('.mode').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.m)));
+function bestOf(m){if(m==='normal')return best;try{return +localStorage.getItem('kamo.best.'+m)||0}catch(e){return 0}}
+
+/* ---------- ランキング（Firestore REST） ---------- */
+const fbOn=()=>!!(FIREBASE.apiKey&&FIREBASE.projectId);
+const fbBase=()=>`https://firestore.googleapis.com/v1/projects/${encodeURIComponent(FIREBASE.projectId)}/databases/(default)/documents`;
+async function fbAdd(col,r){
+  const res=await fetch(`${fbBase()}/${col}?key=${FIREBASE.apiKey}`,{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({fields:{name:{stringValue:r.name},speed:{integerValue:String(r.speed)},dist:{integerValue:String(r.dist)},
+      score:{integerValue:String(r.speed*100000+r.dist)},at:{timestampValue:new Date().toISOString()}}})});
+  if(!res.ok)throw new Error('add '+res.status);
+}
+async function fbTop(col){
+  const res=await fetch(`${fbBase()}:runQuery?key=${FIREBASE.apiKey}`,{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({structuredQuery:{from:[{collectionId:col}],orderBy:[{field:{fieldPath:'score'},direction:'DESCENDING'}],limit:100}})});
+  if(!res.ok)throw new Error('top '+res.status);
+  const j=await res.json();
+  return j.filter(x=>x.document).map(x=>{const f=x.document.fields;return{name:f.name.stringValue,speed:+f.speed.integerValue,dist:+f.dist.integerValue}});
+}
+let rankTab='normal',rankReq=0,myName='',lastRun=null;
+try{myName=localStorage.getItem('kamo.name')||''}catch(e){}
+$('nameIn').value=myName;
+async function renderRank(){
+  document.querySelectorAll('.rtab').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.m===rankTab)));
+  const list=$('rList'),msg=$('rMsg');list.textContent='';
+  if(!fbOn()){msg.textContent='ランキングは準備中です。';msg.hidden=false;return}
+  msg.textContent='読み込み中…';msg.hidden=false;
+  const req=++rankReq;
+  try{
+    const rows=await fbTop(MODES[rankTab].col);if(req!==rankReq)return;
+    if(!rows.length){msg.textContent='まだ記録がありません。最初の1人になろう。';return}
+    msg.hidden=true;
+    rows.forEach((r,i)=>{const li=document.createElement('li');li.className='rrow'+(i<3?' top'+(i+1):'');
+      const n=document.createElement('span');n.className='rno';n.textContent=i+1;
+      const nm=document.createElement('span');nm.className='rnm';nm.textContent=r.name;
+      const sp=document.createElement('span');sp.className='rsp';sp.innerHTML=`<b>${r.speed}</b>km/h`;
+      const ds=document.createElement('span');ds.className='rds';ds.textContent=r.dist+'m';
+      li.append(n,nm,sp,ds);list.append(li)});
+  }catch(e){if(req!==rankReq)return;msg.textContent='ランキングを読み込めませんでした。通信状況を確かめて、もう一度開いてください。'}
+}
+function openRank(m){rankTab=m||gm;$('rankOv').hidden=false;$('rankOv').scrollTop=0;renderRank()}
+document.querySelectorAll('.rtab').forEach(b=>b.addEventListener('click',()=>{rankTab=b.dataset.m;renderRank()}));
+$('rankBtn1').addEventListener('click',()=>openRank());
+$('rankBtn2').addEventListener('click',()=>openRank(lastRun&&lastRun.mode));
+$('rClose').addEventListener('click',()=>{$('rankOv').hidden=true});
+$('rTitle').addEventListener('click',goTitle);
+$('entryForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const name=$('nameIn').value.trim().slice(0,10),btn=$('entryBtn'),st=$('entrySt');
+  if(!name){st.textContent='名前を入れてください。';return}
+  if(!lastRun||lastRun.sent)return;
+  btn.disabled=true;st.textContent='登録中…';
+  try{await fbAdd(MODES[lastRun.mode].col,{name,speed:lastRun.speed,dist:lastRun.dist});
+    lastRun.sent=true;myName=name;try{localStorage.setItem('kamo.name',name)}catch(err){}
+    st.textContent='登録しました。';btn.textContent='登録済み';
+  }catch(err){btn.disabled=false;st.textContent='登録できませんでした。もう一度押してください。'}
+});
 
 function showOver(){
   mode='over';
   const d=Math.floor(g.dist),info=CAUSE[g.cause]||CAUSE.traffic;
-  const isNew=d>best;if(isNew){best=d;try{localStorage.setItem('kamo.best',String(d))}catch(e){}}
-  $('bestV').textContent=Math.floor(best);
+  const isNew=d>bestOf(gm);if(isNew){if(gm==='normal')best=d;try{localStorage.setItem(gm==='normal'?'kamo.best':'kamo.best.'+gm,String(d))}catch(e){}}
+  $('bestV').textContent=Math.floor(bestOf(gm));
+  $('rMode').textContent=MODES[gm].name+'モード';
+  lastRun={mode:gm,speed:Math.round(g.vmax),dist:d,sent:false};
+  $('entryForm').hidden=!fbOn();$('entryBtn').disabled=false;$('entryBtn').textContent='ランキングに登録';$('entrySt').textContent='';
   let rank=RANKS[0][1];for(const[m,n]of RANKS)if(d>=m)rank=n;
   $('rDist').textContent=d;$('rNew').hidden=!isNew;$('rRank').textContent=rank;
   $('rCause').textContent=info.c;$('rDaro').textContent=info.d+' ── だろう運転でした。';
@@ -404,7 +549,7 @@ function showOver(){
   const zn=$('rZnew');zn.hidden=!g.newZ.length;
   if(g.newZ.length)zn.textContent='図鑑に新しく登録：「'+g.newZ[0]+'」'+(g.newZ.length>1?' ほか'+(g.newZ.length-1)+'件':'');
   $('rSpd').textContent=Math.round(g.vmax);$('rHiyari').textContent=g.hiyari;
-  const share=`「かもしれない運転」で${d}m生存！ 最高${Math.round(g.vmax)}km/h／ヒヤリ${g.hiyari}回／原因：${info.c}`;
+  const share=`「かもしれない運転」${gm==='normal'?'':MODES[gm].name+'モード'}で${d}m生存！ 最高${Math.round(g.vmax)}km/h／ヒヤリ${g.hiyari}回／原因：${info.c}`;
   $('shareTxt').textContent=share;$('copyBtn').dataset.t=share;$('copyBtn').textContent='結果をコピー';
   $('overOv').hidden=false;$('hud').hidden=true;
 }
@@ -424,11 +569,17 @@ function update(dt){
 
   // steering
   const prev=P.x;
-  if(P.ice){P.x+=P.vx*dt;P.tx=P.x}
+  if(P.ice){P.x+=P.vx*dt;P.tx=inTx=P.x;g.hist=[]}
   else if(mode==='play'){
-    if(keys.l)P.tx-=laneW*4.2*dt;if(keys.r)P.tx+=laneW*4.2*dt;
+    if(keys.l)inTx-=laneW*4.2*dt;if(keys.r)inTx+=laneW*4.2*dt;
+    inTx=clamp(inTx,pmin(),pmax());
+    if(gm==='silver'){ // 反応がワンテンポ遅い
+      g.hist.push([g.t,inTx]);
+      while(g.hist.length>1&&g.hist[1][0]<=g.t-SILVER_LAG)g.hist.shift();
+      if(g.hist[0][0]<=g.t-SILVER_LAG)P.tx=g.hist[0][1];
+    }else P.tx=inTx;
     P.tx=clamp(P.tx,pmin(),pmax());
-    const d=P.tx-P.x,m=laneW*10*dt;P.x+=clamp(d,-m,m);P.vx=dt>0?(P.x-prev)/dt:0;
+    const d=P.tx-P.x,m=laneW*(gm==='silver'?6:10)*dt;P.x+=clamp(d,-m,m);P.vx=dt>0?(P.x-prev)/dt:0;
   }
   if(P.x<pmin()||P.x>pmax()){if(P.ice&&mode==='play')crash('ice',P.x,P.y);P.x=clamp(P.x,pmin(),pmax());P.vx=0}
 
@@ -489,7 +640,10 @@ function drawCar(x,y,w,h,col,o={}){
   if(o.brake){ctx.shadowColor='#ff2d1f';ctx.shadowBlur=14}
   rr(-w*.42,h/2-h*.06,w*.24,h*.05,2);ctx.fill();rr(w*.18,h/2-h*.06,w*.24,h*.05,2);ctx.fill();
   ctx.shadowBlur=0;
-  if(o.player){ // 若葉マーク
+  if(o.player&&o.silver){ // もみじマーク
+    const s=w*.075,cy=-h*.36,cols=['#e8742a','#f5c31b','#9cc63c','#2f9a57'];ctx.lineWidth=1;ctx.strokeStyle='#1a1a1a';
+    [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([dx,dy],i)=>{ctx.fillStyle=cols[i];ctx.beginPath();ctx.ellipse(dx*s*.75,cy+dy*s*.75,s*.85,s*.85,0,0,7);ctx.fill();ctx.stroke()});
+  }else if(o.player){ // 若葉マーク
     const s=w*.13,cy=-h*.36;ctx.lineWidth=1.2;ctx.strokeStyle='#1a1a1a';
     ctx.fillStyle='#f5c31b';ctx.beginPath();ctx.moveTo(-s,cy-s);ctx.lineTo(0,cy-s*.4);ctx.lineTo(0,cy+s*1.1);ctx.lineTo(-s,cy+s*.5);ctx.closePath();ctx.fill();ctx.stroke();
     ctx.fillStyle='#2f9a57';ctx.beginPath();ctx.moveTo(s,cy-s);ctx.lineTo(0,cy-s*.4);ctx.lineTo(0,cy+s*1.1);ctx.lineTo(s,cy+s*.5);ctx.closePath();ctx.fill();ctx.stroke();
@@ -583,7 +737,7 @@ function draw(){
   for(const e of g.ents)if(e.layer===0)drawEnt(e);
   const list=g.ents.filter(e=>e.layer!==0);
   const pl={kind:'_p',y:P.y};list.push(pl);list.sort((a,b)=>a.y-b.y);
-  for(const e of list){if(e===pl){const ang=mode==='play'||mode==='crash'?clamp(P.vx/(laneW*10),-1,1)*.28:0;drawCar(P.x,P.y,P.w,P.h,'#f4f4ef',{player:true,ang:mode==='crash'||mode==='over'?Math.sin(g.t*20)*.0+(g.crashSpin||0):ang})}else drawEnt(e)}
+  for(const e of list){if(e===pl){const ang=mode==='play'||mode==='crash'?clamp(P.vx/(laneW*10),-1,1)*.28:0;drawCar(P.x,P.y,P.w,P.h,'#f4f4ef',{player:true,silver:gm==='silver',ang:mode==='crash'||mode==='over'?Math.sin(g.t*20)*.0+(g.crashSpin||0):ang})}else drawEnt(e)}
   for(const e of g.ents)drawTop(e);
   if(g.pending&&g.pending.p.ix!=null&&Math.floor(g.t*8)%2){const{ix,iy}=g.pending.p;ctx.save();ctx.translate(ix,iy);ctx.rotate(Math.PI/4);
     ctx.fillStyle='#f5c31b';ctx.strokeStyle='#141518';ctx.lineWidth=3;ctx.fillRect(-12,-12,24,24);ctx.strokeRect(-12,-12,24,24);ctx.rotate(-Math.PI/4);
@@ -662,6 +816,8 @@ function openZukan(){renderZukan();$('zukanOv').hidden=false;$('zukanOv').scroll
 $('zukanBtn1').addEventListener('click',openZukan);
 $('zukanBtn2').addEventListener('click',openZukan);
 $('zClose').addEventListener('click',()=>{$('zukanOv').hidden=true});
+$('zTitle').addEventListener('click',goTitle);
+setMode(gm);
 document.fonts&&document.fonts.ready.then(()=>{if(!$('zukanOv').hidden)renderZukan()});
 
 /* ---------- loop ---------- */
