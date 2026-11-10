@@ -7,7 +7,13 @@
 <meta name="description" content="迫りくる「かもしれない」をよけて、加速し続ける車で何m生き残れるかを競うブラウザゲーム。">
 <meta property="og:title" content="かもしれない運転">
 <meta property="og:description" content="迫りくる「かもしれない」をよけて、何m生き残れるか。">
-<meta name="twitter:card" content="summary">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://zirihinit.github.io/kamoshirenai/">
+<meta property="og:image" content="https://zirihinit.github.io/kamoshirenai/ogp.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://zirihinit.github.io/kamoshirenai/ogp.png">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -98,7 +104,8 @@ h1 .u{display:inline-block;margin-top:8px;font-family:var(--f-display);font-weig
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .stats div{background:#e6e7e2;border-radius:4px;padding:6px 8px;font-size:11px;font-weight:700;color:#4a4d52}
 .stats b{display:block;font-family:var(--f-num);font-size:20px;color:var(--ink);font-variant-numeric:tabular-nums}
-#shareTxt{font-size:11px;color:var(--dim);text-align:center;-webkit-user-select:text;user-select:text;line-height:1.5}
+a.btn{display:flex;align-items:center;justify-content:center;text-decoration:none;text-align:center}
+.btn.share{background:var(--ink);color:var(--plate);border-color:var(--plate);box-shadow:0 5px 0 #000}
 .wnew{display:inline-block;background:var(--stop);color:var(--plate);font-family:var(--f-num);font-size:11px;padding:1px 5px;border-radius:2px;margin-right:6px;vertical-align:2px}
 .znew{font-size:12px;font-weight:700;background:var(--sign);border:2px solid var(--ink);border-radius:3px;padding:4px 8px;line-height:1.5}
 
@@ -244,8 +251,7 @@ body{margin:0;font-size:14px}
       <div class="est" id="entrySt" aria-live="polite"></div>
     </form>
     <div class="btns"><button class="btn" id="againBtn">もう一度</button><button class="btn sub" id="titleBtn">タイトルに戻る</button></div>
-    <div class="btns"><button class="btn sub" id="zukanBtn2">図鑑</button><button class="btn sub" id="rankBtn2">ランキング</button><button class="btn sub" id="copyBtn">結果をコピー</button></div>
-    <div id="shareTxt"></div>
+    <div class="btns"><button class="btn sub" id="zukanBtn2">図鑑</button><button class="btn sub" id="rankBtn2">ランキング</button><a class="btn sub share" id="shareBtn" href="https://x.com/intent/post" target="_blank" rel="noopener">共有する</a></div>
   </div>
 </div>
 
@@ -550,13 +556,20 @@ function showOver(){
   if(g.newZ.length)zn.textContent='図鑑に新しく登録：「'+g.newZ[0]+'」'+(g.newZ.length>1?' ほか'+(g.newZ.length-1)+'件':'');
   $('rSpd').textContent=Math.round(g.vmax);$('rHiyari').textContent=g.hiyari;
   const share=`「かもしれない運転」${gm==='normal'?'':MODES[gm].name+'モード'}で${d}m生存！ 最高${Math.round(g.vmax)}km/h／ヒヤリ${g.hiyari}回／原因：${info.c}`;
-  $('shareTxt').textContent=share;$('copyBtn').dataset.t=share;$('copyBtn').textContent='結果をコピー';
+  shareData={text:share,url:GAME_URL};shareNative=!!navigator.share;
+  const sb=$('shareBtn');sb.textContent='共有する';
+  sb.href='https://x.com/intent/post?text='+encodeURIComponent(share)+'&url='+encodeURIComponent(GAME_URL)+'&hashtags='+encodeURIComponent('かもしれない運転');
   $('overOv').hidden=false;$('hud').hidden=true;
 }
-$('copyBtn').addEventListener('click',e=>{
-  const btn=e.currentTarget,t=btn.dataset.t||'';
-  const fallback=()=>{const r=document.createRange();r.selectNodeContents($('shareTxt'));const s=getSelection();s.removeAllRanges();s.addRange(r);btn.textContent='下の文を選択しました'};
-  try{navigator.clipboard.writeText(t).then(()=>{btn.textContent='コピーしました'},fallback)}catch(err){fallback()}
+const GAME_URL='https://zirihinit.github.io/kamoshirenai/';
+let shareData=null,shareNative=false;
+$('shareBtn').addEventListener('click',e=>{
+  if(!shareNative||!shareData)return; // 共有シートが使えない環境はXの投稿画面へ
+  e.preventDefault();
+  navigator.share({text:shareData.text+'\n#かもしれない運転',url:shareData.url}).catch(err=>{
+    if(err&&err.name==='AbortError')return;
+    shareNative=false;$('shareBtn').textContent='Xで共有する';
+  });
 });
 
 /* ---------- update ---------- */
