@@ -1,3 +1,20 @@
+Claude
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Index · HTML
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -120,7 +137,7 @@ body{user-select:none;-webkit-user-select:none;touch-action:manipulation}
     <div class="row front" id="rowFront"></div>
   </div>
   <div id="flash"></div>
-
+ 
   <div class="ov" id="title">
     <h1>ジャスト<br>えんだ〜</h1>
     <div class="sub">〜 スマホでエンダーチャレンジ 〜</div>
@@ -135,7 +152,7 @@ body{user-select:none;-webkit-user-select:none;touch-action:manipulation}
     <div id="status">曲を準備中…</div>
     <button class="btn" id="startBtn" disabled>ステージへ</button>
   </div>
-
+ 
   <div class="ov" id="result">
     <div id="rRank"></div>
     <div id="rName"></div>
@@ -151,21 +168,21 @@ body{user-select:none;-webkit-user-select:none;touch-action:manipulation}
     </div>
   </div>
 </div>
-
+ 
 <script>
 (()=>{
 /* ===== 設定 ===== */
 const VIDEO_ID='3JWTaaS7LdU';   // Whitney Houston - I Will Always Love You (Official 4K Video)
-let TARGET=190.2;               // ★ブレイク明けのドラムが入る瞬間の動画内の秒数。#calib で調整して書き換える
+let TARGET=189.8;               // ★ブレイク明けのドラムが入る瞬間の動画内の秒数。#calib で調整して書き換える
 const LEAD_MIN=12, LEAD_MAX=20; // ドラムの何秒前から再生するか（毎回ランダム）
 const EARLY_CUT=0.6;            // これより早くタップしたら即終了（秒）
 const CALIB=location.hash==='#calib';
 try{const v=localStorage.getItem('justender_target');if(CALIB&&v)TARGET=parseFloat(v);}catch(e){}
-
+ 
 const $=id=>document.getElementById(id);
 const rand=(a,b)=>a+Math.random()*(b-a);
 const pick=a=>a[Math.floor(Math.random()*a.length)];
-
+ 
 /* ===== 効果音（拍手・ブーイングのみ合成） ===== */
 let ctx,master,noiseBuf;
 function initAudio(){
@@ -210,7 +227,7 @@ function applause(amount,len=2.5){
     s.connect(bp);bp.connect(g);g.connect(master);s.start(tt,Math.random()*2,.06);
   }
 }
-
+ 
 /* ===== YouTube ===== */
 let player,ready=false;
 window.onYouTubeIframeAPIReady=()=>{
@@ -224,7 +241,7 @@ window.onYouTubeIframeAPIReady=()=>{
   });
 };
 const tag=document.createElement('script');tag.src='https://www.youtube.com/iframe_api';document.head.appendChild(tag);
-
+ 
 // getCurrentTime() は飛び飛びに更新されるので、変化した瞬間を基準に補間する
 let anchorV=-1,anchorT=0,lastRaw=-1;
 function sampleTime(){
@@ -237,7 +254,7 @@ function videoNow(){
   if(anchorV<0) return null;
   return anchorV+(performance.now()-anchorT)/1000*player.getPlaybackRate();
 }
-
+ 
 /* ===== 観客 ===== */
 const colors=['#2b2440','#3a2a2a','#23303a','#3b3320','#2e2238','#33263a','#1f2f2a','#3a2030'];
 const people=[];
@@ -280,14 +297,14 @@ function confetti(n){
       {duration:rand(1800,3600),delay:rand(0,1200),easing:'linear',fill:'forwards'});
   }
 }
-
+ 
 /* ===== ゲーム ===== */
 let state='title',tapped=false,tapErr=null,tapV=null,endTimer=null;
 let best=null;
 try{const v=localStorage.getItem('justender_best');if(v!==null)best=parseFloat(v);}catch(e){}
 function showBest(){$('best').textContent=best===null?'':`自己ベスト誤差：${best.toFixed(2)}秒`;}
 showBest();
-
+ 
 function placeCue(){ // 動画の下にガイド文字
   const s=$('screen').getBoundingClientRect(),a=$('app').getBoundingClientRect();
   $('cue').style.top=(s.bottom-a.top+14)+'px';
@@ -340,7 +357,7 @@ function tap(){
   endTimer=setTimeout(()=>finish(tapErr),wait);
 }
 $('tapzone').addEventListener('pointerdown',e=>{e.preventDefault();tap();});
-
+ 
 /* ===== 判定 ===== */
 const TIERS=[
   // 正解位置は耳で合わせた値（±0.1秒くらいの誤差あり）なので判定は甘め
@@ -435,7 +452,7 @@ function finish(err,cut=false){
     $('result').classList.add('show');
   },none?800:cut?600:1400);
 }
-
+ 
 $('startBtn').addEventListener('click',start);
 $('retryBtn').addEventListener('click',start);
 $('calibBtn').addEventListener('click',()=>{
@@ -450,3 +467,6 @@ buildCrowd();placeCue();
 </script>
 </body>
 </html>
+ 
+Claude が応答を完了しました
+
