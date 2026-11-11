@@ -942,13 +942,16 @@ function checkAgain(){
 // ================= ランクマッチ（Firebase） =================
 // ↓ Firebaseコンソール「プロジェクトの設定 → マイアプリ（ウェブ）」の firebaseConfig をそのまま貼る
 const FIREBASE_CONFIG={
-  apiKey:"",
-  authDomain:"",
-  projectId:"",
-  storageBucket:"",
-  messagingSenderId:"",
-  appId:""
+  apiKey:"AIzaSyDDR-4nuugeyakM9Zf9WbR1oarwpIOjRYU",
+  authDomain:"zirihinit-games.firebaseapp.com",
+  projectId:"zirihinit-games",
+  storageBucket:"zirihinit-games.firebasestorage.app",
+  messagingSenderId:"1052102781874",
+  appId:"1:1052102781874:web:8a0ccf72dbff509f99d2ab"
 };
+// ランクマッチが使える場所（Firebaseの承認済みドメインと合わせる）
+const RK_HOSTS=['zirihinit.github.io','localhost','127.0.0.1'];
+const RK_URL='https://zirihinit.github.io/gekiochi/';
 const FB_VER='10.14.1',RK_K=32,COL={p:'gekiochi_players',q:'gekiochi_queue',m:'gekiochi_matches'};
 const TIERS=[
   {min:-1e9,name:'消しカス',col:'#9a9aa8'},{min:1350,name:'落書きノート',col:'#62c46a'},{min:1450,name:'ふでばこ',col:'#3fb6f2'},
@@ -962,6 +965,7 @@ function loadScript(src){return new Promise((res,rej)=>{const s=document.createE
 async function rkInit(){
   if(RK.db)return true;
   if(!FIREBASE_CONFIG.apiKey){toast('ランクマッチは準備中です（サーバー未設定）');return false}
+  if(!RK_HOSTS.includes(location.hostname)){toast('ランクマッチは公開版で遊べます → '+RK_URL.replace('https://',''));return false}
   toast('サーバーに接続中…');
   try{
     if(!window.firebase||!firebase.firestore)for(const f of['app','auth','firestore'])await loadScript(`https://cdn.jsdelivr.net/npm/firebase@${FB_VER}/firebase-${f}-compat.js`);
