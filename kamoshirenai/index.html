@@ -178,6 +178,29 @@ a.btn{display:flex;align-items:center;justify-content:center;text-decoration:non
 .rrow.top1 .rno,.rrow.top2 .rno,.rrow.top3 .rno{color:var(--ink);font-size:16px}
 .rrow.top2{background:#dfe3e8}
 .rrow.top3{background:#efd2b4}
+
+/* 事故発生（1画面に収める） */
+.ocard{gap:8px}
+.ocard .res .head{font-size:18px;padding:3px 12px 5px;display:flex;justify-content:center;align-items:baseline;gap:10px}
+.hmode{font-family:var(--f-body);font-weight:900;font-size:11px;letter-spacing:.06em;background:var(--plate);color:var(--stop);padding:1px 6px;border-radius:2px}
+.ocard .res .body{padding:8px 12px 10px;gap:7px}
+.distrow{display:flex;justify-content:center;align-items:center;gap:10px}
+.ocard .dist{font-size:46px}
+.ocard .newrec{font-size:12px;line-height:1.2;color:var(--plate);background:var(--stop);padding:3px 6px;border-radius:3px;text-align:center}
+.meta{display:flex;flex-wrap:wrap;justify-content:center;gap:2px 12px;font-size:12px;font-weight:700;color:#5d6066}
+.meta b{color:var(--ink);font-weight:900;font-variant-numeric:tabular-nums}
+.ocard .cause{padding-top:7px;font-size:13px;line-height:1.45}
+.ocard .cause .q{font-size:15px;margin-top:2px}
+.ocard .cause .n{font-size:11px}
+.ocard .znew{font-size:11px;padding:3px 7px}
+.ocard .entry{padding:7px;gap:4px}
+.ocard .erow input{padding:6px 9px}
+.ocard .ebtn{padding:6px 10px}
+.ocard .est:empty{display:none}
+.ocard .btn{font-size:17px;padding:10px 6px 11px}
+.minis{display:flex;gap:8px;width:100%}
+.mini{flex:1;font:900 13px var(--f-body);padding:8px 4px;border-radius:5px;border:2px solid #6a6d72;background:rgba(20,21,24,.75);color:var(--plate);cursor:pointer}
+.mini:active{transform:translateY(1px)}
 @media (prefers-reduced-motion:reduce){#warn.show,#toast.on{animation-duration:.01s}}
 </style>
 <style>
@@ -229,29 +252,22 @@ body{margin:0;font-size:14px}
 </div>
 
 <div class="ov" id="overOv" hidden>
-  <div class="card">
+  <div class="card ocard">
     <div class="res">
-      <div class="head">事故発生</div>
+      <div class="head">事故発生<span class="hmode" id="rMode">ふつうモード</span></div>
       <div class="body">
-        <div class="rmode" id="rMode">ふつうモード</div>
-        <div class="dist"><span id="rDist">0</span><small>m</small></div>
-        <div class="newrec" id="rNew" hidden>自己ベスト更新</div>
-        <div class="rank">あなたの免許<span id="rRank">若葉マーク</span></div>
+        <div class="distrow"><div class="dist"><span id="rDist">0</span><small>m</small></div><div class="newrec" id="rNew" hidden>自己ベスト<br>更新</div></div>
+        <div class="meta"><span>免許 <b id="rRank">若葉マーク</b></span><span>最高 <b><span id="rSpd">0</span>km/h</b></span><span>ヒヤリ <b><span id="rHiyari">0</span>回</b></span></div>
         <div class="cause">原因：<span id="rCause"></span><span class="q" id="rDaro"></span><span class="n" id="rNote"></span></div>
         <div class="znew" id="rZnew" hidden></div>
-        <div class="stats">
-          <div>最高速度<b><span id="rSpd">0</span> km/h</b></div>
-          <div>ヒヤリ・ハット<b><span id="rHiyari">0</span> 回</b></div>
-        </div>
       </div>
     </div>
     <form class="entry" id="entryForm" hidden>
-      <label for="nameIn">名前（10文字まで）</label>
-      <div class="erow"><input id="nameIn" maxlength="10" autocomplete="nickname" placeholder="ななしのドライバー"><button class="ebtn" id="entryBtn" type="submit">ランキングに登録</button></div>
+      <div class="erow"><input id="nameIn" maxlength="10" autocomplete="nickname" placeholder="名前（10文字まで）" aria-label="ランキングに載せる名前（10文字まで）"><button class="ebtn" id="entryBtn" type="submit">ランキングに登録</button></div>
       <div class="est" id="entrySt" aria-live="polite"></div>
     </form>
-    <div class="btns"><button class="btn" id="againBtn">もう一度</button><button class="btn sub" id="titleBtn">タイトルに戻る</button></div>
-    <div class="btns"><button class="btn sub" id="zukanBtn2">図鑑</button><button class="btn sub" id="rankBtn2">ランキング</button><a class="btn sub share" id="shareBtn" href="https://x.com/intent/post" target="_blank" rel="noopener">結果をポストする</a></div>
+    <div class="btns"><button class="btn" id="againBtn">もう一度</button><a class="btn share" id="shareBtn" href="https://x.com/intent/post" target="_blank" rel="noopener">結果をポストする</a></div>
+    <div class="minis"><button class="mini" id="titleBtn">タイトルに戻る</button><button class="mini" id="zukanBtn2">図鑑</button><button class="mini" id="rankBtn2">ランキング</button></div>
   </div>
 </div>
 
