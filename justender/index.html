@@ -4,6 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>ジャストえんだ〜</title>
+<meta name="description" content="エンダーチャレンジがスマホで。あの名曲の溜めの後に入るドラムに、ドンを合わせろ。誤差は1/1000秒まで丸見え。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="ジャストえんだ〜">
+<meta property="og:description" content="エンダーチャレンジがスマホで。あの名曲の溜めの後に入るドラムに、ドンを合わせろ。誤差は1/1000秒まで丸見え。">
+<meta property="og:url" content="https://zirihinit.github.io/justender/">
+<meta property="og:image" content="https://zirihinit.github.io/justender/card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ジャストえんだ〜">
+<meta name="twitter:description" content="エンダーチャレンジがスマホで。あのドラムにドンを合わせろ。">
+<meta name="twitter:image" content="https://zirihinit.github.io/justender/card.png">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;background:#000;overflow:hidden;font-family:"Hiragino Maru Gothic ProN","Hiragino Sans","Noto Sans JP",sans-serif;color:#fff}
@@ -16,6 +28,13 @@ body{user-select:none;-webkit-user-select:none;touch-action:manipulation}
 #screen{position:absolute;top:9%;left:4%;right:4%;aspect-ratio:16/9;background:#000;border:4px solid #d4a637;border-radius:8px;box-shadow:0 0 40px rgba(255,120,180,.35);overflow:hidden;z-index:2}
 #player,#screen iframe{position:absolute;inset:0;width:100%;height:100%}
 #cue{position:absolute;left:0;right:0;text-align:center;font-size:20px;font-weight:900;z-index:4;pointer-events:none;text-shadow:0 2px 0 #000}
+#drum{position:absolute;left:50%;width:46%;max-width:210px;transform:translateX(-50%);z-index:2;pointer-events:none}
+#drum svg{width:100%;display:block;transform-origin:50% 60%}
+#drum.hit svg{animation:hit .18s ease-out}
+@keyframes hit{0%{transform:scale(1.08,.92)}100%{transform:scale(1)}}
+.ripple{position:absolute;left:50%;top:22%;width:60%;aspect-ratio:2/1;border:4px solid #ffd34d;border-radius:50%;transform:translate(-50%,-50%);opacity:0;pointer-events:none}
+.ripple.go{animation:ripple .5s ease-out}
+@keyframes ripple{0%{opacity:1;transform:translate(-50%,-50%) scale(.6)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.7)}}
 #tapzone{position:absolute;inset:0;z-index:3;cursor:pointer}
 #lyric{position:absolute;left:0;right:0;text-align:center;font-size:46px;font-weight:900;z-index:7;pointer-events:none;color:#fff;-webkit-text-stroke:2px #c2185b;text-shadow:0 4px 0 #6a0d33,0 0 24px #ff6fa8;opacity:0;white-space:nowrap}
 #lyric.show{animation:lyric 2.4s ease-out forwards}
@@ -69,7 +88,7 @@ body{user-select:none;-webkit-user-select:none;touch-action:manipulation}
 #rName{font-size:22px;font-weight:900;margin-top:6px}
 #rErr{font-size:52px;font-weight:900;margin-top:12px;font-variant-numeric:tabular-nums;text-shadow:0 3px 0 #000}
 #rDir{font-size:16px;color:#ffd;margin-top:2px}
-#rComment{margin-top:12px;font-size:15px;background:rgba(255,255,255,.12);border-radius:10px;padding:8px 12px;max-width:90%}
+#rComment{white-space:pre-line;margin-top:12px;font-size:15px;background:rgba(255,255,255,.12);border-radius:10px;padding:8px 12px;max-width:90%}
 #rNew{color:#ffd34d;font-weight:900;margin-top:8px;min-height:1.2em}
 #rCalib{margin-top:8px;font-size:12px;color:#8ff;display:none}
 .btns{margin-top:auto;margin-bottom:8%;display:flex;flex-direction:column;align-items:center}
@@ -80,8 +99,22 @@ body{user-select:none;-webkit-user-select:none;touch-action:manipulation}
   <div id="head"><div class="logo">ジャストえんだ〜</div></div>
   <div id="screen"><div id="player"></div></div>
   <div id="cue"></div>
+  <div id="drum">
+    <svg viewBox="0 0 200 170" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="shell" x1="0" x2="1"><stop offset="0" stop-color="#7a0f22"/><stop offset=".45" stop-color="#e0304e"/><stop offset="1" stop-color="#6a0c1d"/></linearGradient>
+      <linearGradient id="chrome" x1="0" x2="1"><stop offset="0" stop-color="#777"/><stop offset=".5" stop-color="#f4f4f4"/><stop offset="1" stop-color="#666"/></linearGradient></defs>
+      <path d="M40 150 L28 168 M160 150 L172 168 M100 155 L100 170" stroke="#aaa" stroke-width="5" stroke-linecap="round"/>
+      <path d="M14 40 L14 130 A86 26 0 0 0 186 130 L186 40 Z" fill="url(#shell)"/>
+      <g fill="url(#chrome)"><rect x="34" y="80" width="9" height="40" rx="3"/><rect x="78" y="84" width="9" height="40" rx="3"/><rect x="113" y="84" width="9" height="40" rx="3"/><rect x="157" y="80" width="9" height="40" rx="3"/></g>
+      <path d="M14 126 A86 26 0 0 0 186 126 L186 134 A86 26 0 0 1 14 134 Z" fill="url(#chrome)"/>
+      <ellipse cx="100" cy="40" rx="88" ry="28" fill="url(#chrome)"/>
+      <ellipse cx="100" cy="40" rx="81" ry="23" fill="#f3efe4"/>
+      <ellipse cx="100" cy="40" rx="30" ry="9" fill="#e4dccb"/>
+    </svg>
+    <div class="ripple" id="ripple"></div>
+  </div>
   <div id="tapzone"></div>
-  <div id="lyric">エンダアァァァ〜</div>
+  <div id="lyric">ドンッ!!</div>
   <div id="crowd">
     <div class="row back" id="rowBack"></div>
     <div class="row front" id="rowFront"></div>
@@ -90,11 +123,12 @@ body{user-select:none;-webkit-user-select:none;touch-action:manipulation}
 
   <div class="ov" id="title">
     <h1>ジャスト<br>えんだ〜</h1>
-    <div class="sub">〜 あの名曲のサビ頭、合わせられるか 〜</div>
+    <div class="sub">〜 スマホでエンダーチャレンジ 〜</div>
     <div class="rule">
       曲が流れます。<br>
-      溜めに溜めた<b>あのサビの頭</b>に合わせて<br>
-      <b>画面をタップ</b>して「エンダー」と歌い出せ！<br>
+      長〜いブレイクの後、「エンダー」の直前に<br>
+      <b>ドラムがドンッと入る瞬間</b>に合わせて<br>
+      <b>太鼓をタップ</b>！<br>
       <span style="font-size:12px;color:#aaa">※音が出ます／再生位置は毎回ちょっと違う</span>
     </div>
     <div id="best"></div>
@@ -122,8 +156,9 @@ body{user-select:none;-webkit-user-select:none;touch-action:manipulation}
 (()=>{
 /* ===== 設定 ===== */
 const VIDEO_ID='3JWTaaS7LdU';   // Whitney Houston - I Will Always Love You (Official 4K Video)
-let TARGET=189.0;               // ★サビ頭（ドラムが入って歌い出す瞬間）の動画内の秒数。#calib で調整して書き換える
-const LEAD_MIN=12, LEAD_MAX=20; // サビ頭の何秒前から再生するか（毎回ランダム）
+let TARGET=189.0;               // ★ブレイク明けのドラムが入る瞬間の動画内の秒数。#calib で調整して書き換える
+const LEAD_MIN=12, LEAD_MAX=20; // ドラムの何秒前から再生するか（毎回ランダム）
+const EARLY_CUT=0.5;            // これより早くタップしたら即終了（秒）
 const CALIB=location.hash==='#calib';
 try{const v=localStorage.getItem('justender_target');if(CALIB&&v)TARGET=parseFloat(v);}catch(e){}
 
@@ -144,6 +179,17 @@ function noise(){
   noiseBuf=ctx.createBuffer(1,ctx.sampleRate*2.5,ctx.sampleRate);
   const d=noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
   return noiseBuf;
+}
+function tom(){ // 太鼓（フロアタム風）
+  if(!ctx) return;const t=ctx.currentTime;
+  const o=ctx.createOscillator(),g=ctx.createGain();
+  o.frequency.setValueAtTime(140,t);o.frequency.exponentialRampToValueAtTime(62,t+.25);
+  g.gain.setValueAtTime(1,t);g.gain.exponentialRampToValueAtTime(.001,t+.7);
+  o.connect(g);g.connect(master);o.start(t);o.stop(t+.75);
+  const s=ctx.createBufferSource();s.buffer=noise();
+  const lp=ctx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=1200;
+  const ng=ctx.createGain();ng.gain.setValueAtTime(.6,t);ng.gain.exponentialRampToValueAtTime(.001,t+.12);
+  s.connect(lp);lp.connect(ng);ng.connect(master);s.start(t,0,.15);
 }
 function boo(delay=0){
   if(!ctx) return;const t=ctx.currentTime+delay;
@@ -245,7 +291,8 @@ showBest();
 function placeCue(){ // 動画の下にガイド文字
   const s=$('screen').getBoundingClientRect(),a=$('app').getBoundingClientRect();
   $('cue').style.top=(s.bottom-a.top+14)+'px';
-  $('lyric').style.top=(s.bottom-a.top+50)+'px';
+  $('drum').style.top=(s.bottom-a.top+48)+'px';
+  $('lyric').style.top=(s.bottom-a.top+40)+'px';
 }
 function start(){
   if(!ready) return;
@@ -258,7 +305,7 @@ function start(){
   player.unMute();player.setVolume(100);
   player.seekTo(from,true);player.playVideo();
   state='play';placeCue();
-  $('cue').textContent='サビ頭でタップ！';
+  $('cue').textContent='ドラムが入る瞬間に太鼓をタップ！';
   people.forEach(p=>{if(Math.random()<.3)say(p,pick(['来るぞ…','ゴクリ','…','しーっ']),rand(500,3000));});
   setTimeout(()=>people.forEach(p=>p.querySelector('.bub').classList.remove('on')),5000);
   requestAnimationFrame(loop);
@@ -276,6 +323,15 @@ function tap(){
   const v=videoNow();
   if(v===null) return; // まだ再生が始まってない
   tapped=true;tapV=v;tapErr=v-TARGET;
+  tom();
+  const d=$('drum');d.classList.remove('hit');void d.offsetWidth;d.classList.add('hit');
+  const rp=$('ripple');rp.classList.remove('go');void rp.offsetWidth;rp.classList.add('go');
+  if(tapErr<-EARLY_CUT){ // 早すぎ → 曲をブツッと止めて即終了（正解は聴かせない）
+    player.pauseVideo();
+    $('cue').textContent='';
+    finish(tapErr,true);
+    return;
+  }
   const l=$('lyric');l.classList.remove('show');void l.offsetWidth;l.classList.add('show');
   $('flash').classList.remove('go');void $('flash').offsetWidth;$('flash').classList.add('go');
   $('cue').textContent='';
@@ -289,8 +345,8 @@ $('tapzone').addEventListener('pointerdown',e=>{e.preventDefault();tap();});
 const TIERS=[
   {max:.015,rank:'神',name:'ジャストえんだ〜！！！',col:'#ffd34d'},
   {max:.05, rank:'S', name:'ほぼジャスト',col:'#ff7fd0'},
-  {max:.12, rank:'A', name:'歌姫の風格',col:'#7fe0ff'},
-  {max:.25, rank:'B', name:'カラオケ上手い人',col:'#8dff6a'},
+  {max:.12, rank:'A', name:'プロドラマー',col:'#7fe0ff'},
+  {max:.25, rank:'B', name:'軽音部のエース',col:'#8dff6a'},
   {max:.5,  rank:'C', name:'ちょっとズレた',col:'#ddd'},
   {max:1.2, rank:'D', name:'放送事故',col:'#ff9d5c'},
   {max:1e9, rank:'論外',name:'事件',col:'#ff4d4d'}
@@ -299,16 +355,16 @@ function react(tier,early,none){
   if(none){
     people.forEach(p=>{
       if(Math.random()<.5){p.classList.add('sleep');say(p,'😴 zzz',rand(0,800));}
-      else if(Math.random()<.5){say(p,pick(['歌えよ','え？','帰るわ']),rand(0,600));setTimeout(()=>p.classList.add('leave'),rand(900,2000));}
+      else if(Math.random()<.5){say(p,pick(['叩けよ','え？','帰るわ']),rand(0,600));setTimeout(()=>p.classList.add('leave'),rand(900,2000));}
       else say(p,'？？？',rand(0,800));
     });
-    return '…歌わなかった。会場が静まり返った。';
+    return '…叩かなかった。会場が静まり返った。';
   }
   switch(tier.rank){
   case '神':
     applause(3,3.5);confetti(120);
     people.forEach((p,i)=>{p.classList.add('jump');p.style.animationDelay=(i%3)*.1+'s';
-      say(p,pick(['ブラボー!!','神!!!','😭😭','泣いた','本人?','👏👏👏','スタオベ!!']),rand(0,500));
+      say(p,pick(['ブラボー!!','神!!!','😭😭','泣いた','デビッド・フォスター?','👏👏👏','スタオベ!!']),rand(0,500));
       if(Math.random()<.5) throwAt('💐',p,rand(300,1500));});
     return '会場総立ち！ 花束が舞い、全員泣いている。';
   case 'S':
@@ -343,27 +399,28 @@ function react(tier,early,none){
       for(let k=0;k<2;k++) throwAt(pick(['🍅','🍅','🥫','🍌','🥚']),p,rand(200,1800));
       if(Math.random()<.4) setTimeout(()=>p.classList.add('leave'),rand(1800,3000));
     });
-    return early?'曲の途中で歌い出した。物が飛んできた。':'物が飛んできた。客が帰り始めている。';
+    return early?'ブレイク中に叩いた。物が飛んできた。':'物が飛んできた。客が帰り始めている。';
   }
 }
 function fadeOutVideo(){
   let v=100;const id=setInterval(()=>{v-=10;if(v<=0){clearInterval(id);player.pauseVideo();player.setVolume(100);}else player.setVolume(v);},80);
 }
-function finish(err){
+function finish(err,cut=false){
   if(state!=='play') return;
   state='result';
-  fadeOutVideo();
+  if(!cut) fadeOutVideo();
   const none=err===null;
   let tier=TIERS[TIERS.length-1],early=false;
   if(!none){const a=Math.abs(err);early=err<0;tier=TIERS.find(t=>a<=t.max);}
-  const comment=react(tier,early,none);
+  let comment=(cut?'フライングで演奏が止まった。':'')+react(tier,early,none);
+  if(!none&&err<-.4&&err>-1.4) comment+='\nヒント：ブレイクは4拍じゃないらしい…';
   let isNew=false;
   if(!none){const a=Math.abs(err);if(best===null||a<best){best=a;isNew=true;try{localStorage.setItem('justender_best',String(a));}catch(e){}}}
   setTimeout(()=>{
     $('rRank').textContent=none?'無':tier.rank;$('rRank').style.color=none?'#888':tier.col;
-    $('rName').textContent=none?'歌い忘れ':tier.name;
+    $('rName').textContent=none?'叩き忘れ':tier.name;
     $('rErr').textContent=none?'−−.−−−秒':(err>=0?'+':'−')+Math.abs(err).toFixed(3)+'秒';
-    $('rDir').textContent=none?'タップしてないよ':(Math.abs(err)<.0005?'完全一致':early?'早すぎ（フライング）':'遅すぎ');
+    $('rDir').textContent=none?'タップしてないよ':(Math.abs(err)<.0005?'完全一致':cut?'フライング！ 演奏中止':early?'早すぎ':'遅すぎ');
     $('rNew').textContent=isNew?'★ 自己ベスト更新！':(best!==null?`ベスト ${best.toFixed(3)}秒`:'');
     $('rComment').textContent=comment;
     if(CALIB){
@@ -371,11 +428,11 @@ function finish(err){
       $('rCalib').textContent=`現在の正解位置 ${TARGET.toFixed(3)}秒 ／ 今のタップ ${tapV===null?'なし':tapV.toFixed(3)+'秒'}`;
       $('calibBtn').style.display=tapV===null?'none':'inline-block';
     }
-    const txt=none?'「ジャストえんだ〜」で歌い忘れて客が寝た…':
-      `「ジャストえんだ〜」で誤差${err>=0?'+':'−'}${Math.abs(err).toFixed(3)}秒！【${tier.rank}：${tier.name}】`;
-    $('shareBtn').href='https://x.com/intent/post?text='+encodeURIComponent(txt+'\n#ジャストえんだ #クソゲー\n'+location.href.split('#')[0]);
+    const txt=none?'「ジャストえんだ〜」で太鼓を叩き忘れて客が寝た…':
+      `エンダーチャレンジ「ジャストえんだ〜」でドラム誤差${err>=0?'+':'−'}${Math.abs(err).toFixed(3)}秒！【${tier.rank}：${tier.name}】`;
+    $('shareBtn').href='https://x.com/intent/post?text='+encodeURIComponent(txt+'\n#エンダーチャレンジ #ジャストえんだ #クソゲー\n'+location.href.split('#')[0]);
     $('result').classList.add('show');
-  },none?800:1400);
+  },none?800:cut?600:1400);
 }
 
 $('startBtn').addEventListener('click',start);
