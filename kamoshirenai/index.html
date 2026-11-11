@@ -251,7 +251,7 @@ body{margin:0;font-size:14px}
       <div class="est" id="entrySt" aria-live="polite"></div>
     </form>
     <div class="btns"><button class="btn" id="againBtn">もう一度</button><button class="btn sub" id="titleBtn">タイトルに戻る</button></div>
-    <div class="btns"><button class="btn sub" id="zukanBtn2">図鑑</button><button class="btn sub" id="rankBtn2">ランキング</button><a class="btn sub share" id="shareBtn" href="https://x.com/intent/post" target="_blank" rel="noopener">共有する</a></div>
+    <div class="btns"><button class="btn sub" id="zukanBtn2">図鑑</button><button class="btn sub" id="rankBtn2">ランキング</button><a class="btn sub share" id="shareBtn" href="https://x.com/intent/post" target="_blank" rel="noopener">結果をポストする</a></div>
   </div>
 </div>
 
@@ -556,22 +556,17 @@ function showOver(){
   const zn=$('rZnew');zn.hidden=!g.newZ.length;
   if(g.newZ.length)zn.textContent='図鑑に新しく登録：「'+g.newZ[0]+'」'+(g.newZ.length>1?' ほか'+(g.newZ.length-1)+'件':'');
   $('rSpd').textContent=Math.round(g.vmax);$('rHiyari').textContent=g.hiyari;
-  const share=`「かもしれない運転」${gm==='normal'?'':MODES[gm].name+'モード'}で${d}m生存！ 最高${Math.round(g.vmax)}km/h／ヒヤリ${g.hiyari}回／原因：${info.c}`;
-  shareData={text:share,url:GAME_URL};shareNative=!!navigator.share;
-  const sb=$('shareBtn');sb.textContent='共有する';
+  const modeTxt=gm==='normal'?'':`【${MODES[gm].name}モード】`;
+  const share=`${modeTxt}「かもしれない運転」で${d}m生き残った🚗💨${isNew?'（自己ベスト更新）':''}
+免許：${rank}／最高${Math.round(g.vmax)}km/h／ヒヤリ${g.hiyari}回
+最期は「${info.c}」
+あなたは何m行ける？`;
+  const sb=$('shareBtn');
   sb.href='https://x.com/intent/post?text='+encodeURIComponent(share)+'&url='+encodeURIComponent(GAME_URL)+'&hashtags='+encodeURIComponent('かもしれない運転');
   $('overOv').hidden=false;$('hud').hidden=true;
 }
 const GAME_URL='https://zirihinit.github.io/kamoshirenai/';
-let shareData=null,shareNative=false;
-$('shareBtn').addEventListener('click',e=>{
-  if(!shareNative||!shareData)return; // 共有シートが使えない環境はXの投稿画面へ
-  e.preventDefault();
-  navigator.share({text:shareData.text+'\n#かもしれない運転',url:shareData.url}).catch(err=>{
-    if(err&&err.name==='AbortError')return;
-    shareNative=false;$('shareBtn').textContent='Xで共有する';
-  });
-});
+
 
 /* ---------- update ---------- */
 function update(dt){
