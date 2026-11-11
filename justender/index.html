@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>ジャストえんだ〜</title>
-<meta name="description" content="エンダーチャレンジがスマホで。あの名曲の溜めの後に入るドラムに、ドンを合わせろ。誤差は1/1000秒まで丸見え。">
+<meta name="description" content="エンダーチャレンジがスマホで。あの名曲の溜めの後に入るドラムに、ドンを合わせろ。誤差は1/100秒まで丸見え。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="ジャストえんだ〜">
-<meta property="og:description" content="エンダーチャレンジがスマホで。あの名曲の溜めの後に入るドラムに、ドンを合わせろ。誤差は1/1000秒まで丸見え。">
+<meta property="og:description" content="エンダーチャレンジがスマホで。あの名曲の溜めの後に入るドラムに、ドンを合わせろ。誤差は1/100秒まで丸見え。">
 <meta property="og:url" content="https://zirihinit.github.io/justender/">
 <meta property="og:image" content="https://zirihinit.github.io/justender/card.png">
 <meta property="og:image:width" content="1200">
@@ -156,9 +156,9 @@ body{user-select:none;-webkit-user-select:none;touch-action:manipulation}
 (()=>{
 /* ===== 設定 ===== */
 const VIDEO_ID='3JWTaaS7LdU';   // Whitney Houston - I Will Always Love You (Official 4K Video)
-let TARGET=189.7;               // ★ブレイク明けのドラムが入る瞬間の動画内の秒数。#calib で調整して書き換える
+let TARGET=190.2;               // ★ブレイク明けのドラムが入る瞬間の動画内の秒数。#calib で調整して書き換える
 const LEAD_MIN=12, LEAD_MAX=20; // ドラムの何秒前から再生するか（毎回ランダム）
-const EARLY_CUT=0.5;            // これより早くタップしたら即終了（秒）
+const EARLY_CUT=0.6;            // これより早くタップしたら即終了（秒）
 const CALIB=location.hash==='#calib';
 try{const v=localStorage.getItem('justender_target');if(CALIB&&v)TARGET=parseFloat(v);}catch(e){}
 
@@ -285,7 +285,7 @@ function confetti(n){
 let state='title',tapped=false,tapErr=null,tapV=null,endTimer=null;
 let best=null;
 try{const v=localStorage.getItem('justender_best');if(v!==null)best=parseFloat(v);}catch(e){}
-function showBest(){$('best').textContent=best===null?'':`自己ベスト誤差：${best.toFixed(3)}秒`;}
+function showBest(){$('best').textContent=best===null?'':`自己ベスト誤差：${best.toFixed(2)}秒`;}
 showBest();
 
 function placeCue(){ // 動画の下にガイド文字
@@ -343,12 +343,13 @@ $('tapzone').addEventListener('pointerdown',e=>{e.preventDefault();tap();});
 
 /* ===== 判定 ===== */
 const TIERS=[
-  {max:.015,rank:'神',name:'ジャストえんだ〜！！！',col:'#ffd34d'},
-  {max:.05, rank:'S', name:'ほぼジャスト',col:'#ff7fd0'},
-  {max:.12, rank:'A', name:'プロドラマー',col:'#7fe0ff'},
-  {max:.25, rank:'B', name:'軽音部のエース',col:'#8dff6a'},
-  {max:.5,  rank:'C', name:'ちょっとズレた',col:'#ddd'},
-  {max:1.2, rank:'D', name:'放送事故',col:'#ff9d5c'},
+  // 正解位置は耳で合わせた値（±0.1秒くらいの誤差あり）なので判定は甘め
+  {max:.08, rank:'神',name:'ジャストえんだ〜！！！',col:'#ffd34d'},
+  {max:.15, rank:'S', name:'ほぼジャスト',col:'#ff7fd0'},
+  {max:.25, rank:'A', name:'プロドラマー',col:'#7fe0ff'},
+  {max:.40, rank:'B', name:'軽音部のエース',col:'#8dff6a'},
+  {max:.70, rank:'C', name:'ちょっとズレた',col:'#ddd'},
+  {max:1.3, rank:'D', name:'放送事故',col:'#ff9d5c'},
   {max:1e9, rank:'論外',name:'事件',col:'#ff4d4d'}
 ];
 function react(tier,early,none){
@@ -413,15 +414,15 @@ function finish(err,cut=false){
   let tier=TIERS[TIERS.length-1],early=false;
   if(!none){const a=Math.abs(err);early=err<0;tier=TIERS.find(t=>a<=t.max);}
   let comment=(cut?'フライングで演奏が止まった。':'')+react(tier,early,none);
-  if(!none&&err<-.4&&err>-1.4) comment+='\nヒント：ブレイクは4拍じゃないらしい…';
+  if(!none&&err<-.5&&err>-1.5) comment+='\nヒント：ブレイクは4拍じゃないらしい…';
   let isNew=false;
   if(!none){const a=Math.abs(err);if(best===null||a<best){best=a;isNew=true;try{localStorage.setItem('justender_best',String(a));}catch(e){}}}
   setTimeout(()=>{
     $('rRank').textContent=none?'無':tier.rank;$('rRank').style.color=none?'#888':tier.col;
     $('rName').textContent=none?'叩き忘れ':tier.name;
-    $('rErr').textContent=none?'−−.−−−秒':(err>=0?'+':'−')+Math.abs(err).toFixed(3)+'秒';
-    $('rDir').textContent=none?'タップしてないよ':(Math.abs(err)<.0005?'完全一致':cut?'フライング！ 演奏中止':early?'早すぎ':'遅すぎ');
-    $('rNew').textContent=isNew?'★ 自己ベスト更新！':(best!==null?`ベスト ${best.toFixed(3)}秒`:'');
+    $('rErr').textContent=none?'−−.−−秒':(err>=0?'+':'−')+Math.abs(err).toFixed(2)+'秒';
+    $('rDir').textContent=none?'タップしてないよ':(Math.abs(err)<.005?'完全一致':cut?'フライング！ 演奏中止':early?'早すぎ':'遅すぎ');
+    $('rNew').textContent=isNew?'★ 自己ベスト更新！':(best!==null?`ベスト ${best.toFixed(2)}秒`:'');
     $('rComment').textContent=comment;
     if(CALIB){
       $('rCalib').style.display='block';
@@ -429,7 +430,7 @@ function finish(err,cut=false){
       $('calibBtn').style.display=tapV===null?'none':'inline-block';
     }
     const txt=none?'「ジャストえんだ〜」で太鼓を叩き忘れて客が寝た…':
-      `エンダーチャレンジ「ジャストえんだ〜」でドラム誤差${err>=0?'+':'−'}${Math.abs(err).toFixed(3)}秒！【${tier.rank}：${tier.name}】`;
+      `エンダーチャレンジ「ジャストえんだ〜」でドラム誤差${err>=0?'+':'−'}${Math.abs(err).toFixed(2)}秒！【${tier.rank}：${tier.name}】`;
     $('shareBtn').href='https://x.com/intent/post?text='+encodeURIComponent(txt+'\n#エンダーチャレンジ #ジャストえんだ #クソゲー\n'+location.href.split('#')[0]);
     $('result').classList.add('show');
   },none?800:cut?600:1400);
