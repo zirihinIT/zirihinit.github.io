@@ -141,7 +141,10 @@ h2{font-family:'Dela Gothic One',sans-serif;font-size:clamp(28px,6vw,44px);margi
 @keyframes gshake{50%{transform:translateY(-50%) translateX(2px)}}
 #gfill{position:absolute;left:0;right:0;bottom:0;height:0;background:linear-gradient(to top,#3ad06b,#ffd23f 55%,#ff3b2f)}
 #gauge span{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-90deg);font-family:'Dela Gothic One';color:var(--ink);font-size:13px;opacity:.6}
-#mute{position:absolute;top:10px;right:10px;pointer-events:auto;font-size:20px;border:3px solid var(--ink);border-radius:10px;background:#fff;cursor:pointer;padding:2px 8px}
+#snd{position:fixed;top:10px;right:10px;z-index:15;display:flex;flex-direction:column;gap:6px}
+#snd button{font:800 18px 'M PLUS Rounded 1c',sans-serif;width:42px;height:38px;border:3px solid var(--ink);border-radius:10px;background:#fff;color:var(--ink);cursor:pointer;box-shadow:0 3px 0 var(--ink);padding:0}
+#snd button.off{opacity:.45;text-decoration:line-through}
+@media(max-width:520px){#top{justify-content:flex-start;padding:0 58px 0 6px;gap:6px}.pl{min-width:0;flex:1;padding:4px 6px}#round{font-size:15px;white-space:nowrap}.pl .st{font-size:17px}}
 #pop{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);font-family:'Dela Gothic One';white-space:nowrap;pointer-events:none;z-index:8;opacity:0;color:#fff;-webkit-text-stroke:3px var(--ink)}
 #pop.show{animation:pop 1.3s cubic-bezier(.2,1.6,.4,1) forwards}
 #pop.small{font-size:clamp(30px,7vw,54px);color:var(--yel);text-shadow:4px 4px 0 var(--ink)}
@@ -296,8 +299,8 @@ h2{font-family:'Dela Gothic One',sans-serif;font-size:clamp(28px,6vw,44px);margi
     <div id="pWait" class="pp hidden"><div class="ph" id="waitText">…</div></div>
   </div>
   <div id="gauge" class="hidden"><div id="gfill"></div><span>POWER</span></div>
-  <button id="mute">🔊</button>
 </div>
+<div id="snd"><button id="bgmBtn" title="BGM">♪</button><button id="mute" title="サウンド">🔊</button></div>
 <div id="pop"></div>
 <div id="toast" class="hidden"></div>
 
@@ -536,7 +539,7 @@ function cpuChoose(s,i,diff){
 let AC=null,muted=false,noiseBuf=null;
 function ac(){
   if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)();const n=AC.sampleRate;noiseBuf=AC.createBuffer(1,n,AC.sampleRate);const d=noiseBuf.getChannelData(0);for(let i=0;i<n;i++)d[i]=Math.random()*2-1}catch(e){}}
-  if(AC&&AC.state==='suspended')AC.resume();return AC;
+  if(AC&&AC.state==='suspended')AC.resume();if(AC&&!BGM.gain)bgmEnsure();return AC;
 }
 function noise(dur,freq,type,vol,t0=0){const a=ac();if(!a||muted)return;const t=a.currentTime+t0;const src=a.createBufferSource();src.buffer=noiseBuf;const f=a.createBiquadFilter();f.type=type;f.frequency.value=freq;const g=a.createGain();g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(0.001,t+dur);src.connect(f).connect(g).connect(a.destination);src.start(t);src.stop(t+dur+0.02)}
 function tone(f1,f2,dur,type,vol,t0=0){const a=ac();if(!a||muted)return;const t=a.currentTime+t0;const o=a.createOscillator();o.type=type;o.frequency.setValueAtTime(f1,t);o.frequency.exponentialRampToValueAtTime(f2,t+dur);const g=a.createGain();g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(0.001,t+dur);o.connect(g).connect(a.destination);o.start(t);o.stop(t+dur+0.02)}
@@ -566,10 +569,118 @@ const SFX={
   jump(){tone(300,950,0.16,'sine',0.15)},
   fall(){tone(1100,140,1.2,'sine',0.22)},
   floor(){noise(0.12,400,'lowpass',0.5);tone(120,55,0.18,'sine',0.35)},
-  win(){[523,659,784,1047].forEach((f,i)=>tone(f,f,0.2,'square',0.08,i*0.12))},
+  win(){[60,64,67,72,67,72].forEach((n,i)=>tone(mf(n),mf(n),0.16,'square',0.09,i*0.09));
+    [72,76,79,84].forEach(n=>tone(mf(n),mf(n)*1.002,1.1,'sawtooth',0.035,0.55));tone(mf(36),mf(36),1.1,'triangle',0.25,0.55);noise(1.3,4500,'highpass',0.3,0.55)},
   lose(){[392,330,262].forEach((f,i)=>tone(f,f*0.97,0.26,'square',0.08,i*0.2))},
   round(){tone(660,660,0.1,'square',0.06);tone(990,990,0.18,'square',0.06,0.12)}
 };
+
+// ================= BGM（WebAudioでその場で合成） =================
+const mf=n=>440*Math.pow(2,(n-69)/12);
+const BGM={on:true,gain:null,bus:null,filt:null,timer:null,cur:null,want:'menu',next:0,step:0,tempo:1,fTarget:20000};
+try{BGM.on=localStorage.getItem('gekiochiBgm')!=='0'}catch(e){}
+function bgmVol(){if(!BGM.gain)return;BGM.gain.gain.setTargetAtTime((muted||!BGM.on)?0:0.36,AC.currentTime,0.08)}
+function bgmEnsure(){
+  const a=AC;if(!a||BGM.gain)return;
+  BGM.bus=a.createGain();
+  BGM.filt=a.createBiquadFilter();BGM.filt.type='lowpass';BGM.filt.frequency.value=20000;BGM.filt.Q.value=5;
+  const comp=a.createDynamicsCompressor();comp.threshold.value=-16;comp.ratio.value=4;comp.attack.value=0.004;comp.release.value=0.15;
+  BGM.gain=a.createGain();BGM.gain.gain.value=0;
+  BGM.bus.connect(BGM.filt).connect(comp).connect(BGM.gain).connect(a.destination);
+  BGM.timer=setInterval(bgmTick,25);bgmVol();const w=BGM.want;BGM.want=null;bgmPlay(w);
+}
+function bgmPlay(name,force){
+  if(!force&&BGM.want===name&&BGM.cur===name)return;BGM.want=name;if(!BGM.gain)return;
+  BGM.cur=name;BGM.step=0;BGM.next=AC.currentTime+0.06;
+}
+function bgmTick(){
+  const a=AC;if(!a||!BGM.cur||a.state!=='running')return;const T=TRACKS[BGM.cur];
+  if(BGM.next<a.currentTime-0.25)BGM.next=a.currentTime+0.02;
+  while(BGM.next<a.currentTime+0.12){const sd=60/T.bpm/4*BGM.tempo;try{T.play(BGM.step,BGM.next,sd)}catch(e){}BGM.step++;BGM.next+=sd}
+}
+// ゲームの展開に合わせて音を動かす（毎フレーム）
+let bgmFilt=20000;
+function bgmUpdate(){
+  if(!BGM.gain)return;
+  const ph=game.phase,sub=ph==='wait'?game.remoteSub:ph;let f=20000,tempo=1;
+  if(slowT>0){f=900;tempo=2}                                            // 激落スロー：こもって半分の速さ
+  else if(sub==='power'&&game.mode)f=700+Math.pow(game.shot.power,2)*15000; // パワーをためるほど開いていく
+  BGM.tempo=tempo;
+  if(Math.abs(f-bgmFilt)>30){bgmFilt=f;BGM.filt.frequency.setTargetAtTime(f,AC.currentTime,slowT>0?0.05:0.03)}
+}
+function bgmHit(kind){if(!BGM.gain||muted||!BGM.on)return;const t=AC.currentTime+0.005;
+  if(kind==='crash')DR.crash(t,1.1);else if(kind==='boom'){DR.kick(t,1.2);DR.crash(t,0.8)}}
+function iOsc(t,type,f,dur,vol,o={}){
+  const a=AC,os=a.createOscillator(),g=a.createGain();os.type=type;os.frequency.setValueAtTime(f,t);
+  if(o.to)os.frequency.exponentialRampToValueAtTime(o.to,t+(o.toT||dur));if(o.det)os.detune.value=o.det;
+  const at=o.att||0.004;g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(vol,t+at);
+  g.gain.setValueAtTime(vol,t+Math.max(at,dur*(o.sus==null?0.3:o.sus)));g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  let n=os;if(o.lp){const fl=a.createBiquadFilter();fl.type='lowpass';fl.frequency.setValueAtTime(o.lp,t);if(o.lpTo)fl.frequency.exponentialRampToValueAtTime(o.lpTo,t+dur);fl.Q.value=o.q||1;os.connect(fl);n=fl}
+  n.connect(g).connect(BGM.bus);os.start(t);os.stop(t+dur+0.03);
+}
+function iNoise(t,dur,type,freq,vol,q=1){
+  const a=AC,sr=a.createBufferSource();sr.buffer=noiseBuf;const f=a.createBiquadFilter();f.type=type;f.frequency.value=freq;f.Q.value=q;
+  const g=a.createGain();g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  sr.connect(f).connect(g).connect(BGM.bus);sr.start(t,Math.random()*0.4);sr.stop(t+dur+0.03);
+}
+const DR={
+  kick(t,v=1){iOsc(t,'sine',165,0.24,0.95*v,{to:42,toT:0.13,sus:0.05});iOsc(t,'triangle',1400,0.02,0.22*v,{to:180})},
+  snare(t,v=1){iNoise(t,0.17,'bandpass',1900,0.6*v,0.8);iOsc(t,'triangle',230,0.09,0.32*v,{to:150})},
+  clap(t,v=1){iNoise(t,0.13,'bandpass',1300,0.5*v,1.4);iNoise(t+0.012,0.1,'bandpass',1500,0.35*v,1.4)},
+  hat(t,v=1,open){iNoise(t,open?0.13:0.03,'highpass',7800,0.2*v)},
+  crash(t,v=1){iNoise(t,1.5,'highpass',4200,0.32*v);iNoise(t,0.5,'bandpass',6000,0.18*v)}
+};
+const bass=(t,n,d,v=1)=>{iOsc(t,'sawtooth',mf(n),d,0.3*v,{lp:1000,lpTo:260,q:5,sus:0.5});iOsc(t,'square',mf(n-12),d,0.13*v,{lp:380,sus:0.5})};
+const lead=(t,n,d,v=1)=>{iOsc(t,'square',mf(n),d,0.1*v,{sus:0.75,lp:4600});iOsc(t,'sawtooth',mf(n),d,0.065*v,{det:14,sus:0.75,lp:3200})};
+const pluck=(t,n,d,v=1)=>iOsc(t,'square',mf(n),Math.min(d,0.16),0.055*v,{lp:3800,lpTo:900,sus:0.04});
+const stab=(t,ns,d,v=1)=>ns.forEach((n,i)=>iOsc(t,'sawtooth',mf(n),d,0.045*v,{lp:2800,lpTo:700,sus:0.1,det:(i-1)*9}));
+const bell=(t,n,d,v=1)=>{iOsc(t,'sine',mf(n),d,0.14*v,{sus:0.04});iOsc(t,'triangle',mf(n+12),d*0.5,0.05*v,{sus:0.04})};
+// コード（ベースの根音, 上の和音）
+const CH={Am:[45,[57,60,64]],F:[41,[53,57,60]],C:[48,[55,60,64]],G:[43,[55,59,62]],E:[40,[56,59,64]],Dm:[38,[57,62,65]]};
+// バトル曲のメロディ（小節ごとに [16分の位置, 音, 長さ]）
+const BAT_MEL=[
+  [[0,76,2],[2,74,2],[4,72,2],[6,74,2],[8,76,4],[12,81,4]],
+  [[0,77,3],[3,76,1],[4,74,2],[6,72,2],[8,74,8]],
+  [[0,72,2],[2,74,2],[4,76,2],[6,79,2],[8,76,3],[11,74,1],[12,72,4]],
+  [[0,74,4],[4,71,2],[6,74,2],[8,79,8]],
+  [[0,76,2],[2,74,2],[4,72,2],[6,74,2],[8,76,4],[12,84,4]],
+  [[0,81,3],[3,79,1],[4,77,2],[6,76,2],[8,77,4],[12,76,4]],
+  [[0,74,2],[2,76,2],[4,79,2],[6,81,2],[8,83,8]],
+  [[0,80,6],[6,83,2],[8,88,8]]];
+const MENU_MEL=[
+  [[0,76,4],[4,79,4],[8,84,6],[14,83,2]],
+  [[0,81,4],[4,79,4],[8,74,8]],
+  [[0,76,4],[4,72,4],[8,76,4],[12,79,4]],
+  [[0,77,6],[6,76,2],[8,74,4],[12,72,4]]];
+const TRACKS={
+  // 対戦：168BPMで突っ走る
+  battle:{bpm:168,play(step,t,sd){
+    const bar=(step>>4)%16,s=step&15,B=bar>=8,prog=B?['F','G','Am','Am','F','G','E','E']:['Am','F','C','G','Am','F','G','E'],ch=CH[prog[bar%8]],last=bar%8===7;
+    if(step<16){ // 最初の1小節は助走（ハットとスネアのロール）
+      DR.hat(t,0.7,s%4===2);if(s>=8)DR.snare(t,0.4+0.07*(s-8));if(s===0)DR.kick(t);return}
+    if(s%4===0)DR.kick(t);if(B&&s===14)DR.kick(t,0.7);
+    if(s===4||s===12)DR.snare(t);
+    if(last&&s>=12)DR.snare(t,0.55+0.12*(s-12));
+    DR.hat(t,s%2?0.55:0.9,s%4===2);
+    if(s===0&&bar%8===0)DR.crash(t);
+    if(s%2===0)bass(t,ch[0]+((s>>1)%2?12:0),sd*1.7);
+    if(s%4===2)stab(t,ch[1].map(n=>n+12),sd*1.4,B?1:0.75);
+    if(!B){for(const[st,n,l]of BAT_MEL[bar])if(st===s)lead(t,n,sd*l*0.95)}
+    else{const tn=ch[1],arp=[tn[0],tn[1],tn[2],tn[0]+12];pluck(t,arp[s%4]+12,sd,s%4===0?1.2:0.9);
+      if(s===0)lead(t,tn[2]+12,sd*7.5,0.75);if(s===8)lead(t,tn[1]+12+(bar%2?2:0),sd*7.5,0.75)}
+  }},
+  // タイトル・メニュー：132BPMの明るいループ
+  menu:{bpm:132,play(step,t,sd){
+    const bar=(step>>4)%8,s=step&15,ch=CH[['C','G','Am','F'][bar%4]];
+    if(s===0||s===8||s===10)DR.kick(t,0.8);
+    if(s===4||s===12)DR.clap(t,0.75);
+    if(s%2===0)DR.hat(t,0.45,s%4===2);
+    if([0,3,6,8,11,14].includes(s))bass(t,ch[0]+12*(s===6||s===14?1:0),sd*1.6,0.85);
+    if(s%2===0){const tn=ch[1];pluck(t,[tn[0],tn[1],tn[2],tn[1]][(s>>1)%4]+12,sd*2,0.8)}
+    if(bar>=4)for(const[st,n,l]of MENU_MEL[bar-4])if(st===s)bell(t,n,sd*l);
+  }}
+};
+document.addEventListener('visibilitychange',()=>{if(!AC)return;if(document.hidden)AC.suspend();else AC.resume()});
 
 // ================= 3D =================
 const cv=$('c');
@@ -792,6 +903,7 @@ function setTurnText(){
 function curveLabel(){$('bCurve').textContent=game.shot.curve>0?'曲がる向き：右 ↪':'曲がる向き：左 ↩';$('bCurve').classList.toggle('hidden',game.shot.type!==2)}
 
 function startMatch(mode,seed,first,types){
+  bgmPlay('battle',true);
   game.token++;game.mode=mode;game.seed=seed;game.types=types.slice();applyLooks(game.types);game.score=[0,0];game.round=1;
   game.pendingShot=null;game.pendingSettle=null;game.waitSettle=false;game.againMe=game.againRemote=false;
   showScreen(null);$('hud').classList.remove('hidden');
@@ -800,7 +912,7 @@ function startMatch(mode,seed,first,types){
 function startRound(first){
   S=newState(game.seed+game.round*7919,game.types);buildObs(S.obs);clearParts();fallCam=null;sq.forEach(q=>{q.v=0;q.vel=0});
   game.shooter=first;game.phase='between';updateHUD();$('turn').textContent='';showPanel(null);
-  pop('ROUND '+game.round,'mid');SFX.round();
+  pop('ROUND '+game.round,'mid');SFX.round();if(game.round>1)bgmHit('crash');
   later(beginTurn,1100);
 }
 function beginTurn(){
@@ -829,7 +941,7 @@ function fireShot(sh){
   game.shot={type:sh.type,angle:sh.angle,curve:sh.curve,power:sh.power};
   launch(S,game.shooter,game.shot);game.phase='flying';game.flyT=0;acc=0;camTarget=game.shooter;fallCam=null;
   showPanel(null);$('gauge').classList.add('hidden');$('turn').textContent='';
-  chargeStop();SFX.flick(sh.power);if(sh.type===1)SFX.jump();
+  chargeStop();SFX.flick(sh.power);if(sh.power>0.6)bgmHit('crash');if(sh.type===1)SFX.jump();
   const e=S.e[game.shooter],bx=e.x-Math.cos(sh.angle)*0.9,bz=e.z-Math.sin(sh.angle)*0.9;
   fingerFx={t:0,g0:fingerGap('power',sh.power),x:e.x,z:e.z,a:sh.angle};
   hitstop=0.08+sh.power*0.06;shake=0.5+sh.power*0.8;cam.fov+=6+sh.power*12;
@@ -860,9 +972,11 @@ function endMatch(w){
   $('resS').textContent=`${game.score[myIdx()]} － ${game.score[1-myIdx()]}`;
   $('bAgain').textContent=game.ranked?'もう一回ランクマッチ':'もう一回！';$('bAgain').disabled=false;
   $('resRate').classList.add('hidden');if(game.ranked)rkReportEnd(mine);
-  mine?SFX.win():SFX.lose();
+  bgmPlay(null);mine?SFX.win():SFX.lose();
+  setTimeout(()=>{if(game.phase==='over')bgmPlay('menu')},2600);
 }
 function toTitle(){
+  bgmPlay('menu');
   game.token++;game.phase='title';chargeStop();game.ranked=null;rkCleanupQueue();netClose();$('hud').classList.add('hidden');showScreen('title');
   S=newState(12345);buildObs(S.obs);applyLooks([0,0]);clearParts();
 }
@@ -878,7 +992,7 @@ function handleEvents(ev){
     else if(e.k==='ofall'){SFX.drop();if(e.kind===1)pop('定規が落ちた！','small')}
     else if(e.k==='ofloor'){SFX.clack()}
     else if(e.k==='land'){squash(e.i,Math.min(2.5,e.p*0.12));if(e.p>3){SFX.land(e.p);spawn(e.x,0.1,e.z,4,pMatE,2);shake=Math.max(shake,0.2)}}
-    else if(e.k==='fall'){SFX.fall();slowT=1.5;pop('激落！！','big');shake=0.6;camTarget=e.i;
+    else if(e.k==='fall'){SFX.fall();bgmHit('boom');slowT=1.5;pop('激落！！','big');shake=0.6;camTarget=e.i;
       const c=nearestOnTable(e.x,e.z),ex=c[0],ez=c[1];let ix=e.x-ex,iz=e.z-ez,l=Math.hypot(ix,iz);if(l<1e-6){ix=ex;iz=ez;l=Math.hypot(ix,iz)||1}
       fallCam={pos:new THREE.Vector3(ex-ix/l*3.4,3.6,ez-iz/l*3.4)}}
     else if(e.k==='floor'){SFX.floor()}
@@ -998,7 +1112,7 @@ function vsCard(el,name,rating,k){
 }
 function rkShowVs(){const q=RK.q;if(!q)return;
   vsCard($('vsL'),RK.name,rkRating(),game.myType);vsCard($('vsR'),q.opp.name,q.opp.rating,safeType(q.opp.type));
-  $('vsSub').textContent='接続中…';showScreen('rankVs');SFX.round();}
+  $('vsSub').textContent='接続中…';showScreen('rankVs');SFX.round();bgmPlay(null);bgmHit('crash');}
 function rkCleanupQueue(){
   const q=RK.q;RK.q=null;if(!q)return;
   clearInterval(q.timer);clearTimeout(q.connTO);try{q.unsub&&q.unsub()}catch(e){}
@@ -1137,7 +1251,11 @@ document.querySelectorAll('.tbtn').forEach(b=>b.onclick=()=>chooseType(+b.datase
 $('bOk').onclick=toPower;$('bBack1').onclick=back;$('bBack2').onclick=back;$('bFire').onclick=myFire;
 $('bCurve').onclick=()=>setCurve(-game.shot.curve);
 for(const[id,d]of[['bLeft',-1],['bRight',1]]){const b=$(id);b.onpointerdown=e=>{holdDir=d;e.preventDefault()};b.onpointerup=b.onpointerleave=b.onpointercancel=()=>holdDir=0}
-$('mute').onclick=()=>{muted=!muted;$('mute').textContent=muted?'🔇':'🔊'};
+$('mute').onclick=()=>{ac();muted=!muted;$('mute').textContent=muted?'🔇':'🔊';bgmVol()};
+$('bgmBtn').classList.toggle('off',!BGM.on);
+$('bgmBtn').onclick=()=>{ac();BGM.on=!BGM.on;$('bgmBtn').classList.toggle('off',!BGM.on);try{localStorage.setItem('gekiochiBgm',BGM.on?'1':'0')}catch(e){}bgmVol()};
+// どこかを最初に触ったら音を起動（スマホは操作するまで音を出せないため）
+addEventListener('pointerdown',()=>ac(),{passive:true});addEventListener('keydown',()=>ac());
 $('bRank').onclick=async()=>{ac();SFX.click();if(!await rkInit())return;
   if(!RK.name){$('nameIn').value='';showScreen('rankName')}else{rkRenderLobby();showScreen('rankLobby')}};
 $('bNameOk').onclick=async()=>{const n=sanitizeName($('nameIn').value);if(!n){toast('名前を入れてね');return}
@@ -1310,6 +1428,7 @@ function frame(now){
   requestAnimationFrame(frame);
   const rdt=Math.min(0.05,(now-last)/1000);last=now;game.realT+=rdt;
   let ts=1;if(slowT>0){slowT-=rdt;ts=0.3}
+  bgmUpdate();
   const ph=game.phase;
   if(ph==='flying'){
     let sdt=rdt*ts;if(hitstop>0){hitstop-=rdt;sdt=0}
