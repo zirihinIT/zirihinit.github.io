@@ -157,7 +157,7 @@ a.btn{display:flex;align-items:center;justify-content:center;text-decoration:non
 .erow input{flex:1;min-width:0;font:700 16px var(--f-body);padding:8px 10px;border-radius:4px;border:2px solid var(--plate);background:var(--ink);color:var(--plate)}
 .ebtn{flex:none;font:900 14px var(--f-body);padding:8px 12px;border-radius:4px;border:2px solid var(--ink);background:var(--sign);color:var(--ink);cursor:pointer}
 .ebtn:disabled{opacity:.55;cursor:default}
-.est{font-size:12px;font-weight:700;color:var(--sign);min-height:1em}
+.est{font-size:12px;font-weight:700;color:var(--sign);min-height:1em;overflow-wrap:anywhere;-webkit-user-select:text;user-select:text}
 .btns .btn.sub{font-size:14px;padding:12px 6px 13px}
 
 /* ランキング */
@@ -168,7 +168,7 @@ a.btn{display:flex;align-items:center;justify-content:center;text-decoration:non
 .rnote{margin:0;font-size:12px;color:var(--dim);font-weight:700}
 .rmsg{margin:0;padding:16px;text-align:center;background:var(--plate);color:var(--ink);border:3px solid var(--ink);border-radius:4px;font-weight:700;font-size:14px}
 #rList{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
-.rrow{display:grid;grid-template-columns:2.6em minmax(0,1fr) auto 4.8em;gap:8px;align-items:baseline;background:var(--plate);color:var(--ink);border-radius:4px;padding:7px 10px;font-weight:700;font-size:14px}
+.rrow{display:grid;grid-template-columns:2.6em minmax(0,1fr) auto 5.4em;gap:8px;align-items:baseline;background:var(--plate);color:var(--ink);border-radius:4px;padding:7px 10px;font-weight:700;font-size:14px}
 .rno{font-family:var(--f-num);font-variant-numeric:tabular-nums;color:#6a6d72}
 .rnm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rsp{font-size:11px;color:#5d6066}
@@ -265,11 +265,11 @@ body{margin:0;font-size:14px}
 
 <div class="ov" id="rankOv" hidden>
   <div class="zcard rcard">
-    <div class="zhead"><h2>最高速度ランキング</h2><div class="zbtns"><button class="zclose" id="rClose">閉じる</button><button class="zclose" id="rTitle">タイトルに戻る</button></div></div>
+    <div class="zhead"><h2>生存距離ランキング</h2><div class="zbtns"><button class="zclose" id="rClose">閉じる</button><button class="zclose" id="rTitle">タイトルに戻る</button></div></div>
     <div class="rtabs" role="tablist">
       <button class="rtab" role="tab" data-m="normal">ふつう</button><button class="rtab" role="tab" data-m="hell">ヘル</button><button class="rtab" role="tab" data-m="silver">シルバー</button>
     </div>
-    <p class="rnote">上位100名・同じ速度なら距離の長い順</p>
+    <p class="rnote">生存距離の上位100名</p>
     <p class="rmsg" id="rMsg"></p>
     <ol id="rList"></ol>
   </div>
@@ -488,16 +488,17 @@ function bestOf(m){if(m==='normal')return best;try{return +localStorage.getItem(
 /* ---------- ランキング（Firestore REST） ---------- */
 const fbOn=()=>!!(FIREBASE.apiKey&&FIREBASE.projectId);
 const fbBase=()=>`https://firestore.googleapis.com/v1/projects/${encodeURIComponent(FIREBASE.projectId)}/databases/(default)/documents`;
+async function fbErr(res){let t='';try{const j=await res.json();t=(j.error&&(j.error.status+' '+j.error.message))||''}catch(e){}return res.status+(t?' '+t:'')}
 async function fbAdd(col,r){
   const res=await fetch(`${fbBase()}/${col}?key=${FIREBASE.apiKey}`,{method:'POST',headers:{'Content-Type':'application/json'},
     body:JSON.stringify({fields:{name:{stringValue:r.name},speed:{integerValue:String(r.speed)},dist:{integerValue:String(r.dist)},
       score:{integerValue:String(r.speed*100000+r.dist)},at:{timestampValue:new Date().toISOString()}}})});
-  if(!res.ok)throw new Error('add '+res.status);
+  if(!res.ok)throw new Error(await fbErr(res));
 }
 async function fbTop(col){
   const res=await fetch(`${fbBase()}:runQuery?key=${FIREBASE.apiKey}`,{method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({structuredQuery:{from:[{collectionId:col}],orderBy:[{field:{fieldPath:'score'},direction:'DESCENDING'}],limit:100}})});
-  if(!res.ok)throw new Error('top '+res.status);
+    body:JSON.stringify({structuredQuery:{from:[{collectionId:col}],orderBy:[{field:{fieldPath:'dist'},direction:'DESCENDING'}],limit:100}})});
+  if(!res.ok)throw new Error(await fbErr(res));
   const j=await res.json();
   return j.filter(x=>x.document).map(x=>{const f=x.document.fields;return{name:f.name.stringValue,speed:+f.speed.integerValue,dist:+f.dist.integerValue}});
 }
@@ -517,10 +518,10 @@ async function renderRank(){
     rows.forEach((r,i)=>{const li=document.createElement('li');li.className='rrow'+(i<3?' top'+(i+1):'');
       const n=document.createElement('span');n.className='rno';n.textContent=i+1;
       const nm=document.createElement('span');nm.className='rnm';nm.textContent=r.name;
-      const sp=document.createElement('span');sp.className='rsp';sp.innerHTML=`<b>${r.speed}</b>km/h`;
-      const ds=document.createElement('span');ds.className='rds';ds.textContent=r.dist+'m';
+      const sp=document.createElement('span');sp.className='rsp';sp.innerHTML=`<b>${r.dist}</b>m`;
+      const ds=document.createElement('span');ds.className='rds';ds.textContent=r.speed+'km/h';
       li.append(n,nm,sp,ds);list.append(li)});
-  }catch(e){if(req!==rankReq)return;msg.textContent='ランキングを読み込めませんでした。通信状況を確かめて、もう一度開いてください。'}
+  }catch(e){if(req!==rankReq)return;msg.textContent='ランキングを読み込めませんでした。（'+e.message+'）'}
 }
 function openRank(m){rankTab=m||gm;$('rankOv').hidden=false;$('rankOv').scrollTop=0;renderRank()}
 document.querySelectorAll('.rtab').forEach(b=>b.addEventListener('click',()=>{rankTab=b.dataset.m;renderRank()}));
@@ -537,7 +538,7 @@ $('entryForm').addEventListener('submit',async e=>{
   try{await fbAdd(MODES[lastRun.mode].col,{name,speed:lastRun.speed,dist:lastRun.dist});
     lastRun.sent=true;myName=name;try{localStorage.setItem('kamo.name',name)}catch(err){}
     st.textContent='登録しました。';btn.textContent='登録済み';
-  }catch(err){btn.disabled=false;st.textContent='登録できませんでした。もう一度押してください。'}
+  }catch(err){btn.disabled=false;st.textContent='登録できませんでした。（'+err.message+'）'}
 });
 
 function showOver(){
