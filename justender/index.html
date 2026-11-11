@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>ジャストえんだ〜</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:#000;overflow:hidden;font-family:"Hiragino Maru Gothic ProN","Hiragino Sans","Noto Sans JP",sans-serif;color:#fff}
+body{user-select:none;-webkit-user-select:none;touch-action:manipulation}
+#app{position:relative;width:100%;max-width:480px;height:100vh;height:100dvh;margin:0 auto;overflow:hidden;background:radial-gradient(ellipse at 50% 20%,#3a0f28,#0b0308 70%)}
+/* header */
+#head{position:absolute;top:0;left:0;right:0;height:9%;display:flex;align-items:center;justify-content:center;z-index:4}
+#head .logo{font-size:24px;font-weight:900;-webkit-text-stroke:1px #c2185b;text-shadow:0 3px 0 #6a0d33,0 0 14px #ff6fa8;transform:rotate(-3deg)}
+/* video (ステージのスクリーン) */
+#screen{position:absolute;top:9%;left:4%;right:4%;aspect-ratio:16/9;background:#000;border:4px solid #d4a637;border-radius:8px;box-shadow:0 0 40px rgba(255,120,180,.35);overflow:hidden;z-index:2}
+#player,#screen iframe{position:absolute;inset:0;width:100%;height:100%}
+#cue{position:absolute;left:0;right:0;text-align:center;font-size:20px;font-weight:900;z-index:4;pointer-events:none;text-shadow:0 2px 0 #000}
+#tapzone{position:absolute;inset:0;z-index:3;cursor:pointer}
+#lyric{position:absolute;left:0;right:0;text-align:center;font-size:46px;font-weight:900;z-index:7;pointer-events:none;color:#fff;-webkit-text-stroke:2px #c2185b;text-shadow:0 4px 0 #6a0d33,0 0 24px #ff6fa8;opacity:0;white-space:nowrap}
+#lyric.show{animation:lyric 2.4s ease-out forwards}
+@keyframes lyric{0%{opacity:0;transform:scale(.4)}10%{opacity:1;transform:scale(1.15)}20%{transform:scale(1)}80%{opacity:1}100%{opacity:0;transform:scale(1.1) translateY(-20px)}}
+#flash{position:absolute;inset:0;background:#fff;opacity:0;z-index:8;pointer-events:none}
+#flash.go{animation:flash .4s ease-out}
+@keyframes flash{0%{opacity:.6}100%{opacity:0}}
+/* audience */
+#crowd{position:absolute;left:0;right:0;bottom:0;height:34%;background:linear-gradient(rgba(0,0,0,0),#000 40%);z-index:5;pointer-events:none}
+.row{position:absolute;left:0;right:0;display:flex;justify-content:space-around}
+.row.back{bottom:40%;padding:0 6%}
+.row.front{bottom:-6%}
+.aud{position:relative;display:flex;flex-direction:column;align-items:center;transition:transform .6s ease-in,opacity .6s}
+.aud .h{border-radius:50%;background:var(--c)}
+.aud .b{border-radius:40% 40% 0 0;background:var(--c);margin-top:-4px}
+.back .aud .h{width:34px;height:34px}.back .aud .b{width:52px;height:34px}
+.front .aud .h{width:48px;height:48px}.front .aud .b{width:74px;height:56px}
+.bub{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:#fff;color:#222;font-size:13px;font-weight:800;padding:3px 7px;border-radius:10px;white-space:nowrap;opacity:0;transition:opacity .2s;margin-bottom:4px}
+.bub.on{opacity:1}
+.bub::after{content:"";position:absolute;top:100%;left:50%;margin-left:-5px;border:5px solid transparent;border-top-color:#fff}
+.jump{animation:jump .45s ease-in-out infinite alternate}
+@keyframes jump{to{transform:translateY(-18px)}}
+.clap{animation:clap .25s ease-in-out infinite alternate}
+@keyframes clap{to{transform:translateY(-4px)}}
+.tilt{animation:tilt 1.6s ease-in-out infinite alternate}
+@keyframes tilt{from{transform:rotate(-8deg)}to{transform:rotate(8deg)}}
+.angry{animation:angry .12s linear infinite alternate}
+@keyframes angry{from{transform:translateX(-3px)}to{transform:translateX(3px)}}
+.leave{transform:translateY(120%)!important;opacity:0;animation:none!important}
+.sleep{transform:rotate(25deg) translateY(6px)}
+.fly{position:absolute;z-index:9;font-size:30px;pointer-events:none;left:0;top:0}
+.conf{position:absolute;top:-20px;width:8px;height:14px;z-index:9;pointer-events:none}
+/* overlays */
+.ov{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px}
+#title{background:radial-gradient(ellipse at 50% 40%,rgba(60,10,40,.85),rgba(0,0,0,.95))}
+#title h1{font-size:48px;line-height:1.1;font-weight:900;-webkit-text-stroke:2px #c2185b;text-shadow:0 5px 0 #6a0d33,0 0 30px #ff6fa8;transform:rotate(-4deg)}
+#title .sub{margin-top:14px;font-size:14px;color:#ffc6dc}
+#title .rule{margin-top:22px;font-size:15px;line-height:1.8;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:12px;padding:14px}
+#title .rule b{color:#ffd34d}
+#best,#status{margin-top:12px;font-size:13px;color:#ccc;min-height:1em}
+.btn{margin-top:20px;font-family:inherit;font-size:22px;font-weight:900;color:#fff;background:linear-gradient(#ff5c9a,#c2185b);border:none;border-radius:40px;padding:14px 40px;box-shadow:0 5px 0 #6a0d33;cursor:pointer}
+.btn:active{transform:translateY(3px);box-shadow:0 2px 0 #6a0d33}
+.btn:disabled{opacity:.4}
+.btn.sub2{font-size:15px;padding:10px 22px;background:linear-gradient(#444,#222);box-shadow:0 4px 0 #000;margin-top:12px;text-decoration:none;display:inline-block}
+.blink{animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:.3}}
+#result{display:none;background:rgba(0,0,0,.55);justify-content:flex-start;padding-top:10%}
+#result.show{display:flex;animation:fadein .4s}
+@keyframes fadein{from{opacity:0}}
+#rRank{font-size:64px;font-weight:900;line-height:1;text-shadow:0 4px 0 #000}
+#rName{font-size:22px;font-weight:900;margin-top:6px}
+#rErr{font-size:52px;font-weight:900;margin-top:12px;font-variant-numeric:tabular-nums;text-shadow:0 3px 0 #000}
+#rDir{font-size:16px;color:#ffd;margin-top:2px}
+#rComment{margin-top:12px;font-size:15px;background:rgba(255,255,255,.12);border-radius:10px;padding:8px 12px;max-width:90%}
+#rNew{color:#ffd34d;font-weight:900;margin-top:8px;min-height:1.2em}
+#rCalib{margin-top:8px;font-size:12px;color:#8ff;display:none}
+.btns{margin-top:auto;margin-bottom:8%;display:flex;flex-direction:column;align-items:center}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="head"><div class="logo">ジャストえんだ〜</div></div>
+  <div id="screen"><div id="player"></div></div>
+  <div id="cue"></div>
+  <div id="tapzone"></div>
+  <div id="lyric">エンダアァァァ〜</div>
+  <div id="crowd">
+    <div class="row back" id="rowBack"></div>
+    <div class="row front" id="rowFront"></div>
+  </div>
+  <div id="flash"></div>
+
+  <div class="ov" id="title">
+    <h1>ジャスト<br>えんだ〜</h1>
+    <div class="sub">〜 あの名曲のサビ頭、合わせられるか 〜</div>
+    <div class="rule">
+      曲が流れます。<br>
+      溜めに溜めた<b>あのサビの頭</b>に合わせて<br>
+      <b>画面をタップ</b>して「エンダー」と歌い出せ！<br>
+      <span style="font-size:12px;color:#aaa">※音が出ます／再生位置は毎回ちょっと違う</span>
+    </div>
+    <div id="best"></div>
+    <div id="status">曲を準備中…</div>
+    <button class="btn" id="startBtn" disabled>ステージへ</button>
+  </div>
+
+  <div class="ov" id="result">
+    <div id="rRank"></div>
+    <div id="rName"></div>
+    <div id="rErr"></div>
+    <div id="rDir"></div>
+    <div id="rNew"></div>
+    <div id="rComment"></div>
+    <div id="rCalib"></div>
+    <div class="btns">
+      <button class="btn" id="retryBtn">もう一回歌う</button>
+      <button class="btn sub2" id="calibBtn" style="display:none">このタップを正解にする（調整用）</button>
+      <a class="btn sub2" id="shareBtn" href="#" target="_blank" rel="noopener">𝕏 でポスト</a>
+    </div>
+  </div>
+</div>
+
+<script>
+(()=>{
+/* ===== 設定 ===== */
+const VIDEO_ID='3JWTaaS7LdU';   // Whitney Houston - I Will Always Love You (Official 4K Video)
+let TARGET=189.0;               // ★サビ頭（ドラムが入って歌い出す瞬間）の動画内の秒数。#calib で調整して書き換える
+const LEAD_MIN=12, LEAD_MAX=20; // サビ頭の何秒前から再生するか（毎回ランダム）
+const CALIB=location.hash==='#calib';
+try{const v=localStorage.getItem('justender_target');if(CALIB&&v)TARGET=parseFloat(v);}catch(e){}
+
+const $=id=>document.getElementById(id);
+const rand=(a,b)=>a+Math.random()*(b-a);
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+
+/* ===== 効果音（拍手・ブーイングのみ合成） ===== */
+let ctx,master,noiseBuf;
+function initAudio(){
+  try{
+    if(!ctx){ctx=new (window.AudioContext||window.webkitAudioContext)();master=ctx.createGain();master.gain.value=.8;master.connect(ctx.destination);}
+    ctx.resume();
+  }catch(e){}
+}
+function noise(){
+  if(noiseBuf) return noiseBuf;
+  noiseBuf=ctx.createBuffer(1,ctx.sampleRate*2.5,ctx.sampleRate);
+  const d=noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+  return noiseBuf;
+}
+function boo(delay=0){
+  if(!ctx) return;const t=ctx.currentTime+delay;
+  const s=ctx.createBufferSource();s.buffer=noise();
+  const bp=ctx.createBiquadFilter();bp.type='bandpass';bp.frequency.value=350;bp.Q.value=2;
+  const g=ctx.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.5,t+.4);g.gain.linearRampToValueAtTime(0,t+2.2);
+  s.connect(bp);bp.connect(g);g.connect(master);s.start(t);s.stop(t+2.3);
+}
+function applause(amount,len=2.5){
+  if(!ctx) return;const t=ctx.currentTime;
+  const n=Math.floor(amount*len*30);
+  for(let i=0;i<n;i++){
+    const tt=t+Math.random()*len;
+    const s=ctx.createBufferSource();s.buffer=noise();
+    const bp=ctx.createBiquadFilter();bp.type='bandpass';bp.frequency.value=rand(1200,2600);bp.Q.value=1.2;
+    const g=ctx.createGain();const v=.25*(1-(tt-t)/len*.6);
+    g.gain.setValueAtTime(v,tt);g.gain.exponentialRampToValueAtTime(.001,tt+.05);
+    s.connect(bp);bp.connect(g);g.connect(master);s.start(tt,Math.random()*2,.06);
+  }
+}
+
+/* ===== YouTube ===== */
+let player,ready=false;
+window.onYouTubeIframeAPIReady=()=>{
+  player=new YT.Player('player',{
+    videoId:VIDEO_ID,
+    playerVars:{playsinline:1,controls:0,disablekb:1,rel:0,modestbranding:1,fs:0,iv_load_policy:3},
+    events:{
+      onReady:()=>{ready=true;$('status').textContent=CALIB?'調整モード（#calib）':'';$('startBtn').disabled=false;$('startBtn').classList.add('blink');},
+      onError:e=>{$('status').textContent='動画を読み込めませんでした（エラー'+e.data+'）。http(s)で開いているか確認してね';}
+    }
+  });
+};
+const tag=document.createElement('script');tag.src='https://www.youtube.com/iframe_api';document.head.appendChild(tag);
+
+// getCurrentTime() は飛び飛びに更新されるので、変化した瞬間を基準に補間する
+let anchorV=-1,anchorT=0,lastRaw=-1;
+function sampleTime(){
+  const raw=player.getCurrentTime();
+  const st=player.getPlayerState();
+  if(st!==YT.PlayerState.PLAYING){anchorV=-1;lastRaw=raw;return;}
+  if(raw!==lastRaw){anchorV=raw;anchorT=performance.now();lastRaw=raw;}
+}
+function videoNow(){
+  if(anchorV<0) return null;
+  return anchorV+(performance.now()-anchorT)/1000*player.getPlaybackRate();
+}
+
+/* ===== 観客 ===== */
+const colors=['#2b2440','#3a2a2a','#23303a','#3b3320','#2e2238','#33263a','#1f2f2a','#3a2030'];
+const people=[];
+function buildCrowd(){
+  [['rowBack',6],['rowFront',6]].forEach(([id,n])=>{
+    const row=$(id);
+    for(let i=0;i<n;i++){
+      const a=document.createElement('div');a.className='aud';a.style.setProperty('--c',pick(colors));
+      a.innerHTML='<div class="bub"></div><div class="h"></div><div class="b"></div>';
+      row.appendChild(a);people.push(a);
+    }
+  });
+}
+function resetCrowd(){
+  people.forEach(p=>{p.className='aud';p.style.animationDelay='';p.querySelector('.bub').className='bub';});
+  document.querySelectorAll('.fly,.conf').forEach(e=>e.remove());
+}
+function say(p,txt,delay=0){setTimeout(()=>{const b=p.querySelector('.bub');b.textContent=txt;b.classList.add('on');},delay);}
+function throwAt(emoji,fromEl,delay){
+  setTimeout(()=>{
+    const app=$('app').getBoundingClientRect(),r=fromEl.getBoundingClientRect(),s=$('screen').getBoundingClientRect();
+    const x0=r.left+r.width/2-app.left-15,y0=r.top-app.top;
+    const x1=s.left+s.width*rand(.1,.9)-app.left-15,y1=s.top+s.height*rand(.2,.8)-app.top;
+    const el=document.createElement('div');el.className='fly';el.textContent=emoji;$('app').appendChild(el);
+    const mx=(x0+x1)/2,my=Math.min(y0,y1)-rand(60,140);
+    el.animate([
+      {transform:`translate(${x0}px,${y0}px) rotate(0deg)`},
+      {transform:`translate(${mx}px,${my}px) rotate(360deg)`,offset:.5},
+      {transform:`translate(${x1}px,${y1}px) rotate(720deg) scale(1.4)`}
+    ],{duration:700,easing:'ease-in',fill:'forwards'});
+  },delay);
+}
+function confetti(n){
+  const app=$('app');const w=app.clientWidth;
+  const cs=['#ff5c9a','#ffd34d','#5ce1ff','#8dff6a','#c38bff','#fff'];
+  for(let i=0;i<n;i++){
+    const c=document.createElement('div');c.className='conf';c.style.left=rand(0,w)+'px';c.style.background=pick(cs);
+    app.appendChild(c);
+    c.animate([{transform:'translateY(0) rotate(0)'},{transform:`translate(${rand(-60,60)}px,${app.clientHeight+40}px) rotate(${rand(360,1080)}deg)`}],
+      {duration:rand(1800,3600),delay:rand(0,1200),easing:'linear',fill:'forwards'});
+  }
+}
+
+/* ===== ゲーム ===== */
+let state='title',tapped=false,tapErr=null,tapV=null,endTimer=null;
+let best=null;
+try{const v=localStorage.getItem('justender_best');if(v!==null)best=parseFloat(v);}catch(e){}
+function showBest(){$('best').textContent=best===null?'':`自己ベスト誤差：${best.toFixed(3)}秒`;}
+showBest();
+
+function placeCue(){ // 動画の下にガイド文字
+  const s=$('screen').getBoundingClientRect(),a=$('app').getBoundingClientRect();
+  $('cue').style.top=(s.bottom-a.top+14)+'px';
+  $('lyric').style.top=(s.bottom-a.top+50)+'px';
+}
+function start(){
+  if(!ready) return;
+  initAudio();
+  resetCrowd();
+  $('result').classList.remove('show');$('title').style.display='none';
+  clearTimeout(endTimer);
+  tapped=false;tapErr=null;tapV=null;anchorV=-1;lastRaw=-1;
+  const from=Math.max(0,TARGET-rand(LEAD_MIN,LEAD_MAX));
+  player.unMute();player.setVolume(100);
+  player.seekTo(from,true);player.playVideo();
+  state='play';placeCue();
+  $('cue').textContent='サビ頭でタップ！';
+  people.forEach(p=>{if(Math.random()<.3)say(p,pick(['来るぞ…','ゴクリ','…','しーっ']),rand(500,3000));});
+  setTimeout(()=>people.forEach(p=>p.querySelector('.bub').classList.remove('on')),5000);
+  requestAnimationFrame(loop);
+}
+function loop(){
+  if(state!=='play') return;
+  sampleTime();
+  const v=videoNow();
+  if(v!==null&&!tapped&&v>TARGET+3){finish(null);return;}
+  requestAnimationFrame(loop);
+}
+function tap(){
+  if(state!=='play'||tapped) return;
+  sampleTime();
+  const v=videoNow();
+  if(v===null) return; // まだ再生が始まってない
+  tapped=true;tapV=v;tapErr=v-TARGET;
+  const l=$('lyric');l.classList.remove('show');void l.offsetWidth;l.classList.add('show');
+  $('flash').classList.remove('go');void $('flash').offsetWidth;$('flash').classList.add('go');
+  $('cue').textContent='';
+  // 本物のサビ頭を聴かせてから結果へ
+  const wait=Math.max(0,TARGET-v)*1000+2200;
+  endTimer=setTimeout(()=>finish(tapErr),wait);
+}
+$('tapzone').addEventListener('pointerdown',e=>{e.preventDefault();tap();});
+
+/* ===== 判定 ===== */
+const TIERS=[
+  {max:.015,rank:'神',name:'ジャストえんだ〜！！！',col:'#ffd34d'},
+  {max:.05, rank:'S', name:'ほぼジャスト',col:'#ff7fd0'},
+  {max:.12, rank:'A', name:'歌姫の風格',col:'#7fe0ff'},
+  {max:.25, rank:'B', name:'カラオケ上手い人',col:'#8dff6a'},
+  {max:.5,  rank:'C', name:'ちょっとズレた',col:'#ddd'},
+  {max:1.2, rank:'D', name:'放送事故',col:'#ff9d5c'},
+  {max:1e9, rank:'論外',name:'事件',col:'#ff4d4d'}
+];
+function react(tier,early,none){
+  if(none){
+    people.forEach(p=>{
+      if(Math.random()<.5){p.classList.add('sleep');say(p,'😴 zzz',rand(0,800));}
+      else if(Math.random()<.5){say(p,pick(['歌えよ','え？','帰るわ']),rand(0,600));setTimeout(()=>p.classList.add('leave'),rand(900,2000));}
+      else say(p,'？？？',rand(0,800));
+    });
+    return '…歌わなかった。会場が静まり返った。';
+  }
+  switch(tier.rank){
+  case '神':
+    applause(3,3.5);confetti(120);
+    people.forEach((p,i)=>{p.classList.add('jump');p.style.animationDelay=(i%3)*.1+'s';
+      say(p,pick(['ブラボー!!','神!!!','😭😭','泣いた','本人?','👏👏👏','スタオベ!!']),rand(0,500));
+      if(Math.random()<.5) throwAt('💐',p,rand(300,1500));});
+    return '会場総立ち！ 花束が舞い、全員泣いている。';
+  case 'S':
+    applause(2.4,3);confetti(60);
+    people.forEach((p,i)=>{p.classList.add(Math.random()<.7?'jump':'clap');p.style.animationDelay=(i%4)*.08+'s';
+      say(p,pick(['最高!','うますぎ','👏👏','鳥肌','ブラボー!']),rand(0,600));
+      if(Math.random()<.2) throwAt('🌹',p,rand(300,1500));});
+    return '大喝采！ ほとんど本物。';
+  case 'A':
+    applause(1.8,2.5);
+    people.forEach(p=>{p.classList.add('clap');if(Math.random()<.7)say(p,pick(['👏','いいね!','上手い!','おお〜']),rand(0,800));});
+    return '大きな拍手。いい夜だ。';
+  case 'B':
+    applause(.9,2);
+    people.forEach(p=>{if(Math.random()<.6){p.classList.add('clap');say(p,pick(['👏','まあまあ','いいじゃん']),rand(0,900));}else say(p,'…',rand(0,900));});
+    return early?'ちょっと食い気味。でも拍手はもらえた。':'ちょっと遅れた。でも拍手はもらえた。';
+  case 'C':
+    applause(.25,1.5);
+    people.forEach(p=>{p.classList.add('tilt');p.style.animationDelay=rand(0,1)+'s';
+      say(p,pick(early?['早っ','フライング','食い気味','ざわ…']:['遅っ','ん？','ざわ…','ズレてね？']),rand(0,900));});
+    return 'まばらな拍手…会場がざわついている。';
+  case 'D':
+    boo();
+    people.forEach(p=>{p.classList.add('angry');say(p,pick(early?['ブー!!','早すぎ!','👎','フライング!']:['ブー!!','遅すぎ!','👎','寝てた?']),rand(0,700));
+      if(Math.random()<.25) throwAt(pick(['🥫','🍌']),p,rand(400,1600));});
+    return 'ブーイングの嵐。';
+  default:
+    boo();boo(1);
+    people.forEach(p=>{
+      p.classList.add('angry');
+      say(p,pick(['金返せ!!','ふざけんな','👎👎','帰る','何これ']),rand(0,600));
+      for(let k=0;k<2;k++) throwAt(pick(['🍅','🍅','🥫','🍌','🥚']),p,rand(200,1800));
+      if(Math.random()<.4) setTimeout(()=>p.classList.add('leave'),rand(1800,3000));
+    });
+    return early?'曲の途中で歌い出した。物が飛んできた。':'物が飛んできた。客が帰り始めている。';
+  }
+}
+function fadeOutVideo(){
+  let v=100;const id=setInterval(()=>{v-=10;if(v<=0){clearInterval(id);player.pauseVideo();player.setVolume(100);}else player.setVolume(v);},80);
+}
+function finish(err){
+  if(state!=='play') return;
+  state='result';
+  fadeOutVideo();
+  const none=err===null;
+  let tier=TIERS[TIERS.length-1],early=false;
+  if(!none){const a=Math.abs(err);early=err<0;tier=TIERS.find(t=>a<=t.max);}
+  const comment=react(tier,early,none);
+  let isNew=false;
+  if(!none){const a=Math.abs(err);if(best===null||a<best){best=a;isNew=true;try{localStorage.setItem('justender_best',String(a));}catch(e){}}}
+  setTimeout(()=>{
+    $('rRank').textContent=none?'無':tier.rank;$('rRank').style.color=none?'#888':tier.col;
+    $('rName').textContent=none?'歌い忘れ':tier.name;
+    $('rErr').textContent=none?'−−.−−−秒':(err>=0?'+':'−')+Math.abs(err).toFixed(3)+'秒';
+    $('rDir').textContent=none?'タップしてないよ':(Math.abs(err)<.0005?'完全一致':early?'早すぎ（フライング）':'遅すぎ');
+    $('rNew').textContent=isNew?'★ 自己ベスト更新！':(best!==null?`ベスト ${best.toFixed(3)}秒`:'');
+    $('rComment').textContent=comment;
+    if(CALIB){
+      $('rCalib').style.display='block';
+      $('rCalib').textContent=`現在の正解位置 ${TARGET.toFixed(3)}秒 ／ 今のタップ ${tapV===null?'なし':tapV.toFixed(3)+'秒'}`;
+      $('calibBtn').style.display=tapV===null?'none':'inline-block';
+    }
+    const txt=none?'「ジャストえんだ〜」で歌い忘れて客が寝た…':
+      `「ジャストえんだ〜」で誤差${err>=0?'+':'−'}${Math.abs(err).toFixed(3)}秒！【${tier.rank}：${tier.name}】`;
+    $('shareBtn').href='https://x.com/intent/post?text='+encodeURIComponent(txt+'\n#ジャストえんだ #クソゲー\n'+location.href.split('#')[0]);
+    $('result').classList.add('show');
+  },none?800:1400);
+}
+
+$('startBtn').addEventListener('click',start);
+$('retryBtn').addEventListener('click',start);
+$('calibBtn').addEventListener('click',()=>{
+  if(tapV===null) return;
+  TARGET=+tapV.toFixed(3);
+  try{localStorage.setItem('justender_target',String(TARGET));}catch(e){}
+  $('rCalib').textContent=`正解位置を ${TARGET.toFixed(3)}秒 にしました（コードの TARGET もこの値に書き換えてね）`;
+});
+window.addEventListener('resize',placeCue);
+buildCrowd();placeCue();
+})();
+</script>
+</body>
+</html>
