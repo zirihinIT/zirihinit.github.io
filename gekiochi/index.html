@@ -1056,13 +1056,13 @@ function endMatch(w){
   setTimeout(()=>{if(game.phase==='over')bgmPlay('menu')},2600);
 }
 // 結果の共有（スマホは共有シート、それ以外はXの投稿画面）
-const GAME_URL='https://zirihinit.github.io/gekiochi/',GAME_TAG='激落消しゴムバトル';
+const GAME_URL='https://zirihinit.github.io/gekiochi/?v=2',GAME_TAG='激落消しゴムバトル';
 let shareData=null,shareNative=!!navigator.share;
 function setShare(mine){
   const me=myIdx(),sc=`${game.score[me]}-${game.score[1-me]}`,et=ETYPES[game.types[me]].name;let text;
   if(game.ranked){const g=game.ranked,K=g.K||RK_K,E=g.E==null?0.5:g.E,pre=g.pre==null?rkRating():g.pre;
     const r=Math.round(pre+(mine?K*(1-E):-K*E)),t=tierOf(r).name;
-    text=mine?`ランクマッチで「${g.opp.name}」を${sc}で激落させた！ レート${r}（${t}）`:`ランクマッチで「${g.opp.name}」に激落させられた… レート${r}（${t}）`}
+    text=mine?`ランクマッチで${sc}で激落勝ち！ レート${r}（${t}）`:`ランクマッチで${sc}で激落させられた… レート${r}（${t}）`}
   else if(game.mode==='cpu'){const d=['よわい','ふつう','つよい'][game.diff];
     text=mine?`CPU（${d}）を${et}で${sc}で激落させた！`:`CPU（${d}）に${sc}で激落させられた…`}
   else text=mine?`ネット対戦でライバルを${sc}で激落させた！`:`ネット対戦でライバルに${sc}で激落させられた…`;
