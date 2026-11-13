@@ -431,7 +431,7 @@ function finish(err,cut=false){
     }
     const txt=none?'「ジャストえんだ〜」で太鼓を叩き忘れて客が寝た…':
       `エンダーチャレンジ「ジャストえんだ〜」でドラム誤差${err>=0?'+':'−'}${Math.abs(err).toFixed(2)}秒！【${tier.rank}：${tier.name}】`;
-    $('shareBtn').href='https://x.com/intent/post?text='+encodeURIComponent(txt+'\n#エンダーチャレンジ #ジャストえんだ #クソゲー\n'+location.href.split('#')[0]);
+    $('shareBtn').href='https://x.com/intent/post?text='+encodeURIComponent(txt+'\n#エンダーチャレンジ #ジャストえんだ〜\n'+location.href.split('#')[0]);
     $('result').classList.add('show');
   },none?800:cut?600:1400);
 }
