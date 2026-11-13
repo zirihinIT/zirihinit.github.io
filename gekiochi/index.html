@@ -1068,7 +1068,8 @@ function setShare(mine){
   else text=mine?`ネット対戦でライバルを${sc}で激落させた！`:`ネット対戦でライバルに${sc}で激落させられた…`;
   text='「激落！！消しゴムバトル！！」'+text;
   shareData={text,url:GAME_URL};
-  $('bShare').href='https://x.com/intent/post?text='+encodeURIComponent(text)+'&url='+encodeURIComponent(GAME_URL)+'&hashtags='+encodeURIComponent(GAME_TAG);
+  // 本文・URL・ハッシュタグを改行で区切って、すべて本文に入れる（url/hashtagsを分けるとXが空白でつなげてしまう）
+  $('bShare').href='https://x.com/intent/post?text='+encodeURIComponent(text+'\n'+GAME_URL+'\n#'+GAME_TAG);
 }
 function toTitle(){
   bgmPlay('menu');
