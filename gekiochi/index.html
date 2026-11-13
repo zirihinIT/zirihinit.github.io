@@ -1456,11 +1456,8 @@ $('bAgain').onclick=()=>{ac();SFX.click();
   if(game.ranked){game.ranked=null;netClose();rkStartQueue();return}
   if(game.mode==='cpu')startMatch('cpu',(Math.random()*1e9)|0,0,cpuTypes());
   else{game.againMe=true;netSend({t:'again'});$('bAgain').textContent='相手を待っています…';$('bAgain').disabled=true;checkAgain()}};
-$('bShare').addEventListener('click',e=>{
-  SFX.click();if(!shareNative||!shareData||!matchMedia('(pointer:coarse)').matches)return;   // スマホだけ共有シート
-  e.preventDefault();navigator.share({text:shareData.text+'\n#'+GAME_TAG,url:shareData.url}).catch(err=>{
-    if(err&&err.name==='AbortError')return;shareNative=false;window.open($('bShare').href,'_blank','noopener')});
-});
+// スマホもPCも、文章入りのXの投稿画面を開く（共有シートだとXアプリがURLしか拾わないことがあるため）
+$('bShare').addEventListener('click',()=>SFX.click());
 $('bToTitle').onclick=()=>{SFX.click();toTitle()};
 addEventListener('keydown',e=>{
   keys[e.key]=true;if(!isMyTurn())return;
