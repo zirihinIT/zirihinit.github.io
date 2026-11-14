@@ -49,7 +49,8 @@ body{position:fixed;inset:0;width:100%}
   background:linear-gradient(90deg,#2f8cff,#1a5bd6);border:.08em solid #140c26;box-shadow:.14em .14em 0 #140c26}
 .lgB .lgSub span::before{display:none}
 #title{gap:10px}
-@media(max-height:760px){#title .btn{padding:9px 22px}#title .sub{margin-bottom:0}}
+@media(max-height:760px){#title .btn:not(.mode){padding:9px 22px}#title .sub{margin-bottom:0}}
+@media(max-height:620px){#title .btn.mode{height:54px}.subBar button{height:56px}}
 .sub{font-weight:800;font-size:clamp(14px,3.6vw,18px);opacity:.95;margin-bottom:8px}
 h2{font-family:'Dela Gothic One',sans-serif;font-size:clamp(28px,6vw,44px);margin:0 0 6px;-webkit-text-stroke:2px var(--ink);text-shadow:4px 4px 0 var(--red)}
 .btn{font:800 clamp(17px,4vw,21px) 'M PLUS Rounded 1c',sans-serif;padding:13px 26px;border:4px solid var(--ink);border-radius:14px;background:var(--yel);color:var(--ink);box-shadow:0 6px 0 var(--ink);cursor:pointer;min-width:min(260px,80vw)}
@@ -147,7 +148,12 @@ a.btn{display:inline-block;box-sizing:border-box;text-decoration:none;text-align
 .pl .tl{font-size:10px;font-weight:800;color:#8a3fe0;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pl .tl:empty{display:none}
 .vsp .vtl{font-size:12px;font-weight:800;color:#8a3fe0;min-height:16px}.bnm small{font-size:10px;color:#8a3fe0;margin-left:5px;font-weight:800}
 #resRate .ks{margin-top:4px;font-size:15px}#resRate .ks b{font:18px 'Dela Gothic One',sans-serif;color:#a64bff}
-.row2{display:flex;gap:10px}.btn.sm{min-width:0;font-size:16px;padding:10px 16px}
+.row2{display:flex;gap:10px}#title .btn.mode{width:min(300px,82vw);height:62px;min-width:0;padding:0;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.15}
+#title .btn.mode small{font-size:11px}
+.subBar{display:flex;gap:10px;width:min(300px,82vw);margin-top:4px}
+.subBar button{flex:1 1 0;height:64px;border:4px solid var(--ink);border-radius:14px;background:#fff;color:var(--ink);box-shadow:0 5px 0 var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font:800 12px 'M PLUS Rounded 1c',sans-serif;padding:0;cursor:pointer;touch-action:manipulation}
+.subBar button:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink)}
+#bGacha{position:relative;overflow:visible}#bGacha.ready::after{content:'引ける！';position:absolute;top:-10px;right:-6px;background:#ff4b3e;color:#fff;font:800 11px 'M PLUS Rounded 1c',sans-serif;padding:2px 7px;border:2px solid var(--ink);border-radius:999px;transform:rotate(8deg)}.tRow .btn{min-width:0;flex:1}.tRow{width:min(300px,80vw)}.btn.sm{min-width:0;font-size:16px;padding:10px 16px}
 .rnote{font-size:12px;font-weight:800;opacity:.85}
 #rankQueue .qspin{height:110px;display:flex;align-items:center;justify-content:center}
 #rankQueue .eras{animation:qspin 1.2s ease-in-out infinite}
@@ -238,10 +244,10 @@ a.btn{display:inline-block;box-sizing:border-box;text-decoration:none;text-align
     </div>
   </div>
   <div class="sub">消しゴムを指で弾いて、相手を机から叩き落とせ！</div>
-  <button class="btn rank" id="bRank">ランクマッチ</button>
-  <button class="btn red" id="bCpu">5人抜きチャレンジ<small id="bestTxt">ひとりで遊ぶ</small></button>
-  <button class="btn blue" id="bNet">ネット対戦</button>
-  <button class="btn ghost" id="bHow">あそびかた</button>
+  <button class="btn rank mode" id="bRank">ランクマッチ<small>全国の誰かと勝負</small></button>
+  <button class="btn red mode" id="bCpu">5人抜きチャレンジ<small id="bestTxt">ひとりで遊ぶ</small></button>
+  <button class="btn blue mode" id="bNet">ネット対戦<small>友達とコードで対戦</small></button>
+  <div class="subBar"><button id="bGacha"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="#ff4b3e" stroke="#1b1430" stroke-width="2.4"/><path d="M3.2 12a8.8 8.8 0 0 0 17.6 0z" fill="#fff" stroke="#1b1430" stroke-width="2.4"/><circle cx="12" cy="12" r="2.6" fill="#fff" stroke="#1b1430" stroke-width="2.2"/></svg><span>ガチャ</span></button><button id="bDress"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M8 3l-5 3 2 5 2-1v11h10V10l2 1 2-5-5-3c-.5 2-2 3-4 3s-3.5-1-4-3z" fill="#7fd2ff" stroke="#1b1430" stroke-width="2.2" stroke-linejoin="round"/></svg><span>きせかえ</span></button><button id="bHow"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="#ffd23f" stroke="#1b1430" stroke-width="2.4"/><path d="M9.2 9.3a2.9 2.9 0 1 1 4 2.7c-.9.4-1.2 1-1.2 1.9" fill="none" stroke="#1b1430" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="17" r="1.4" fill="#1b1430"/></svg><span>あそびかた</span></button></div>
 </div>
 
 <div id="pickMenu" class="screen hidden">
@@ -269,7 +275,6 @@ a.btn{display:inline-block;box-sizing:border-box;text-decoration:none;text-align
     <div class="rkasu">消しカス <b id="rkKasu">0</b></div>
   </div>
   <button class="btn rank" id="bQueue">マッチング開始！</button>
-  <div class="row2"><button class="btn sm gacha" id="bGacha">ガチャ</button><button class="btn ghost sm" id="bDress">きせかえ</button></div>
   <div class="row2"><button class="btn ghost sm" id="bBoard">ランキング</button><button class="btn ghost sm" id="bRename">名前を変える</button></div>
   <button class="btn ghost" id="bRankBack">もどる</button>
   <div class="rnote">※ 対戦中に抜けると負け扱いになります</div>
@@ -1188,7 +1193,7 @@ function setShare(mine){
   $('bShare').href='https://x.com/intent/post?text='+encodeURIComponent(text+'\n'+GAME_URL+'\n#'+GAME_TAG);
 }
 function toTitle(){
-  bgmPlay('menu');
+  bgmPlay('menu');gachaBadge();
   game.token++;game.phase='title';chargeStop();game.ranked=null;game.gt=null;rkCleanupQueue();netClose();$('hud').classList.add('hidden');showScreen('title');
   S=newState(12345);buildObs(S.obs);applyLooks([0,0]);clearParts();
 }
@@ -1322,7 +1327,7 @@ function rkRenderLobby(){
   const r=Math.round(rkRating()),t=tierOf(r),i=TIERS.indexOf(t),n=TIERS[i+1],p=RK.prof||{};
   $('rkTier').textContent=t.name;$('rkTier').style.background=t.col;$('rkName').textContent=RK.name;$('rkRate').textContent=r;
   $('rkWL').textContent=`${p.wins|0}勝 ${p.losses|0}敗`;
-  $('rkKasu').textContent=rkKasu();$('bGacha').textContent=rkKasu()>=GACHA_COST?'ガチャ（引ける！）':'ガチャ';
+  $('rkKasu').textContent=rkKasu();gachaBadge();
   $('rkNext').textContent=n?`次の称号「${n.name}」まで あと ${n.min-r} pt`:'最高ランク！ 君こそ激落王だ';
 }
 function eraserIcon(k,sk){const d=document.createElement('div'),S2=SKINS[sk];d.className='eras k'+k;d.dataset.l=ETYPES[k].label;d.style.setProperty('--b','#'+(S2?S2.body:ETYPES[k].body).toString(16).padStart(6,'0'));return d}
@@ -1487,7 +1492,8 @@ async function rkReportEnd(won){
   el.classList.remove('hidden');
 }
 // ===== ガチャ =====
-function gachaRender(){const k=rkKasu();$('gaKasu').textContent=k;$('bPull').disabled=k<GACHA_COST||!!gachaRender.busy}
+function gachaBadge(){$('bGacha').classList.toggle('ready',!!(RK.db&&rkKasu()>=GACHA_COST))}
+function gachaRender(){gachaBadge();const k=rkKasu();$('gaKasu').textContent=k;$('bPull').disabled=k<GACHA_COST||!!gachaRender.busy}
 function prizeIcon(id){const p=PRIZES[id],d=document.createElement('span');
   if(SKINS[id]){d.className='sw';d.style.background='#'+p.body.toString(16).padStart(6,'0');d.style.setProperty('--s',p.sleeve)}else d.textContent='「'+p.name+'」';return d}
 async function gachaPull(){
@@ -1541,15 +1547,21 @@ $('bRank').onclick=async()=>{ac();SFX.click();if(!await rkInit())return;
 $('bNameOk').onclick=async()=>{const n=sanitizeName($('nameIn').value);if(!n){toast('名前を入れてね');return}
   SFX.click();RK.name=n;try{localStorage.setItem('gekiochiName',n)}catch(e){}
   if(RK.prof){RK.prof.name=n;pRef().update({name:n}).catch(e=>console.warn(e))}
-  rkRenderLobby();showScreen('rankLobby')};
+  const af=rkReady.after;rkReady.after=null;
+  if(af==='gacha')gachaOpen();else if(af==='title'){dressRender();showScreen('rankDress')}else{rkRenderLobby();showScreen('rankLobby')}};
 $('nameIn').addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Enter')$('bNameOk').click()});
 $('bNameBack').onclick=()=>{SFX.click();if(RK.name){rkRenderLobby();showScreen('rankLobby')}else showScreen('title')};
 $('bRename').onclick=()=>{SFX.click();$('nameIn').value=RK.name;showScreen('rankName')};
 $('bQueue').onclick=()=>{SFX.click();game.pickFor='rank';showScreen('pickMenu')};
 $('bBoard').onclick=()=>{SFX.click();rkShowBoard()};
-$('bGacha').onclick=()=>{SFX.click();gachaOpen()};$('bPull').onclick=()=>{ac();gachaPull()};
-$('bDress').onclick=$('bGaDress').onclick=()=>{SFX.click();dressRender();showScreen('rankDress')};
-$('bGaBack').onclick=$('bDressBack').onclick=()=>{SFX.click();rkRenderLobby();showScreen('rankLobby')};
+let dressFrom='title';
+// ガチャ・きせかえはタイトルから。サーバーと名前が要るので、なければ先に用意する
+async function rkReady(){if(!await rkInit())return false;if(!RK.name){$('nameIn').value='';rkReady.after=dressFrom;showScreen('rankName');return false}return true}
+$('bGacha').onclick=async()=>{ac();SFX.click();dressFrom='gacha';if(await rkReady())gachaOpen()};$('bPull').onclick=()=>{ac();gachaPull()};
+$('bDress').onclick=async()=>{ac();SFX.click();dressFrom='title';if(await rkReady()){dressRender();showScreen('rankDress')}};
+$('bGaDress').onclick=()=>{SFX.click();dressFrom='gacha';dressRender();showScreen('rankDress')};
+$('bGaBack').onclick=()=>{SFX.click();dressFrom='title';showScreen('title')};
+$('bDressBack').onclick=()=>{SFX.click();if(dressFrom==='gacha')gachaOpen();else showScreen('title')};
 $('bBoardBack').onclick=()=>{SFX.click();rkRenderLobby();showScreen('rankLobby')};
 $('bRankBack').onclick=()=>{SFX.click();showScreen('title')};
 $('bQCancel').onclick=()=>{SFX.click();rkCleanupQueue();netClose();rkRenderLobby();showScreen('rankLobby')};
