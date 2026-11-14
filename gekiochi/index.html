@@ -122,6 +122,31 @@ a.btn{display:inline-block;box-sizing:border-box;text-decoration:none;text-align
 .rname{font-weight:800;font-size:22px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rrate b{font:42px 'Dela Gothic One',sans-serif}
 .rwl,.rnext{font-size:13px;font-weight:800;opacity:.75}
+.rkasu{font-weight:800;font-size:15px;background:#f3efe2;border:2px solid var(--ink);border-radius:999px;padding:2px 14px;margin-top:4px}.rkasu b{font:18px 'Dela Gothic One',sans-serif}
+.rkasu.big{background:#fff;color:var(--ink);border-width:4px;font-size:18px;padding:6px 22px;box-shadow:0 5px 0 var(--ink)}.rkasu.big b{font-size:26px}
+.btn.gacha{background:linear-gradient(135deg,#ff9de0,#a64bff);color:#fff;font-family:'Dela Gothic One',sans-serif}.btn.gacha:disabled{filter:grayscale(.8);opacity:.6;cursor:default}
+.gaStage{position:relative;width:min(280px,76vw);height:210px;display:flex;align-items:center;justify-content:center}
+.capsule{width:120px;height:120px;border-radius:50%;border:5px solid var(--ink);background:linear-gradient(#ff4b3e 0 50%,#fff 50% 100%);box-shadow:0 8px 0 var(--ink);position:relative}
+.capsule i{position:absolute;left:-5px;right:-5px;top:50%;height:6px;margin-top:-3px;background:var(--ink)}
+.capsule.shake{animation:capShake .9s ease-in-out}@keyframes capShake{0%,100%{transform:rotate(0)}15%{transform:rotate(-16deg)}30%{transform:rotate(14deg)}45%{transform:rotate(-12deg) scale(1.06)}60%{transform:rotate(10deg) scale(1.1)}80%{transform:rotate(-6deg) scale(1.18)}}
+.gaCard{position:absolute;inset:0;background:#fff;color:var(--ink);border:5px solid var(--ink);border-radius:20px;box-shadow:0 8px 0 var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;animation:gaIn .45s cubic-bezier(.2,1.6,.4,1) both}
+@keyframes gaIn{from{transform:scale(.3) rotate(-8deg);opacity:0}}
+.gaCard.r1{border-color:#2f8cff;box-shadow:0 8px 0 #2f8cff}.gaCard.r2{border-color:#f5a400;box-shadow:0 8px 0 #f5a400,0 0 40px rgba(255,210,63,.9)}
+.gaRar{font:20px 'Dela Gothic One',sans-serif;letter-spacing:.1em}.gaCard.r1 .gaRar{color:#2f8cff}.gaCard.r2 .gaRar{color:#f5a400}
+.gaKind{font-size:12px;font-weight:800;opacity:.65}.gaName{font:clamp(20px,6vw,26px) 'Dela Gothic One',sans-serif}.gaNote{font-size:13px;font-weight:800;color:#d8302a;min-height:18px}
+.gaIcon .sw{transform:scale(1.9)}
+.gaIcon{height:44px;display:flex;align-items:center;justify-content:center;font:22px 'Dela Gothic One',sans-serif}
+.sw{display:inline-block;width:34px;height:20px;border:3px solid var(--ink);border-radius:6px;position:relative;overflow:hidden;vertical-align:middle;flex:none}
+.sw::after{content:"";position:absolute;left:28%;right:28%;top:-1px;bottom:-1px;background:var(--s)}
+.drBox{background:#fff;color:var(--ink);border:4px solid var(--ink);border-radius:18px;box-shadow:0 7px 0 var(--ink);padding:12px 14px;width:min(420px,92vw);box-sizing:border-box;max-height:66vh;overflow-y:auto;touch-action:pan-y}
+.drT{font:17px 'Dela Gothic One',sans-serif;text-align:left;margin:6px 0}.drT span{font:800 12px 'M PLUS Rounded 1c',sans-serif;opacity:.6}
+.drList{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:8px}
+.drItem{display:inline-flex;flex:0 0 auto;align-items:center;gap:5px;border:3px solid var(--ink);border-radius:12px;padding:4px 8px;margin:0;font:800 13px 'M PLUS Rounded 1c',sans-serif;white-space:nowrap;background:#fff;color:var(--ink);cursor:pointer}
+.drItem.on{background:#ffd23f;box-shadow:0 4px 0 var(--ink);transform:translateY(-2px)}.drItem.lock{opacity:.4;border-style:dashed;cursor:default}
+.drItem em{font-style:normal;font-size:10px;font-weight:800;padding:1px 5px;border-radius:6px;background:#e9e6f2}.drItem em.r1{background:#cfe5ff}.drItem em.r2{background:#ffe9a8}
+.pl .tl{font-size:10px;font-weight:800;color:#8a3fe0;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pl .tl:empty{display:none}
+.vsp .vtl{font-size:12px;font-weight:800;color:#8a3fe0;min-height:16px}.bnm small{font-size:10px;color:#8a3fe0;margin-left:5px;font-weight:800}
+#resRate .ks{margin-top:4px;font-size:15px}#resRate .ks b{font:18px 'Dela Gothic One',sans-serif;color:#a64bff}
 .row2{display:flex;gap:10px}.btn.sm{min-width:0;font-size:16px;padding:10px 16px}
 .rnote{font-size:12px;font-weight:800;opacity:.85}
 #rankQueue .qspin{height:110px;display:flex;align-items:center;justify-content:center}
@@ -241,11 +266,30 @@ a.btn{display:inline-block;box-sizing:border-box;text-decoration:none;text-align
     <div class="rrate"><b id="rkRate">1500</b> pt</div>
     <div class="rwl" id="rkWL">0勝 0敗</div>
     <div class="rnext" id="rkNext"></div>
+    <div class="rkasu">消しカス <b id="rkKasu">0</b></div>
   </div>
   <button class="btn rank" id="bQueue">マッチング開始！</button>
+  <div class="row2"><button class="btn sm gacha" id="bGacha">ガチャ</button><button class="btn ghost sm" id="bDress">きせかえ</button></div>
   <div class="row2"><button class="btn ghost sm" id="bBoard">ランキング</button><button class="btn ghost sm" id="bRename">名前を変える</button></div>
   <button class="btn ghost" id="bRankBack">もどる</button>
   <div class="rnote">※ 対戦中に抜けると負け扱いになります</div>
+</div>
+
+<div id="rankGacha" class="screen hidden">
+  <h2>消しカスガチャ</h2>
+  <div class="rkasu big">消しカス <b id="gaKasu">0</b></div>
+  <div class="gaStage"><div class="capsule" id="gaCap"><i></i></div>
+    <div class="gaCard hidden" id="gaCard"><div class="gaRar" id="gaRar"></div><div class="gaKind" id="gaKind"></div><div class="gaIcon" id="gaIcon"></div><div class="gaName" id="gaName"></div><div class="gaNote" id="gaNote"></div></div></div>
+  <button class="btn gacha" id="bPull">1回まわす<small>消しカス 100</small></button>
+  <div class="row2"><button class="btn ghost sm" id="bGaDress">きせかえ</button><button class="btn ghost sm" id="bGaBack">もどる</button></div>
+  <div class="rnote">ランクマッチ1戦ごとに消しカスがもらえる（勝ち +30 ／ 負け +10）。景品は見た目と称号だけ。</div>
+</div>
+
+<div id="rankDress" class="screen hidden">
+  <h2>きせかえ</h2>
+  <div class="drBox"><div class="drT">スキン <span id="drSkinN"></span></div><div class="drList" id="drSkins"></div>
+    <div class="drT">称号 <span id="drTitleN"></span></div><div class="drList" id="drTitles"></div></div>
+  <button class="btn ghost" id="bDressBack">もどる</button>
 </div>
 
 <div id="rankQueue" class="screen hidden">
@@ -322,9 +366,9 @@ a.btn{display:inline-block;box-sizing:border-box;text-decoration:none;text-align
 
 <div id="hud" class="hidden">
   <div id="top">
-    <div class="pl" id="pl0"><div id="nm0">あなた</div><div class="ty" id="ty0"></div><div class="st" id="st0">☆☆</div></div>
+    <div class="pl" id="pl0"><div class="tl" id="tl0"></div><div id="nm0">あなた</div><div class="ty" id="ty0"></div><div class="st" id="st0">☆☆</div></div>
     <div id="round">ROUND 1</div>
-    <div class="pl" id="pl1"><div id="nm1">CPU</div><div class="ty" id="ty1"></div><div class="st" id="st1">☆☆</div></div>
+    <div class="pl" id="pl1"><div class="tl" id="tl1"></div><div id="nm1">CPU</div><div class="ty" id="ty1"></div><div class="st" id="st1">☆☆</div></div>
   </div>
   <div id="turn"></div>
   <div id="tmr" class="hidden"><span id="tmrN">20</span></div>
@@ -824,8 +868,21 @@ function makeEraser(i){
   return{g,ring,body,sl};
 }
 const eMesh=[makeEraser(0),makeEraser(1)];
+// ===== ガチャ景品（見た目と称号だけ。性能は変わらない） =====
+const RAR=['ノーマル','レア','激レア'];
+const SKINS={
+  s1:{name:'すいか',rar:0,body:0x57c26a,sleeve:'#e23b3b'},s2:{name:'チョコ',rar:0,body:0x7a4a2b,sleeve:'#c79a5b'},
+  s3:{name:'ソーダ',rar:0,body:0x9be8ff,sleeve:'#1c7ed6'},s4:{name:'さくら',rar:0,body:0xffd6e6,sleeve:'#ff6fa5'},
+  s5:{name:'まっくろ',rar:1,body:0x2a2a33,sleeve:'#55556a'},s6:{name:'ほのお',rar:1,body:0xff7a1a,sleeve:'#b01212',emis:0x551500},
+  s7:{name:'ぎんいろ',rar:2,body:0xe3e9f0,sleeve:'#6b7785',emis:0x30343a},s8:{name:'にじいろ',rar:2,body:0xff6ad5,sleeve:'#7b2ff7',anim:1}};
+const TITLES={
+  t1:{name:'かけだし',rar:0},t2:{name:'文房具マニア',rar:0},t3:{name:'えんぴつ派',rar:0},t4:{name:'定規使い',rar:0},
+  t5:{name:'ギリギリ職人',rar:1},t6:{name:'机の端の住人',rar:1},t7:{name:'消しカス長者',rar:2},t8:{name:'休み時間の覇者',rar:2}};
+const PRIZES=Object.assign({},SKINS,TITLES),safeSkin=v=>SKINS[v]?v:'',safeTitle=v=>TITLES[v]?v:'';
+const MY={skin:'',title:''};try{MY.skin=safeSkin(localStorage.getItem('gekiochiSkin'));MY.title=safeTitle(localStorage.getItem('gekiochiTitle'))}catch(e){}
+const skinOf=i=>i===(game.mode==='cpu'?0:game.me)?MY.skin:safeSkin(game.oppSkin),titleOf=i=>i===(game.mode==='cpu'?0:game.me)?MY.title:safeTitle(game.oppTitle);
 function applyLooks(types){
-  types.forEach((k,i)=>{const T=ETYPES[k],m=eMesh[i];
+  types.forEach((k,i)=>{const T=Object.assign({},ETYPES[k],k<3?SKINS[skinOf(i)]:null),m=eMesh[i];m.anim=!!T.anim;T.label=ETYPES[k].label;
     m.body.material.color.setHex(T.body);m.body.material.roughness=T.rough;m.body.material.metalness=T.metal;m.body.material.emissive.setHex(T.emis||0);
     m.sl.material.map=sleeveTex(T.sleeve||PLCOL[i],T.label);m.sl.material.needsUpdate=true;});
 }
@@ -935,13 +992,13 @@ const aiming=()=>['dir','power'].includes(game.phase);
 
 function toast(t){const el=$('toast');el.textContent=t;el.classList.remove('hidden');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.add('hidden'),2600)}
 function pop(text,cls){const el=$('pop');el.textContent=text;el.className='';void el.offsetWidth;el.className='show '+cls}
-function showScreen(id){['title','rankName','rankLobby','rankQueue','rankVs','rankBoard','pickMenu','netMenu','howto','result'].forEach(s=>$(s).classList.toggle('hidden',s!==id))}
+function showScreen(id){['title','rankName','rankLobby','rankGacha','rankDress','rankQueue','rankVs','rankBoard','pickMenu','netMenu','howto','result'].forEach(s=>$(s).classList.toggle('hidden',s!==id))}
 function showPanel(id){['pAim','pWait'].forEach(p=>$(p).classList.toggle('hidden',p!==id))}
 function updateHUD(){
   const names=game.mode==='cpu'?['あなた',GT()?GT().st.name:'CPU']:(game.me===0?['あなた','ライバル']:['ライバル','あなた']);
   if(game.ranked){names[game.me]=RK.name;names[1-game.me]=game.ranked.opp.name}
   $('nm0').textContent=names[0];$('nm1').textContent=names[1];
-  for(let i=0;i<2;i++)$('ty'+i).textContent=ETYPES[game.types[i]].short;
+  for(let i=0;i<2;i++){$('ty'+i).textContent=ETYPES[game.types[i]].short;const t=TITLES[titleOf(i)];$('tl'+i).textContent=t?t.name:''}
   for(let i=0;i<2;i++)$('st'+i).textContent='★'.repeat(game.score[i])+'☆'.repeat(Math.max(0,game.need-game.score[i]));
   $('round').textContent=GT()?GT().n+'人目'+(GT().n<=5?' / 5':''):'ROUND '+game.round;
 }
@@ -963,7 +1020,7 @@ const GT=()=>game.mode==='cpu'&&!game.ranked?game.gt:null,cpuName=()=>GT()?GT().
 let gtBest=0;try{gtBest=+localStorage.getItem('gekiochiBest')||0}catch(e){}
 function gtBestText(){$('bestTxt').textContent=gtBest?'自己ベスト：'+gtBest+'人抜き'+(gtBest>=5?'（クリア済み）':''):'ひとりで遊ぶ'}
 function gtRecord(wins){if(wins<=gtBest)return false;gtBest=wins;try{localStorage.setItem('gekiochiBest',wins)}catch(e){}gtBestText();return true}
-function gtGo(n,keep){const st=stageOf(n);game.gt={n,st,won:false};game.me=0;game.ranked=null;startMatch('cpu',(Math.random()*1e9)|0,0,[game.myType,st.k],st.need,keep)}
+function gtGo(n,keep){game.oppSkin=game.oppTitle='';const st=stageOf(n);game.gt={n,st,won:false};game.me=0;game.ranked=null;startMatch('cpu',(Math.random()*1e9)|0,0,[game.myType,st.k],st.need,keep)}
 function startMatch(mode,seed,first,types,need,keepBgm){
   bgmPlay('battle',!keepBgm);game.need=need||2;
   game.turnLimit=(mode==='net'||game.ranked)?TURN_SEC:0;
@@ -1158,7 +1215,7 @@ function handleEvents(ev){
 const net={peer:null,conn:null};
 function netStatus(h){$('netStatus').innerHTML=h}
 function netSend(o){if(net.conn&&net.conn.open)try{net.conn.send(o)}catch(e){}}
-function netClose(){const c=net.conn,p=net.peer;net.conn=null;net.peer=null;try{c&&c.close()}catch(e){}try{p&&p.destroy()}catch(e){}}
+function netClose(){game.oppSkin=game.oppTitle='';const c=net.conn,p=net.peer;net.conn=null;net.peer=null;try{c&&c.close()}catch(e){}try{p&&p.destroy()}catch(e){}}
 function setupConn(c){
   c.on('data',onNet);
   c.on('close',()=>{
@@ -1188,7 +1245,7 @@ function netJoin(){
   netClose();if(!window.Peer){netStatus('通信ライブラリを読み込めませんでした');return}
   game.me=1;netStatus('接続中…');
   const peer=new Peer();net.peer=peer;
-  peer.on('open',()=>{const c=peer.connect(PEER_PFX+code,{reliable:true});net.conn=c;c.on('open',()=>{setupConn(c);netStatus('接続しました！');netSend({t:'hello',k:game.myType})})});
+  peer.on('open',()=>{const c=peer.connect(PEER_PFX+code,{reliable:true});net.conn=c;c.on('open',()=>{setupConn(c);netStatus('接続しました！');netSend({t:'hello',k:game.myType,sk:MY.skin,ti:MY.title})})});
   peer.on('error',e=>netStatus(e.type==='peer-unavailable'?'部屋が見つかりません…<br>コードを確認してね':'エラー：'+e.type));
 }
 function onNet(m){
@@ -1196,8 +1253,8 @@ function onNet(m){
   if(m.t==='hello'&&m.rk){rkOnHello(m);return}
   if(m.t==='start'&&m.rk){rkOnStart(m);return}
   if(m.t==='hello'){if(game.me!==0||game.phase!=='title'||RK.q)return;const types=[game.myType,clamp(m.k|0,0,2)],seed=(Math.random()*1e9)|0;
-    netSend({t:'start',seed,first:0,types});startMatch('net',seed,0,types)}
-  else if(m.t==='start'){game.me=1;startMatch('net',m.seed,m.first,m.types||[0,0])}
+    game.oppSkin=m.sk;game.oppTitle=m.ti;netSend({t:'start',seed,first:0,types,sk:MY.skin,ti:MY.title});startMatch('net',seed,0,types)}
+  else if(m.t==='start'){game.me=1;if('sk' in m){game.oppSkin=m.sk;game.oppTitle=m.ti}startMatch('net',m.seed,m.first,m.types||[0,0])}
   else if(m.t==='aim'){if(game.phase==='wait'&&!isMyTurn()){Object.assign(game.shot,{type:m.type,angle:m.angle,curve:m.curve,power:m.power});game.remoteSub=m.sub;
     $('waitText').textContent='ライバルが狙っている…（'+(m.sub==='select'?'打ち方をえらび中':TYPE_NAMES[m.type])+'）';showPanel('pWait')}}
   else if(m.t==='shot'){if(game.phase==='wait'&&!isMyTurn())fireShot(m);else game.pendingShot=m}
@@ -1233,6 +1290,12 @@ const tierOf=r=>{let t=TIERS[0];for(const x of TIERS)if(r>=x.min)t=x;return t};
 const RK={db:null,uid:null,prof:null,name:'',q:null,qtk:0};
 try{RK.name=localStorage.getItem('gekiochiName')||''}catch(e){}
 const rkRating=()=>RK.prof&&typeof RK.prof.rating==='number'?RK.prof.rating:1500;
+// 消しカス（初回だけ100＝1回ぶん持っている）と、当てた景品
+const GACHA_COST=100,KASU_WIN=30,KASU_LOSE=10,KASU_DUP=20;
+const rkKasu=()=>RK.prof&&Number.isInteger(RK.prof.kasu)?RK.prof.kasu:100,rkInv=()=>RK.prof&&Array.isArray(RK.prof.inv)?RK.prof.inv.filter(x=>PRIZES[x]):[];
+const rkBase=()=>Object.assign({name:RK.name,rating:1500,wins:0,losses:0,games:0},RK.prof||{},{name:RK.name,updated:Date.now()});
+function mySave(){try{localStorage.setItem('gekiochiSkin',MY.skin);localStorage.setItem('gekiochiTitle',MY.title)}catch(e){}}
+async function rkSaveProf(patch){const d=Object.assign(rkBase(),patch);RK.prof=d;try{await pRef().set(d);return true}catch(e){console.warn(e);return false}}
 const safeType=k=>clamp(k|0,0,2);
 function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=()=>rej(new Error('load '+src));document.head.appendChild(s)})}
 async function rkInit(){
@@ -1249,6 +1312,7 @@ async function rkInit(){
     RK.uid=u.uid;RK.db=firebase.firestore();
     const d=await RK.db.collection(COL.p).doc(RK.uid).get();RK.prof=d.exists?d.data():null;
     if(RK.prof&&RK.prof.name&&!RK.name)RK.name=RK.prof.name;
+    if(RK.prof){const inv=rkInv();MY.skin=inv.includes(RK.prof.skin)?RK.prof.skin:'';MY.title=inv.includes(RK.prof.title)?RK.prof.title:'';mySave()}
     $('toast').classList.add('hidden');return true;
   }catch(e){console.error(e);RK.db=null;toast('サーバーにつながりませんでした');return false}
 }
@@ -1258,19 +1322,22 @@ function rkRenderLobby(){
   const r=Math.round(rkRating()),t=tierOf(r),i=TIERS.indexOf(t),n=TIERS[i+1],p=RK.prof||{};
   $('rkTier').textContent=t.name;$('rkTier').style.background=t.col;$('rkName').textContent=RK.name;$('rkRate').textContent=r;
   $('rkWL').textContent=`${p.wins|0}勝 ${p.losses|0}敗`;
+  $('rkKasu').textContent=rkKasu();$('bGacha').textContent=rkKasu()>=GACHA_COST?'ガチャ（引ける！）':'ガチャ';
   $('rkNext').textContent=n?`次の称号「${n.name}」まで あと ${n.min-r} pt`:'最高ランク！ 君こそ激落王だ';
 }
-function eraserIcon(k){const d=document.createElement('div');d.className='eras k'+k;d.dataset.l=ETYPES[k].label;d.style.setProperty('--b','#'+ETYPES[k].body.toString(16).padStart(6,'0'));return d}
-function vsCard(el,name,rating,k){
+function eraserIcon(k,sk){const d=document.createElement('div'),S2=SKINS[sk];d.className='eras k'+k;d.dataset.l=ETYPES[k].label;d.style.setProperty('--b','#'+(S2?S2.body:ETYPES[k].body).toString(16).padStart(6,'0'));return d}
+function vsCard(el,name,rating,k,sk,ti){
   el.innerHTML='';const t=tierOf(rating);
   const a=document.createElement('div');a.className='vtier';a.style.background=t.col;a.textContent=t.name;
   const b=document.createElement('div');b.className='vn';b.textContent=name;
+  const tl=document.createElement('div');tl.className='vtl';tl.textContent=TITLES[ti]?TITLES[ti].name:'';
   const c=document.createElement('div');c.className='vr';c.textContent=Math.round(rating)+' pt';
   const d=document.createElement('div');d.className='vt';d.textContent=ETYPES[k].name;
-  el.append(a,b,c,eraserIcon(k),d);
+  el.append(a,tl,b,c,eraserIcon(k,sk),d);
 }
 function rkShowVs(){const q=RK.q;if(!q)return;
-  vsCard($('vsL'),RK.name,rkRating(),game.myType);vsCard($('vsR'),q.opp.name,q.opp.rating,safeType(q.opp.type));
+  game.oppSkin=safeSkin(q.opp.sk);game.oppTitle=safeTitle(q.opp.ti);
+  vsCard($('vsL'),RK.name,rkRating(),game.myType,MY.skin,MY.title);vsCard($('vsR'),q.opp.name,q.opp.rating,safeType(q.opp.type),game.oppSkin,game.oppTitle);
   $('vsSub').textContent='接続中…';showScreen('rankVs');SFX.round();bgmPlay(null);bgmHit('crash');}
 function rkCleanupQueue(){
   const q=RK.q;RK.q=null;if(!q)return;
@@ -1298,7 +1365,7 @@ async function rkStartQueue(){
   peer.on('connection',c=>{if(net.conn||RK.q!==q){c.close();return}net.conn=c;c.on('open',()=>setupConn(c))});
   peer.on('error',e=>{if(RK.q===q&&q.state==='matched'&&e.type==='peer-unavailable')rkQueueFail('相手とつながりませんでした')});
   q.ref=RK.db.collection(COL.q).doc(RK.uid);q.ts=Date.now();
-  try{await q.ref.set({uid:RK.uid,name:RK.name,rating:rkRating(),type:game.myType,peerId:pid,status:'waiting',ts:q.ts,hb:q.ts,v:3})}
+  try{await q.ref.set({uid:RK.uid,name:RK.name,rating:rkRating(),type:game.myType,sk:MY.skin,ti:MY.title,peerId:pid,status:'waiting',ts:q.ts,hb:q.ts,v:3})}
   catch(e){console.error(e);if(RK.q===q)rkQueueFail('マッチングに参加できませんでした');return}
   if(RK.q!==q){q.ref.delete().catch(()=>{});return}
   q.state='waiting';
@@ -1330,7 +1397,9 @@ function rkStartBot(){
   const r=rkRating(),diff=r<1450?0:r<1650?1:2,bt=(Math.random()*3)|0,first=(Math.random()*2)|0;
   let name;do{name=BOT_NAMES[(Math.random()*BOT_NAMES.length)|0]}while(name===RK.name);
   const opp={uid:'cpu',name,rating:Math.round(r+(Math.random()*2-1)*45),bot:true};
-  vsCard($('vsL'),RK.name,r,game.myType);vsCard($('vsR'),opp.name,opp.rating,bt);
+  const pick=o=>{const k=Object.keys(o);return k[(Math.random()*k.length)|0]};
+  game.oppSkin=Math.random()<0.4?pick(SKINS):'';game.oppTitle=Math.random()<0.5?pick(TITLES):'';
+  vsCard($('vsL'),RK.name,r,game.myType,MY.skin,MY.title);vsCard($('vsR'),opp.name,opp.rating,bt,game.oppSkin,game.oppTitle);
   $('vsSub').textContent='接続中…';setTimeout(()=>{$('vsSub').textContent='バトル開始！'},700+Math.random()*700);
   showScreen('rankVs');SFX.round();bgmPlay(null);bgmHit('crash');
   const tk=++RK.qtk;
@@ -1355,7 +1424,7 @@ async function rkTryClaim(q){
       const res=await RK.db.runTransaction(async t=>{
         const a=await t.get(q.ref),b=await t.get(cRef);
         if(!a.exists||!b.exists||a.data().status!=='waiting'||b.data().status!=='waiting')return null;
-        const bd=b.data(),me={uid:RK.uid,name:RK.name,rating:myR,type:game.myType},op={uid:bd.uid,name:bd.name,rating:bd.rating,type:bd.type};
+        const bd=b.data(),me={uid:RK.uid,name:RK.name,rating:myR,type:game.myType,sk:MY.skin,ti:MY.title},op={uid:bd.uid,name:bd.name,rating:bd.rating,type:bd.type,sk:bd.sk||'',ti:bd.ti||''};
         t.update(cRef,{status:'matched',matchId:mRef.id,by:RK.uid,opp:me});
         t.update(q.ref,{status:'matched',matchId:mRef.id,by:RK.uid,opp:op});
         t.set(mRef,{p:[bd.uid,RK.uid],names:[bd.name,RK.name],ratings:[bd.rating,myR],types:[bd.type,game.myType],ts:Date.now()});
@@ -1400,14 +1469,13 @@ async function rkReportStart(){
   const R=rkRating(),E=1/(1+Math.pow(10,(game.ranked.opp.rating-R)/400)),p=RK.prof||{},K=game.ranked.K||RK_K;
   Object.assign(game.ranked,{pre:R,E,K});
   // 先に「負け」で記録しておき、勝ったら上書き（途中で抜けると負けのまま）
-  const d={name:RK.name,rating:Math.round((R-K*E)*10)/10,wins:p.wins|0,losses:(p.losses|0)+1,games:(p.games|0)+1,last:game.ranked.matchId,updated:Date.now()};
-  RK.prof=d;try{await pRef().set(d)}catch(e){console.warn(e)}
+  await rkSaveProf({rating:Math.round((R-K*E)*10)/10,wins:p.wins|0,losses:(p.losses|0)+1,games:(p.games|0)+1,last:game.ranked.matchId});
 }
 async function rkReportEnd(won){
   const g=game.ranked;if(!g||g.done)return;g.done=true;
   try{await g.startP}catch(e){}
-  if(won){const p=RK.prof;const d=Object.assign({},p,{rating:Math.round((g.pre+g.K*(1-g.E))*10)/10,wins:(p.wins|0)+1,losses:Math.max(0,(p.losses|0)-1),updated:Date.now()});
-    RK.prof=d;try{await pRef().set(d)}catch(e){console.warn(e)}}
+  const gain=won?KASU_WIN:KASU_LOSE,p=RK.prof||{},kasu=rkKasu()+gain;
+  await rkSaveProf(won?{rating:Math.round((g.pre+g.K*(1-g.E))*10)/10,wins:(p.wins|0)+1,losses:Math.max(0,(p.losses|0)-1),kasu}:{kasu});
   const pre=Math.round(g.pre),now=Math.round(rkRating()),dl=now-pre,t0=tierOf(pre),t1=tierOf(now),el=$('resRate');
   el.innerHTML='';
   const a=document.createElement('div');a.textContent='レート';
@@ -1415,8 +1483,36 @@ async function rkReportEnd(won){
   const c=document.createElement('div');c.textContent='称号：'+t1.name;
   el.append(a,b,c);
   if(t1!==t0){const e=document.createElement('div');e.className='tch';e.textContent=TIERS.indexOf(t1)>TIERS.indexOf(t0)?`ランクアップ！「${t1.name}」`:`ランクダウン…「${t1.name}」`;el.append(e)}
+  const k=document.createElement('div');k.className='ks';k.innerHTML=`消しカス <b>+${gain}</b>（合計 ${kasu}）`+(kasu>=GACHA_COST?'<br>ガチャが引ける！':'');el.append(k);
   el.classList.remove('hidden');
 }
+// ===== ガチャ =====
+function gachaRender(){const k=rkKasu();$('gaKasu').textContent=k;$('bPull').disabled=k<GACHA_COST||!!gachaRender.busy}
+function prizeIcon(id){const p=PRIZES[id],d=document.createElement('span');
+  if(SKINS[id]){d.className='sw';d.style.background='#'+p.body.toString(16).padStart(6,'0');d.style.setProperty('--s',p.sleeve)}else d.textContent='「'+p.name+'」';return d}
+async function gachaPull(){
+  if(gachaRender.busy||rkKasu()<GACHA_COST)return;gachaRender.busy=true;gachaRender();
+  const r=Math.random(),rar=r<0.1?2:r<0.4?1:0,pool=Object.keys(PRIZES).filter(k=>PRIZES[k].rar===rar),id=pool[(Math.random()*pool.length)|0];
+  const inv=rkInv(),dup=inv.includes(id),kasu=rkKasu()-GACHA_COST+(dup?KASU_DUP:0);
+  const ok=await rkSaveProf({kasu,inv:dup?inv:inv.concat(id)});
+  if(!ok){gachaRender.busy=false;gachaRender();toast('保存できませんでした。もう一度ためしてね');const d=await pRef().get().catch(()=>null);if(d&&d.exists)RK.prof=d.data();gachaRender();return}
+  const cap=$('gaCap'),card=$('gaCard');card.classList.add('hidden');cap.style.visibility='';cap.classList.remove('shake');void cap.offsetWidth;cap.classList.add('shake');SFX.round();
+  setTimeout(()=>{const p=PRIZES[id];cap.style.visibility='hidden';card.className='gaCard r'+p.rar;
+    $('gaRar').textContent=RAR[p.rar];$('gaKind').textContent=SKINS[id]?'消しゴムのスキン':'称号';$('gaName').textContent=p.name;
+    $('gaIcon').innerHTML='';$('gaIcon').append(prizeIcon(id));$('gaNote').textContent=dup?`もう持っている → 消しカス +${KASU_DUP}`:'NEW！ きせかえで使えるよ';
+    p.rar===2?SFX.win():p.rar===1?SFX.max():SFX.click();if(p.rar===2)bgmHit('crash');
+    gachaRender.busy=false;gachaRender()},950);
+}
+function gachaOpen(){$('gaCard').classList.add('hidden');$('gaCap').style.visibility='';gachaRender.busy=false;gachaRender();showScreen('rankGacha')}
+// ===== きせかえ =====
+function dressRender(){const inv=rkInv();
+  for(const[box,all,key,cnt]of[['drSkins',SKINS,'skin','drSkinN'],['drTitles',TITLES,'title','drTitleN']]){
+    const el=$(box);el.innerHTML='';const ids=Object.keys(all);$(cnt).textContent=`${ids.filter(i=>inv.includes(i)).length} / ${ids.length}`;
+    const mk=(id,label,own)=>{const b=document.createElement('button');b.className='drItem'+(MY[key]===id?' on':'')+(own?'':' lock');
+      if(id&&own&&SKINS[id])b.append(prizeIcon(id));const t=document.createElement('span');t.textContent=label;b.append(t);
+      if(id){const e=document.createElement('em');e.className='r'+all[id].rar;e.textContent=RAR[all[id].rar];b.append(e)}
+      if(own)b.onclick=()=>{SFX.click();MY[key]=id;mySave();dressRender();rkSaveProf({skin:MY.skin,title:MY.title});applyLooks(game.types)};el.append(b)};
+    mk('','なし',true);ids.forEach(id=>{const own=inv.includes(id);mk(id,own?all[id].name:'？？？',own)})}}
 async function rkShowBoard(){
   showScreen('rankBoard');const el=$('boardList');el.textContent='読み込み中…';
   try{
@@ -1424,7 +1520,7 @@ async function rkShowBoard(){
     s.forEach(d=>{i++;const x=d.data()||{},r=+x.rating||0,t=tierOf(r),row=document.createElement('div');row.className='brow'+(d.id===RK.uid?' me':'');
       const no=document.createElement('span');no.className='bno';no.textContent=i;
       const ti=document.createElement('span');ti.className='btier';ti.style.background=t.col;ti.textContent=t.name;
-      const nm=document.createElement('span');nm.className='bnm';nm.textContent=sanitizeName(x.name)||'???';
+      const nm=document.createElement('span');nm.className='bnm';nm.textContent=sanitizeName(x.name)||'???';if(TITLES[x.title]){const sm=document.createElement('small');sm.textContent=TITLES[x.title].name;nm.append(sm)}
       const rt=document.createElement('span');rt.className='brt';rt.textContent=Math.round(r);
       const wl=document.createElement('span');wl.className='bwl';wl.textContent=`${x.wins|0}勝${x.losses|0}敗`;
       row.append(no,ti,nm,rt,wl);el.appendChild(row)});
@@ -1451,6 +1547,9 @@ $('bNameBack').onclick=()=>{SFX.click();if(RK.name){rkRenderLobby();showScreen('
 $('bRename').onclick=()=>{SFX.click();$('nameIn').value=RK.name;showScreen('rankName')};
 $('bQueue').onclick=()=>{SFX.click();game.pickFor='rank';showScreen('pickMenu')};
 $('bBoard').onclick=()=>{SFX.click();rkShowBoard()};
+$('bGacha').onclick=()=>{SFX.click();gachaOpen()};$('bPull').onclick=()=>{ac();gachaPull()};
+$('bDress').onclick=$('bGaDress').onclick=()=>{SFX.click();dressRender();showScreen('rankDress')};
+$('bGaBack').onclick=$('bDressBack').onclick=()=>{SFX.click();rkRenderLobby();showScreen('rankLobby')};
 $('bBoardBack').onclick=()=>{SFX.click();rkRenderLobby();showScreen('rankLobby')};
 $('bRankBack').onclick=()=>{SFX.click();showScreen('title')};
 $('bQCancel').onclick=()=>{SFX.click();rkCleanupQueue();netClose();rkRenderLobby();showScreen('rankLobby')};
@@ -1492,7 +1591,7 @@ addEventListener('keydown',e=>{if($('howto').classList.contains('hidden'))return
 // ===== ランクマッチの解禁設定 =====
 // false：「近日解禁！」と表示して押せない ／ true：解禁
 // '2026-11-18T21:00:00+09:00' のように日時を書くと、その日時に自動で解禁（それまでは日時を表示）
-const RANKED_OPEN=false;
+const RANKED_OPEN=true;
 function rankedOpen(){if(RANKED_OPEN===true)return true;if(typeof RANKED_OPEN==='string')return Date.now()>=Date.parse(RANKED_OPEN);return false}
 function rankedLabel(){if(typeof RANKED_OPEN==='string'){const d=new Date(RANKED_OPEN);return `${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')} 解禁！`}return '近日解禁！'}
 // 初めて遊ぶときだけ、先にあそびかたを見せる
@@ -1642,7 +1741,7 @@ addEventListener('resize',resize);resize();
 function syncMeshes(dt){
   for(let i=0;i<2;i++){const e=S.e[i],m=eMesh[i],q=sq[i],mo=e.k===2;
     const K=mo?95:280,C=mo?4.5:17;q.vel+=(-K*q.v-C*q.vel)*dt;q.v=clamp(q.v+q.vel*dt,-0.4,0.45);
-    const v=e.falling?0:q.v;m.g.scale.set(1+v*0.6,1-v,1+v*0.6);
+    const v=e.falling?0:q.v;m.g.scale.set(1+v*0.6,1-v,1+v*0.6);if(m.anim)m.body.material.color.setHSL((game.realT*0.3+i*0.5)%1,0.9,0.62);
     m.g.position.set(e.x,e.y+EH/2*(1-v),e.z);m.g.rotation.set(e.rx,-e.yaw,e.rz);
     const wb=game.phase==='title'?null:edgeWobble(e);
     if(wb){_wq.setFromAxisAngle(_wa.set(wb[1],0,-wb[0]),wb[2]*(0.55+0.45*Math.sin(game.realT*11+i*2)));m.g.quaternion.premultiply(_wq)}
