@@ -133,7 +133,8 @@ a.btn{display:inline-block;box-sizing:border-box;text-decoration:none;text-align
 .gaCard{position:absolute;inset:0;background:#fff;color:var(--ink);border:5px solid var(--ink);border-radius:20px;box-shadow:0 8px 0 var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;animation:gaIn .45s cubic-bezier(.2,1.6,.4,1) both}
 @keyframes gaIn{from{transform:scale(.3) rotate(-8deg);opacity:0}}
 .gaCard.r1{border-color:#2f8cff;box-shadow:0 8px 0 #2f8cff}.gaCard.r2{border-color:#f5a400;box-shadow:0 8px 0 #f5a400,0 0 40px rgba(255,210,63,.9)}
-.gaRar{font:20px 'Dela Gothic One',sans-serif;letter-spacing:.1em}.gaCard.r1 .gaRar{color:#2f8cff}.gaCard.r2 .gaRar{color:#f5a400}
+.gaCard.r3{border-color:#a64bff;background:linear-gradient(160deg,#fff,#efe3ff);box-shadow:0 8px 0 #a64bff,0 0 50px rgba(166,75,255,.95),0 0 90px rgba(255,157,224,.7)}
+.gaRar{font:20px 'Dela Gothic One',sans-serif;letter-spacing:.1em}.gaCard.r1 .gaRar{color:#2f8cff}.gaCard.r2 .gaRar{color:#f5a400}.gaCard.r3 .gaRar{color:#a64bff;font-size:26px}
 .gaKind{font-size:12px;font-weight:800;opacity:.65}.gaName{font:clamp(20px,6vw,26px) 'Dela Gothic One',sans-serif}.gaNote{font-size:13px;font-weight:800;color:#d8302a;min-height:18px}
 .gaIcon .sw{transform:scale(1.9)}
 .gaIcon{height:44px;display:flex;align-items:center;justify-content:center;font:22px 'Dela Gothic One',sans-serif}
@@ -144,7 +145,7 @@ a.btn{display:inline-block;box-sizing:border-box;text-decoration:none;text-align
 .drList{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:8px}
 .drItem{display:inline-flex;flex:0 0 auto;align-items:center;gap:5px;border:3px solid var(--ink);border-radius:12px;padding:4px 8px;margin:0;font:800 13px 'M PLUS Rounded 1c',sans-serif;white-space:nowrap;background:#fff;color:var(--ink);cursor:pointer}
 .drItem.on{background:#ffd23f;box-shadow:0 4px 0 var(--ink);transform:translateY(-2px)}.drItem.lock{opacity:.4;border-style:dashed;cursor:default}
-.drItem em{font-style:normal;font-size:10px;font-weight:800;padding:1px 5px;border-radius:6px;background:#e9e6f2}.drItem em.r1{background:#cfe5ff}.drItem em.r2{background:#ffe9a8}
+.drItem em{font-style:normal;font-size:10px;font-weight:800;padding:1px 5px;border-radius:6px;background:#e9e6f2}.drItem em.r1{background:#cfe5ff}.drItem em.r2{background:#ffe9a8}.drItem em.r3{background:#e7d2ff}
 .pl .tl{font-size:10px;font-weight:800;color:#8a3fe0;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pl .tl:empty{display:none}
 .vsp .vtl{font-size:12px;font-weight:800;color:#8a3fe0;min-height:16px}.bnm small{font-size:10px;color:#8a3fe0;margin-left:5px;font-weight:800}
 #resRate .ks{margin-top:4px;font-size:15px}#resRate .ks b{font:18px 'Dela Gothic One',sans-serif;color:#a64bff}
@@ -874,20 +875,22 @@ function makeEraser(i){
 }
 const eMesh=[makeEraser(0),makeEraser(1)];
 // ===== ガチャ景品（見た目と称号だけ。性能は変わらない） =====
-const RAR=['ノーマル','レア','激レア'];
+const RAR=['ノーマル','レア','激レア','伝説'];
 const SKINS={
   s1:{name:'すいか',rar:0,body:0x57c26a,sleeve:'#e23b3b'},s2:{name:'チョコ',rar:0,body:0x7a4a2b,sleeve:'#c79a5b'},
   s3:{name:'ソーダ',rar:0,body:0x9be8ff,sleeve:'#1c7ed6'},s4:{name:'さくら',rar:0,body:0xffd6e6,sleeve:'#ff6fa5'},
   s5:{name:'まっくろ',rar:1,body:0x2a2a33,sleeve:'#55556a'},s6:{name:'ほのお',rar:1,body:0xff7a1a,sleeve:'#b01212',emis:0x551500},
-  s7:{name:'ぎんいろ',rar:2,body:0xe3e9f0,sleeve:'#6b7785',emis:0x30343a},s8:{name:'にじいろ',rar:2,body:0xff6ad5,sleeve:'#7b2ff7',anim:1}};
+  s7:{name:'ぎんいろ',rar:2,body:0x7d8794,sleeve:'#2c333d',emis:0x10141a,rough:0.2},s8:{name:'にじいろ',rar:2,body:0xff6ad5,sleeve:'#7b2ff7',anim:1},
+  s9:{name:'まぼろし',rar:3,body:0xbfe6ff,sleeve:'#2a1d6e',emis:0x2a4fb0,anim:2}};
 const TITLES={
   t1:{name:'かけだし',rar:0},t2:{name:'文房具マニア',rar:0},t3:{name:'えんぴつ派',rar:0},t4:{name:'定規使い',rar:0},
-  t5:{name:'ギリギリ職人',rar:1},t6:{name:'机の端の住人',rar:1},t7:{name:'消しカス長者',rar:2},t8:{name:'休み時間の覇者',rar:2}};
+  t5:{name:'ギリギリ職人',rar:1},t6:{name:'机の端の住人',rar:1},t7:{name:'消しカス長者',rar:2},t8:{name:'休み時間の覇者',rar:2},
+  t9:{name:'伝説の消しゴム',rar:3}};
 const PRIZES=Object.assign({},SKINS,TITLES),safeSkin=v=>SKINS[v]?v:'',safeTitle=v=>TITLES[v]?v:'';
 const MY={skin:'',title:''};try{MY.skin=safeSkin(localStorage.getItem('gekiochiSkin'));MY.title=safeTitle(localStorage.getItem('gekiochiTitle'))}catch(e){}
 const skinOf=i=>i===(game.mode==='cpu'?0:game.me)?MY.skin:safeSkin(game.oppSkin),titleOf=i=>i===(game.mode==='cpu'?0:game.me)?MY.title:safeTitle(game.oppTitle);
 function applyLooks(types){
-  types.forEach((k,i)=>{const T=Object.assign({},ETYPES[k],k<3?SKINS[skinOf(i)]:null),m=eMesh[i];m.anim=!!T.anim;T.label=ETYPES[k].label;
+  types.forEach((k,i)=>{const T=Object.assign({},ETYPES[k],k<3?SKINS[skinOf(i)]:null),m=eMesh[i];m.anim=T.anim|0;T.label=ETYPES[k].label;m.body.material.transparent=m.anim===2;m.body.material.opacity=1;m.body.material.depthWrite=m.anim!==2;
     m.body.material.color.setHex(T.body);m.body.material.roughness=T.rough;m.body.material.metalness=T.metal;m.body.material.emissive.setHex(T.emis||0);
     m.sl.material.map=sleeveTex(T.sleeve||PLCOL[i],T.label);m.sl.material.needsUpdate=true;});
 }
@@ -1498,7 +1501,7 @@ function prizeIcon(id){const p=PRIZES[id],d=document.createElement('span');
   if(SKINS[id]){d.className='sw';d.style.background='#'+p.body.toString(16).padStart(6,'0');d.style.setProperty('--s',p.sleeve)}else d.textContent='「'+p.name+'」';return d}
 async function gachaPull(){
   if(gachaRender.busy||rkKasu()<GACHA_COST)return;gachaRender.busy=true;gachaRender();
-  const r=Math.random(),rar=r<0.1?2:r<0.4?1:0,pool=Object.keys(PRIZES).filter(k=>PRIZES[k].rar===rar),id=pool[(Math.random()*pool.length)|0];
+  const r=Math.random(),rar=r<0.03?3:r<0.12?2:r<0.42?1:0,pool=Object.keys(PRIZES).filter(k=>PRIZES[k].rar===rar),id=pool[(Math.random()*pool.length)|0];
   const inv=rkInv(),dup=inv.includes(id),kasu=rkKasu()-GACHA_COST+(dup?KASU_DUP:0);
   const ok=await rkSaveProf({kasu,inv:dup?inv:inv.concat(id)});
   if(!ok){gachaRender.busy=false;gachaRender();toast('保存できませんでした。もう一度ためしてね');const d=await pRef().get().catch(()=>null);if(d&&d.exists)RK.prof=d.data();gachaRender();return}
@@ -1506,7 +1509,7 @@ async function gachaPull(){
   setTimeout(()=>{const p=PRIZES[id];cap.style.visibility='hidden';card.className='gaCard r'+p.rar;
     $('gaRar').textContent=RAR[p.rar];$('gaKind').textContent=SKINS[id]?'消しゴムのスキン':'称号';$('gaName').textContent=p.name;
     $('gaIcon').innerHTML='';$('gaIcon').append(prizeIcon(id));$('gaNote').textContent=dup?`もう持っている → 消しカス +${KASU_DUP}`:'NEW！ きせかえで使えるよ';
-    p.rar===2?SFX.win():p.rar===1?SFX.max():SFX.click();if(p.rar===2)bgmHit('crash');
+    p.rar>=2?SFX.win():p.rar===1?SFX.max():SFX.click();if(p.rar>=2)bgmHit(p.rar===3?'boom':'crash');
     gachaRender.busy=false;gachaRender()},950);
 }
 function gachaOpen(){$('gaCard').classList.add('hidden');$('gaCap').style.visibility='';gachaRender.busy=false;gachaRender();showScreen('rankGacha')}
@@ -1753,7 +1756,7 @@ addEventListener('resize',resize);resize();
 function syncMeshes(dt){
   for(let i=0;i<2;i++){const e=S.e[i],m=eMesh[i],q=sq[i],mo=e.k===2;
     const K=mo?95:280,C=mo?4.5:17;q.vel+=(-K*q.v-C*q.vel)*dt;q.v=clamp(q.v+q.vel*dt,-0.4,0.45);
-    const v=e.falling?0:q.v;m.g.scale.set(1+v*0.6,1-v,1+v*0.6);if(m.anim)m.body.material.color.setHSL((game.realT*0.3+i*0.5)%1,0.9,0.62);
+    const v=e.falling?0:q.v;m.g.scale.set(1+v*0.6,1-v,1+v*0.6);if(m.anim===1)m.body.material.color.setHSL((game.realT*0.3+i*0.5)%1,0.9,0.62);else if(m.anim===2)m.body.material.opacity=0.45+0.3*Math.sin(game.realT*3+i);
     m.g.position.set(e.x,e.y+EH/2*(1-v),e.z);m.g.rotation.set(e.rx,-e.yaw,e.rz);
     const wb=game.phase==='title'?null:edgeWobble(e);
     if(wb){_wq.setFromAxisAngle(_wa.set(wb[1],0,-wb[0]),wb[2]*(0.55+0.45*Math.sin(game.realT*11+i*2)));m.g.quaternion.premultiply(_wq)}
