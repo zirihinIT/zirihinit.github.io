@@ -149,7 +149,7 @@ a.btn{display:inline-block;box-sizing:border-box;text-decoration:none;text-align
 .pl .tl{font-size:10px;font-weight:800;color:#8a3fe0;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pl .tl:empty{display:none}
 .vsp .vtl{font-size:12px;font-weight:800;color:#8a3fe0;min-height:16px}.bnm small{font-size:10px;color:#8a3fe0;margin-left:5px;font-weight:800}
 #resRate .ks{margin-top:4px;font-size:15px}#resRate .ks b{font:18px 'Dela Gothic One',sans-serif;color:#a64bff}
-.row2{display:flex;gap:10px}#title .btn.mode{width:min(300px,82vw);height:62px;min-width:0;padding:0;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.15}
+.row2{display:flex;gap:10px}button.rname{background:none;border:0;padding:0;color:inherit;cursor:pointer;font-family:inherit}.rnhint{font-size:11px;font-weight:800;color:#d8302a;margin-top:-2px}#title .btn.mode{width:min(300px,82vw);height:62px;min-width:0;padding:0;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.15}
 #title .btn.mode small{font-size:11px}
 .subBar{display:flex;gap:10px;width:min(300px,82vw);margin-top:4px}
 .subBar button{flex:1 1 0;height:64px;border:4px solid var(--ink);border-radius:14px;background:#fff;color:var(--ink);box-shadow:0 5px 0 var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font:800 12px 'M PLUS Rounded 1c',sans-serif;padding:0;cursor:pointer;touch-action:manipulation}
@@ -269,7 +269,8 @@ a.btn{display:inline-block;box-sizing:border-box;text-decoration:none;text-align
   <h2>ランクマッチ</h2>
   <div class="rcard">
     <div class="rtier" id="rkTier">ふでばこ</div>
-    <div class="rname" id="rkName"></div>
+    <button class="rname" id="rkName" aria-label="名前を変える"></button>
+    <div class="rnhint hidden" id="rkNameHint">仮の名前です。タップで変えられます</div>
     <div class="rrate"><b id="rkRate">1500</b> pt</div>
     <div class="rwl" id="rkWL">0勝 0敗</div>
     <div class="rnext" id="rkNext"></div>
@@ -1028,8 +1029,9 @@ const GT=()=>game.mode==='cpu'&&!game.ranked?game.gt:null,cpuName=()=>GT()?GT().
 let gtBest=0;try{gtBest=+localStorage.getItem('gekiochiBest')||0}catch(e){}
 function gtBestText(){$('bestTxt').textContent=gtBest?'自己ベスト：'+gtBest+'人抜き'+(gtBest>=5?'（クリア済み）':''):'ひとりで遊ぶ'}
 function gtRecord(wins){if(wins<=gtBest)return false;gtBest=wins;try{localStorage.setItem('gekiochiBest',wins)}catch(e){}gtBestText();return true}
-function gtGo(n,keep){game.oppSkin=game.oppTitle='';const st=stageOf(n);game.gt={n,st,won:false};game.me=0;game.ranked=null;startMatch('cpu',(Math.random()*1e9)|0,0,[game.myType,st.k],st.need,keep)}
+function gtGo(n,keep){if(n===1)stat('gt_start');game.oppSkin=game.oppTitle='';const st=stageOf(n);game.gt={n,st,won:false};game.me=0;game.ranked=null;startMatch('cpu',(Math.random()*1e9)|0,0,[game.myType,st.k],st.need,keep)}
 function startMatch(mode,seed,first,types,need,keepBgm){
+  if(mode==='net'&&!game.ranked)stat('net_start');
   bgmPlay('battle',!keepBgm);game.need=need||2;
   game.turnLimit=(mode==='net'||game.ranked)?TURN_SEC:0;
   game.token++;game.mode=mode;game.seed=seed;game.types=types.slice();applyLooks(game.types);game.score=[0,0];game.round=1;
@@ -1098,7 +1100,7 @@ function aimEnd(){
 }
 function setAimHint(){const t=matchMedia('(pointer:coarse)').matches?'左右になぞって向き → 下に引っぱって離すと弾く！':'←→で向き ／ スペース長押し→離すと弾く！（ドラッグでもOK）';$('aimHint').textContent=t}
 function myFire(){
-  if(game.phase!=='power'||!isMyTurn())return;drag=null;game.kbCharge=false;
+  if(game.phase!=='power'||!isMyTurn())return;stat('shot1',true);drag=null;game.kbCharge=false;
   const sh={type:game.shot.type,angle:game.shot.angle,curve:game.shot.curve,power:game.shot.power};
   if(game.mode==='net')netSend(Object.assign({t:'shot'},sh));
   fireShot(sh);
@@ -1157,17 +1159,18 @@ function resolveTurn(){
   else{game.score[w]++;updateHUD();pop(w===myIdx()?'ナイス激落！':'落とされた…','mid');next=1-w}
   if(w>=0&&game.score[w]>=game.need){const g=GT();
     // 勝ち抜き中に勝ったら、結果画面をはさまずに次の相手へ（5人抜き達成のときだけ結果画面）
+    if(g&&w===myIdx()&&g.n<=5)stat('gt_win'+g.n);
     if(g&&w===myIdx()&&g.n!==5)later(()=>{const r=gtRecord(g.n)||g.rec;SFX.win();gtGo(g.n+1,true);game.gt.rec=r},2000);
     else later(()=>endMatch(w),2200)}
   else later(()=>{game.round++;startRound(next)},2400);
 }
 function endMatch(w){
-  game.token++;chargeStop();
+  game.token++;chargeStop();if(game.ranked)stat('rank_end');
   game.phase='over';$('hud').classList.add('hidden');showScreen('result');
   const mine=w===myIdx();$('resT').textContent=mine?'YOU WIN!!':'YOU LOSE…';
   $('resS').textContent=`${game.score[myIdx()]} － ${game.score[1-myIdx()]}`;
   $('bAgain').textContent=game.ranked?'もう一回ランクマッチ':'もう一回！';$('bAgain').disabled=false;
-  const g=GT();if(g){g.won=mine;const wins=mine?g.n:g.n-1,rec=gtRecord(wins)||(!mine&&g.rec);
+  const g=GT();if(g){g.won=mine;if(!mine)stat('gt_lose'+Math.min(g.n,6));const wins=mine?g.n:g.n-1,rec=gtRecord(wins)||(!mine&&g.rec);
     if(mine){$('resT').textContent=g.n===5?'5人抜き達成!!':g.n+'人抜き！';
       $('resS').textContent=g.n===5?'全員を激落させた！\nここからはエンドレス':'次は '+(g.n+1<=5?(g.n+1)+'人目：'+STAGES[g.n].name:(g.n+1)+'人目の刺客');
       $('bAgain').textContent=g.n===5?'エンドレスに挑戦！':'次の相手へ！'}
@@ -1235,7 +1238,7 @@ function setupConn(c){
     if(RK.q&&game.phase==='title'){rkQueueFail('相手との接続が切れました');return}
     if(game.mode==='net'&&game.phase!=='title'){toast('相手との接続が切れました');toTitle()}});
 }
-function netHost(){
+function netHost(){stat('net_host');
   netClose();if(!window.Peer){netStatus('通信ライブラリを読み込めませんでした');return}
   const code=String(1000+Math.floor(Math.random()*9000));game.me=0;
   netStatus('部屋を作成中…');
@@ -1247,7 +1250,7 @@ function netHost(){
   });
   peer.on('error',e=>{if(e.type==='unavailable-id'){netHost()}else netStatus('エラー：'+e.type)});
 }
-function netJoin(){
+function netJoin(){stat('net_join');
   const code=$('codeIn').value.trim();
   if(!/^\d{4}$/.test(code)){netStatus('4ケタの数字を入れてね');return}
   netClose();if(!window.Peer){netStatus('通信ライブラリを読み込めませんでした');return}
@@ -1290,6 +1293,16 @@ const FIREBASE_CONFIG={
 // ランクマッチが使える場所（Firebaseの承認済みドメインと合わせる）
 const RK_HOSTS=['zirihinit.github.io','localhost','127.0.0.1'];
 const RK_URL='https://zirihinit.github.io/gekiochi/';
+// ===== 遊ばれた回数（日ごとの合計だけ。誰が遊んだかは記録しない） =====
+const STAT_EV=new Set(["open", "open_new", "howto", "shot1", "gt_start", "gt_win1", "gt_win2", "gt_win3", "gt_win4", "gt_win5", "gt_lose1", "gt_lose2", "gt_lose3", "gt_lose4", "gt_lose5", "gt_lose6", "net_host", "net_join", "net_start", "rank_open", "rank_human", "rank_bot", "rank_end", "gacha", "share"]);
+const statOnce=new Set();
+function stat(k,once){
+  if(!STAT_EV.has(k)||(once&&statOnce.has(k)))return;statOnce.add(k);
+  if(location.hostname!=='zirihinit.github.io'&&!window.__statTest)return;
+  const day=new Date(Date.now()+9*3600e3).toISOString().slice(0,10),P='projects/'+FIREBASE_CONFIG.projectId+'/databases/(default)/documents';
+  const body={writes:[{transform:{document:P+'/gekiochi_stats/'+day,fieldTransforms:[{fieldPath:k,increment:{integerValue:'1'}}]}}]};
+  try{fetch('https://firestore.googleapis.com/v1/'+P+':commit?key='+FIREBASE_CONFIG.apiKey,{method:'POST',keepalive:true,headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).catch(()=>{})}catch(e){}
+}
 const FB_VER='10.14.1',RK_K=32,COL={p:'gekiochi_players',q:'gekiochi_queue',m:'gekiochi_matches'};
 const TIERS=[
   {min:-1e9,name:'消しカス',col:'#9a9aa8'},{min:1350,name:'落書きノート',col:'#62c46a'},{min:1450,name:'ふでばこ',col:'#3fb6f2'},
@@ -1297,6 +1310,8 @@ const TIERS=[
 const tierOf=r=>{let t=TIERS[0];for(const x of TIERS)if(r>=x.min)t=x;return t};
 const RK={db:null,uid:null,prof:null,name:'',q:null,qtk:0};
 try{RK.name=localStorage.getItem('gekiochiName')||''}catch(e){}
+// 名前がまだなければ仮の名前を付ける（あとで「名前を変える」から変更できる）
+function rkAutoName(){if(RK.name)return;RK.name='けしごむ'+String(1000+((Math.random()*9000)|0));RK.autoName=true;try{localStorage.setItem('gekiochiName',RK.name)}catch(e){}}
 const rkRating=()=>RK.prof&&typeof RK.prof.rating==='number'?RK.prof.rating:1500;
 // 消しカス（初回だけ100＝1回ぶん持っている）と、当てた景品
 const GACHA_COST=100,KASU_WIN=30,KASU_LOSE=10,KASU_DUP=20;
@@ -1328,7 +1343,7 @@ const pRef=()=>RK.db.collection(COL.p).doc(RK.uid);
 function sanitizeName(v){return String(v||'').replace(/[\u0000-\u001f\u007f<>]/g,'').trim().slice(0,10)}
 function rkRenderLobby(){
   const r=Math.round(rkRating()),t=tierOf(r),i=TIERS.indexOf(t),n=TIERS[i+1],p=RK.prof||{};
-  $('rkTier').textContent=t.name;$('rkTier').style.background=t.col;$('rkName').textContent=RK.name;$('rkRate').textContent=r;
+  $('rkTier').textContent=t.name;$('rkTier').style.background=t.col;$('rkName').textContent=RK.name+' ✎';$('rkNameHint').classList.toggle('hidden',!RK.autoName);$('rkRate').textContent=r;
   $('rkWL').textContent=`${p.wins|0}勝 ${p.losses|0}敗`;
   $('rkKasu').textContent=rkKasu();gachaBadge();
   $('rkNext').textContent=n?`次の称号「${n.name}」まで あと ${n.min-r} pt`:'最高ランク！ 君こそ激落王だ';
@@ -1413,7 +1428,7 @@ function rkStartBot(){
   const tk=++RK.qtk;
   setTimeout(()=>{if(RK.qtk!==tk||game.phase!=='title'||$('rankVs').classList.contains('hidden'))return;
     game.diff=diff;game.me=0;
-    game.ranked={matchId:'cpu-'+Date.now(),opp,done:false,K:RK_K/2,bot:true};
+    game.ranked={matchId:'cpu-'+Date.now(),opp,done:false,K:RK_K/2,bot:true};stat('rank_bot');
     game.ranked.startP=rkReportStart();
     startMatch('cpu',(Math.random()*1e9)|0,first,[game.myType,bt]);
   },2400);
@@ -1468,7 +1483,7 @@ function rkBegin(q,seed,first,types){
   setTimeout(()=>{
     if(RK.q!==q)return;
     rkCleanupQueue();
-    game.ranked={matchId:q.matchId,opp,done:false};
+    game.ranked={matchId:q.matchId,opp,done:false};stat('rank_human');
     game.ranked.startP=rkReportStart();
     startMatch('net',seed,first,types);
   },1800);
@@ -1504,6 +1519,7 @@ async function gachaPull(){
   const r=Math.random(),rar=r<0.03?3:r<0.12?2:r<0.42?1:0,pool=Object.keys(PRIZES).filter(k=>PRIZES[k].rar===rar),id=pool[(Math.random()*pool.length)|0];
   const inv=rkInv(),dup=inv.includes(id),kasu=rkKasu()-GACHA_COST+(dup?KASU_DUP:0);
   const ok=await rkSaveProf({kasu,inv:dup?inv:inv.concat(id)});
+  if(ok)stat('gacha');
   if(!ok){gachaRender.busy=false;gachaRender();toast('保存できませんでした。もう一度ためしてね');const d=await pRef().get().catch(()=>null);if(d&&d.exists)RK.prof=d.data();gachaRender();return}
   const cap=$('gaCap'),card=$('gaCard');card.classList.add('hidden');cap.style.visibility='';cap.classList.remove('shake');void cap.offsetWidth;cap.classList.add('shake');SFX.round();
   setTimeout(()=>{const p=PRIZES[id];cap.style.visibility='hidden';card.className='gaCard r'+p.rar;
@@ -1545,21 +1561,21 @@ $('bgmBtn').classList.toggle('off',!BGM.on);
 $('bgmBtn').onclick=()=>{ac();BGM.on=!BGM.on;$('bgmBtn').classList.toggle('off',!BGM.on);try{localStorage.setItem('gekiochiBgm',BGM.on?'1':'0')}catch(e){}bgmVol()};
 // どこかを最初に触ったら音を起動（スマホは操作するまで音を出せないため）
 addEventListener('pointerdown',()=>ac(),{passive:true});addEventListener('keydown',()=>ac());
-$('bRank').onclick=async()=>{ac();SFX.click();if(!await rkInit())return;
-  if(!RK.name){$('nameIn').value='';showScreen('rankName')}else{rkRenderLobby();showScreen('rankLobby')}};
+$('bRank').onclick=async()=>{ac();SFX.click();if(!await rkInit())return;stat('rank_open');
+  rkAutoName();if(RK.prof&&RK.prof.name&&RK.prof.name!==RK.name)RK.name=RK.prof.name;rkRenderLobby();showScreen('rankLobby')};
 $('bNameOk').onclick=async()=>{const n=sanitizeName($('nameIn').value);if(!n){toast('名前を入れてね');return}
-  SFX.click();RK.name=n;try{localStorage.setItem('gekiochiName',n)}catch(e){}
+  SFX.click();RK.name=n;RK.autoName=false;try{localStorage.setItem('gekiochiName',n)}catch(e){}
   if(RK.prof){RK.prof.name=n;pRef().update({name:n}).catch(e=>console.warn(e))}
   const af=rkReady.after;rkReady.after=null;
   if(af==='gacha')gachaOpen();else if(af==='title'){dressRender();showScreen('rankDress')}else{rkRenderLobby();showScreen('rankLobby')}};
 $('nameIn').addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Enter')$('bNameOk').click()});
 $('bNameBack').onclick=()=>{SFX.click();if(RK.name){rkRenderLobby();showScreen('rankLobby')}else showScreen('title')};
-$('bRename').onclick=()=>{SFX.click();$('nameIn').value=RK.name;showScreen('rankName')};
+$('bRename').onclick=$('rkName').onclick=()=>{SFX.click();$('nameIn').value=RK.autoName?'':RK.name;showScreen('rankName')};
 $('bQueue').onclick=()=>{SFX.click();game.pickFor='rank';showScreen('pickMenu')};
 $('bBoard').onclick=()=>{SFX.click();rkShowBoard()};
 let dressFrom='title';
 // ガチャ・きせかえはタイトルから。サーバーと名前が要るので、なければ先に用意する
-async function rkReady(){if(!await rkInit())return false;if(!RK.name){$('nameIn').value='';rkReady.after=dressFrom;showScreen('rankName');return false}return true}
+async function rkReady(){if(!await rkInit())return false;rkAutoName();return true}
 $('bGacha').onclick=async()=>{ac();SFX.click();dressFrom='gacha';if(await rkReady())gachaOpen()};$('bPull').onclick=()=>{ac();gachaPull()};
 $('bDress').onclick=async()=>{ac();SFX.click();dressFrom='title';if(await rkReady()){dressRender();showScreen('rankDress')}};
 $('bGaDress').onclick=()=>{SFX.click();dressFrom='gacha';dressRender();showScreen('rankDress')};
@@ -1588,7 +1604,7 @@ function hwGo(i){hwIdx=clamp(i,0,HW_N-1);$('hwTrack').style.transform=`translate
   document.querySelectorAll('#hwDots i').forEach((d,k)=>d.classList.toggle('on',k===hwIdx));
   $('hwPrev').disabled=hwIdx===0;$('hwNext').disabled=hwIdx===HW_N-1;
   if(howNext)$('bHowGo').textContent=hwIdx===HW_N-1?'わかった！あそぶ':'とばしてあそぶ';}
-function openHowto(next){howNext=next||null;hwGo(0);
+function openHowto(next){stat('howto');howNext=next||null;hwGo(0);
   $('bHowGo').classList.toggle('hidden',!howNext);$('bHowBack').classList.toggle('hidden',!!howNext);
   document.querySelector('.hwMore').open=false;showScreen('howto')}
 function closeHowto(){howSeen=true;try{localStorage.setItem('gekiochiHow','1')}catch(e){}
@@ -1626,7 +1642,8 @@ $('bAgain').onclick=()=>{ac();SFX.click();
   if(game.mode==='cpu'){const g=game.gt;gtGo(g&&g.won?g.n+1:1)}
   else{game.againMe=true;netSend({t:'again'});$('bAgain').textContent='相手を待っています…';$('bAgain').disabled=true;checkAgain()}};
 // スマホもPCも、文章入りのXの投稿画面を開く（共有シートだとXアプリがURLしか拾わないことがあるため）
-$('bShare').addEventListener('click',()=>SFX.click());
+{let nw=false;try{nw=!localStorage.getItem('gekiochiSeen');localStorage.setItem('gekiochiSeen','1')}catch(e){}stat('open');if(nw)stat('open_new')}
+$('bShare').addEventListener('click',()=>{SFX.click();stat('share')});
 $('bToTitle').onclick=()=>{SFX.click();toTitle()};
 addEventListener('keydown',e=>{
   if(e.repeat&&(e.key===' '||e.key==='Enter')){e.preventDefault();return}
