@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>本日のマナー講座ザマス</title>
+<meta name="description" content="マナー講師ザマス先生に怒られずに食べきれるか!? 和食・洋食・中華 全12編のお作法3Dゲーム。ムカついたらちゃぶ台返し。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://zirihinit.github.io/zamasu/">
+<meta property="og:title" content="本日のマナー講座ザマス">
+<meta property="og:description" content="マナー講師に怒られずに食べきれるか!? 和洋中 全12編。ムカついたらちゃぶ台返し💥">
+<meta property="og:image" content="https://zirihinit.github.io/zamasu/ogp.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="本日のマナー講座ザマス">
+<meta name="twitter:description" content="マナー講師に怒られずに食べきれるか!? 和洋中 全12編。ムカついたらちゃぶ台返し💥">
+<meta name="twitter:image" content="https://zirihinit.github.io/zamasu/ogp.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=M+PLUS+Rounded+1c:wght@500;800&display=swap" rel="stylesheet">
+<style>
+:root{--pink:#ff3b8a;--purple:#7b3fa0;--cream:#fff8ec;--ink:#3a2433;}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;background:#3a2433;font-family:'M PLUS Rounded 1c',sans-serif;color:var(--ink);
+  user-select:none;-webkit-user-select:none;touch-action:none;overscroll-behavior:none}
+#c{position:fixed;inset:0;width:100%;height:100%;display:block}
+.hidden{display:none!important}
+
+/* ---------- HUD ---------- */
+#hud{position:fixed;left:0;right:0;top:0;padding:8px 10px 0;pointer-events:none;z-index:5}
+.grow{display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:11px;font-weight:800;text-shadow:0 1px 0 #fff}
+.grow .lab{width:104px;white-space:nowrap}
+.bar{flex:1;height:12px;border-radius:7px;background:rgba(0,0,0,.25);border:2px solid #fff;overflow:hidden;position:relative}
+.bar i{position:absolute;left:0;top:0;bottom:0;width:0;transition:width .35s}
+#angerBar i{background:linear-gradient(90deg,#ffb3c8,#ff2d55)}
+#iraBar i{background:linear-gradient(90deg,#ffe08a,#ff7a00)}
+#stepInfo{position:absolute;right:10px;top:48px;font-size:11px;font-weight:800;background:#fff;border-radius:10px;padding:2px 8px;box-shadow:0 2px 0 rgba(0,0,0,.2)}
+
+#bubble{position:fixed;left:50%;top:70px;transform:translate(-50%,-100%) scale(.6);transform-origin:50% 100%;opacity:0;z-index:6;max-width:88%;
+  background:#fff;border:3px solid var(--ink);border-radius:18px;padding:8px 14px;font-weight:800;font-size:16px;line-height:1.35;
+  text-align:center;box-shadow:0 4px 0 rgba(0,0,0,.25);transition:transform .15s,opacity .15s;pointer-events:none}
+#bubble.show{transform:translate(-50%,-100%) scale(1);opacity:1}
+#bubble.angry{background:#ffe3ea;border-color:#d1003a;color:#a00030}
+#bubble:after{content:"";position:absolute;left:50%;bottom:-14px;margin-left:-10px;border:10px solid transparent;border-top:12px solid var(--ink);border-bottom:0}
+
+/* ---------- task panel ---------- */
+#panel{position:fixed;left:8px;right:8px;bottom:8px;z-index:7;background:rgba(255,248,236,.96);border:3px solid var(--ink);
+  border-radius:18px;padding:10px 12px 12px;box-shadow:0 5px 0 rgba(0,0,0,.3)}
+#task{font-weight:800;font-size:16px;line-height:1.35;margin-bottom:8px;min-height:22px}
+#task small{display:block;font-size:11px;color:#8a6a7a;font-weight:500}
+#timer{height:6px;border-radius:3px;background:#e7d6c8;margin-bottom:9px;overflow:hidden}
+#timer i{display:block;height:100%;width:100%;background:var(--purple)}
+#ctrl{display:flex;flex-direction:column;gap:7px}
+.btn{pointer-events:auto;border:3px solid var(--ink);border-radius:14px;background:#fff;font-family:inherit;font-weight:800;font-size:15px;
+  color:var(--ink);padding:11px 10px;box-shadow:0 4px 0 var(--ink);cursor:pointer;touch-action:manipulation}
+.btn:active,.btn.pressed{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.btn.big{font-size:20px;padding:14px}
+.btn.pink{background:var(--pink);color:#fff}
+.btn.purple{background:var(--purple);color:#fff}
+.btn:disabled{opacity:.45}
+.row{display:flex;gap:7px}.row>*{flex:1}
+.gauge{position:relative;height:40px;border-radius:12px;border:3px solid var(--ink);overflow:hidden;
+  background:linear-gradient(90deg,#ff7a8a 0 28%,#ffd84d 28% 45%,#5fd17a 45% 55%,#ffd84d 55% 72%,#ff7a8a 72%)}
+.gauge .cur{position:absolute;top:-4px;bottom:-4px;width:6px;margin-left:-3px;background:var(--ink);border-radius:3px;box-shadow:0 0 0 2px #fff}
+.spad{position:relative;height:150px;border:3px solid var(--ink);border-radius:16px;overflow:hidden;background:#fff;touch-action:none;cursor:pointer}
+.spad .half{position:absolute;left:0;right:0;height:50%;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:800;font-size:17px}
+.spad .up{top:0;background:#e9f7ee;border-bottom:2px dashed #b89}
+.spad .dn{bottom:0;background:#fdeef3}
+.spad .half b{font-size:26px}
+.spad .half.on{filter:brightness(.88)}
+.spad .hand{position:absolute;right:16px;top:50%;font-size:30px;margin-top:-18px;animation:hand 1.6s ease-in-out infinite;pointer-events:none}
+@keyframes hand{0%,100%{transform:translateY(-38px)}50%{transform:translateY(38px)}}
+.spadNote{font-size:11px;color:#8a6a7a;text-align:center}
+#mashCount{text-align:center;font-family:'Dela Gothic One';font-size:34px;line-height:1}
+#feedback{display:flex;gap:10px;align-items:flex-start}
+#feedback .badge{font-family:'Dela Gothic One';font-size:28px;line-height:1;min-width:56px;text-align:center;border-radius:12px;padding:8px 4px;color:#fff}
+.b-perfect{background:#1fb35a}.b-near{background:#f0a400}.b-miss{background:#e0213f}
+#feedback .exp{font-size:13px;line-height:1.45;font-weight:500}
+#feedback .exp b{font-weight:800}
+.absnote{display:inline-block;margin-top:4px;font-size:11px;background:#ffe9a8;border-radius:6px;padding:1px 6px}
+#tapNext{font-size:11px;color:#8a6a7a;text-align:right;margin-top:4px}
+
+/* ---------- flip button ---------- */
+#flip{position:fixed;right:10px;top:84px;z-index:8;width:78px;height:78px;border-radius:50%;border:3px solid var(--ink);
+  background:#fff;box-shadow:0 4px 0 var(--ink);overflow:hidden;pointer-events:auto;touch-action:none;cursor:pointer}
+#flip .fill{position:absolute;left:0;right:0;bottom:0;height:0;background:linear-gradient(0deg,#ff2d00,#ffb300);transition:height .3s}
+#flip .txt{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:800;
+  font-size:12px;line-height:1.1;text-align:center;color:var(--ink)}
+#flip .txt b{font-size:22px}
+#flip .txt small{font-size:9px;opacity:.75}
+#flip.hot{animation:hot .35s infinite alternate}
+#flip.charging{transform:scale(1.12);box-shadow:0 0 0 var(--ink)}
+#flip .ring{position:absolute;inset:0;border-radius:50%;background:conic-gradient(rgba(58,36,51,.55) calc(var(--p,0)*1turn),transparent 0)}
+@keyframes hot{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}
+
+/* ---------- overlays ---------- */
+.screen{position:fixed;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px;
+  background:radial-gradient(circle at 50% 30%,rgba(255,240,250,.92),rgba(240,210,230,.96));overflow:auto}
+.logo{font-family:'Dela Gothic One';text-align:center;color:var(--purple);line-height:1.05;
+  text-shadow:3px 3px 0 #fff,-3px 3px 0 #fff,3px -3px 0 #fff,-3px -3px 0 #fff,0 7px 0 var(--pink)}
+.logo .s{font-size:22px;display:block;color:var(--ink)}
+.logo .l{font-size:44px;display:block}
+.logo .z{font-size:60px;display:block;color:var(--pink);text-shadow:3px 3px 0 #fff,-3px 3px 0 #fff,3px -3px 0 #fff,-3px -3px 0 #fff,0 7px 0 var(--purple);transform:rotate(-4deg)}
+.lead{font-size:13px;text-align:center;margin:14px 0 6px;line-height:1.55;font-weight:500}
+.courses{display:flex;flex-direction:column;gap:10px;width:100%;max-width:340px;margin-top:8px}
+.course{display:flex;align-items:center;gap:10px;text-align:left}
+.course .em{font-size:30px}
+.course .nm{font-size:18px}
+.course .bs{display:block;font-size:11px;font-weight:500;opacity:.8}
+.opts{margin-top:14px;font-size:13px;display:flex;gap:8px;align-items:center}
+.opts input{width:18px;height:18px}
+.howto{font-size:11px;max-width:340px;line-height:1.6;margin-top:10px;background:rgba(255,255,255,.7);border-radius:12px;padding:8px 12px}
+#result .rank{font-family:'Dela Gothic One';font-size:92px;line-height:1;color:var(--pink);text-shadow:4px 4px 0 #fff,0 8px 0 var(--purple)}
+#result .rtitle{font-family:'Dela Gothic One';font-size:24px;margin:6px 0 2px;text-align:center}
+#result .rsub{font-size:13px;margin-bottom:10px;text-align:center;line-height:1.5}
+#result table{font-size:13px;border-collapse:collapse;margin:4px 0 12px;background:rgba(255,255,255,.75);border-radius:12px;overflow:hidden}
+#result td{padding:5px 14px;border-bottom:1px solid #ecd}
+#result td:last-child{text-align:right;font-weight:800}
+#result .acts{display:flex;flex-direction:column;gap:9px;width:100%;max-width:320px}
+a.btn{text-decoration:none;text-align:center;display:block}
+#bigText{position:fixed;left:0;right:0;top:38%;z-index:15;text-align:center;font-family:'Dela Gothic One';font-size:min(44px,9vw);white-space:nowrap;color:#fff;
+  -webkit-text-stroke:2px var(--ink);text-shadow:0 6px 0 #d1003a;pointer-events:none;transform:scale(0);transition:transform .25s cubic-bezier(.3,1.8,.5,1)}
+#bigText.show{transform:scale(1) rotate(-5deg)}
+#toast{position:fixed;left:50%;top:150px;transform:translateX(-50%);z-index:9;background:#ffe9a8;border:2px solid var(--ink);border-radius:10px;
+  font-size:12px;font-weight:800;padding:4px 10px;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+#toast.show{opacity:1}
+#loading{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;z-index:30;background:#3a2433}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="loading">準備中ザマス…</div>
+
+<div id="hud" class="hidden">
+  <div class="grow"><span class="lab">👓 先生のお怒り</span><div class="bar" id="angerBar"><i></i></div></div>
+  <div class="grow"><span class="lab">😤 あなたのイライラ</span><div class="bar" id="iraBar"><i></i></div></div>
+  <div id="stepInfo"></div>
+</div>
+<div id="bubble"></div>
+<div id="toast"></div>
+<div id="bigText"></div>
+
+<div id="flip" class="hidden"><div class="fill"></div><div class="ring"></div><div class="txt"><b>🍽️</b>ちゃぶ台<br>返し<small>長押し</small></div></div>
+
+<div id="panel" class="hidden">
+  <div id="task"></div>
+  <div id="timer"><i></i></div>
+  <div id="ctrl"></div>
+</div>
+
+<!-- title -->
+<div id="title" class="screen hidden">
+  <div class="logo"><span class="s">本日の</span><span class="l">マナー講座</span><span class="z">ザマス</span></div>
+  <div class="lead">マナー講師・<b>ザマス先生</b>の目の前で<br>お食事を最後までやりとげるザマス。<br>小言にムカついたら……<b>ちゃぶ台返し</b>も、アリ。</div>
+  <div class="courses">
+    <button class="btn course" data-c="wa"><span class="em">🍱</span><span><span class="nm">和食コース</span><span class="bs" data-best="wa"></span></span></button>
+    <button class="btn course" data-c="yo"><span class="em">🍽️</span><span><span class="nm">洋食コース</span><span class="bs" data-best="yo"></span></span></button>
+    <button class="btn course" data-c="chu"><span class="em">🥟</span><span><span class="nm">中華コース</span><span class="bs" data-best="chu"></span></span></button>
+  </div>
+  <label class="opts"><input type="checkbox" id="voiceOn" checked>先生がしゃべる（音声読み上げ）</label>
+  <label class="opts" style="margin-top:4px"><input type="checkbox" id="sfxOn" checked>効果音</label>
+  <div class="howto">
+    ・お題に合わせて <b>選ぶ／スワイプ／タイミング／連打</b> でお作法をこなす<br>
+    ・ミスで<b>先生のお怒り</b>が溜まり、満タンで<b>落第</b><br>
+    ・小言を言われると<b>あなたのイライラ</b>が溜まる<br>
+    ・右上の<b>ちゃぶ台返し</b>を長押しで、いつでも講座をぶち壊せる<br>
+    ・イライラが満タンになると……勝手に返す
+  </div>
+</div>
+
+<!-- chapters -->
+<div id="chapters" class="screen hidden">
+  <div class="logo"><span class="s">本日の</span><span class="l" style="font-size:34px">マナー講座ザマス</span></div>
+  <div class="lead" id="chHead" style="font-family:'Dela Gothic One';font-size:22px;margin-top:18px"></div>
+  <div class="lead" style="margin-top:0">どの「編」を受講するザマス？</div>
+  <div class="courses" id="chList"></div>
+  <button class="btn" id="chBack" style="margin-top:14px;width:100%;max-width:340px">← もどる</button>
+</div>
+
+<!-- result -->
+<div id="result" class="screen hidden">
+  <div class="rank" id="rRank"></div>
+  <div class="rtitle" id="rTitle"></div>
+  <div class="rsub" id="rSub"></div>
+  <table id="rTable"></table>
+  <div class="acts">
+    <button class="btn pink big" id="again">もう一度ザマス</button>
+    <button class="btn" id="toTitle">コースを選び直す</button>
+    <a class="btn purple" id="share" target="_blank" rel="noopener">𝕏 で結果をシェア</a>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+'use strict';
+// 公開先URL（GitHub Pages に置いたらここを書き換えると、シェア文にURLが入ります）
+const SHARE_URL = 'https://zirihinit.github.io/zamasu/';
+const HASHTAG = '本日のマナー講座ザマス';
+
+const $ = id => document.getElementById(id);
+const rand = (a,b) => a + Math.random()*(b-a);
+const pick = a => a[Math.floor(Math.random()*a.length)];
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+const shuffle = a => { a = a.slice(); for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const store = {
+  get(k){ try { return JSON.parse(localStorage.getItem('zamasu_'+k)); } catch(e){ return null; } },
+  set(k,v){ try { localStorage.setItem('zamasu_'+k, JSON.stringify(v)); } catch(e){} }
+};
+
+if (!window.THREE) { $('loading').textContent = '3Dの読み込みに失敗したザマス…（通信環境を確認してね）'; return; }
+
+/* =========================================================
+   AUDIO
+   ========================================================= */
+let actx = null;
+function audio(){ if (!actx){ try { actx = new (window.AudioContext||window.webkitAudioContext)(); } catch(e){} } if (actx && actx.state==='suspended') actx.resume(); return actx; }
+function tone(freq, dur, type='sine', vol=.15, slide=0, delay=0){
+  if (!$('sfxOn').checked) return; const a = audio(); if (!a) return;
+  const t = a.currentTime + delay, o = a.createOscillator(), g = a.createGain();
+  o.type = type; o.frequency.setValueAtTime(freq, t); if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(30,freq+slide), t+dur);
+  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.001, t+dur);
+  o.connect(g).connect(a.destination); o.start(t); o.stop(t+dur+.02);
+}
+function noise(dur, vol=.4, lp=1200){
+  if (!$('sfxOn').checked) return; const a = audio(); if (!a) return;
+  const len = Math.floor(a.sampleRate*dur), buf = a.createBuffer(1, len, a.sampleRate), d = buf.getChannelData(0);
+  for (let i=0;i<len;i++) d[i] = (Math.random()*2-1) * Math.pow(1-i/len, 2);
+  const s = a.createBufferSource(); s.buffer = buf; const f = a.createBiquadFilter(); f.type='lowpass'; f.frequency.value = lp;
+  const g = a.createGain(); g.gain.value = vol; s.connect(f).connect(g).connect(a.destination); s.start();
+}
+const sfx = {
+  tap(){ tone(660,.06,'square',.06); },
+  perfect(){ tone(784,.12,'triangle',.18); tone(1175,.2,'triangle',.18,0,.1); },
+  near(){ tone(440,.15,'triangle',.15); tone(415,.2,'triangle',.12,0,.12); },
+  miss(){ tone(180,.35,'sawtooth',.14,-60); tone(140,.4,'sawtooth',.12,-50,.08); },
+  warn(){ tone(900,.05,'square',.05); tone(900,.05,'square',.05,0,.1); },
+  mash(n){ tone(300+(n%5)*40,.05,'square',.05); },
+  crash(){ noise(1.2,.7,2500); noise(.6,.8,300); tone(70,.6,'sine',.5,-40); },
+  ding(){ tone(1568,.5,'sine',.1); }
+};
+
+/* =========================================================
+   VOICE (teacher)
+   ========================================================= */
+let jaVoice = null;
+function loadVoices(){ try { const vs = speechSynthesis.getVoices(); jaVoice = vs.find(v=>/ja/i.test(v.lang) && /female|kyoko|haruka|nanami|o-ren|女性/i.test(v.name)) || vs.find(v=>/ja/i.test(v.lang)) || null; } catch(e){} }
+try { loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; } catch(e){}
+function speak(text){
+  if (!$('voiceOn').checked) return;
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text.replace(/[！!]{2,}/g,'！').replace(/[（(].*?[)）]/g,''));
+    u.lang = 'ja-JP'; if (jaVoice) u.voice = jaVoice; u.pitch = 1.9; u.rate = 1.15; u.volume = .9;
+    speechSynthesis.speak(u);
+  } catch(e){}
+}
+
+/* =========================================================
+   THREE SETUP
+   ========================================================= */
+const canvas = $('c');
+const renderer = new THREE.WebGLRenderer({canvas, antialias:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputEncoding = THREE.sRGBEncoding;
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xf6e7d6);
+const camera = new THREE.PerspectiveCamera(60, 1, .05, 60);
+const TOP = .75;                       // table top height (world)
+const CAM_BASE = new THREE.Vector3(0, 1.5, 1.28);
+const CAM_LOOK = new THREE.Vector3(0, .93, -.6);
+let camDist = 1;
+
+scene.add(new THREE.HemisphereLight(0xfff6ee, 0x8a6a55, .75));
+const sun = new THREE.DirectionalLight(0xffffff, .75);
+sun.position.set(1.5, 4.5, 2.5); sun.castShadow = true;
+sun.shadow.mapSize.set(1024,1024); const sc = sun.shadow.camera; sc.left=-3; sc.right=3; sc.top=3; sc.bottom=-3; sc.near=.5; sc.far=12;
+sun.shadow.bias = -.0008;
+scene.add(sun);
+const fill = new THREE.PointLight(0xffd6e8, .35, 8); fill.position.set(0, 2.2, -.5); scene.add(fill);
+
+function M(color, o={}){ return new THREE.MeshStandardMaterial(Object.assign({color, roughness:.65, metalness:0}, o)); }
+let noShadow=false;
+function mesh(geo, mat, x=0,y=0,z=0, shadow=true){ if(noShadow) shadow=false; const m = new THREE.Mesh(geo, mat); m.position.set(x,y,z); m.castShadow = shadow; m.receiveShadow = true; return m; }
+function canvasTex(w,h,draw){ const c = document.createElement('canvas'); c.width=w; c.height=h; const g = c.getContext('2d'); draw(g,w,h); const t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding; t.anisotropy = 4; t._redraw = ()=>{ g.clearRect(0,0,w,h); draw(g,w,h); t.needsUpdate = true; }; return t; }
+
+function bowlGeo(r, h, seg=28){
+  const p = [], V = THREE.Vector2;
+  p.push(new V(0,0), new V(r*.42,0), new V(r*.46,.012), new V(r*.5,.02), new V(r*.82,h*.45), new V(r,h), new V(r*.95,h*1.0), new V(r*.78,h*.47), new V(r*.45,.03), new V(0,.03));
+  return new THREE.LatheGeometry(p, seg);
+}
+function plateGeo(r, h=.025){
+  const V = THREE.Vector2;
+  return new THREE.LatheGeometry([new V(0,0),new V(r*.6,0),new V(r*.65,.006),new V(r,h),new V(r*.97,h+.004),new V(r*.62,.012),new V(0,.012)], 36);
+}
+
+/* ---------- room ---------- */
+const room = new THREE.Group(); scene.add(room);
+let floorY = 0;
+function buildRoom(kind){ noShadow=true; try{ buildRoomInner(kind); } finally { noShadow=false; } }
+function buildRoomInner(kind){
+  while (room.children.length) room.remove(room.children[0]);
+  floorY = kind==='wa' ? TOP-.36 : 0;
+  // floor
+  const floorTex = canvasTex(512,512,(g,w,h)=>{
+    if (kind==='wa'){ g.fillStyle='#c9c47a'; g.fillRect(0,0,w,h); g.strokeStyle='rgba(90,90,30,.18)'; for(let y=0;y<h;y+=4){g.beginPath();g.moveTo(0,y);g.lineTo(w,y);g.stroke();}
+      g.fillStyle='#3a5a32'; g.fillRect(0,0,w,14); g.fillRect(0,h/2-7,w,14); }
+    else if (kind==='chu'){ g.fillStyle='#7a1f1f'; g.fillRect(0,0,w,h); g.strokeStyle='#d8a741'; g.lineWidth=6; for(let i=0;i<4;i++){ g.strokeRect(20+i*60,20+i*60,w-40-i*120,h-40-i*120);} }
+    else { for(let i=0;i<8;i++){ g.fillStyle = i%2?'#a8774e':'#b98559'; g.fillRect(0,i*64,w,64); g.fillStyle='rgba(0,0,0,.08)'; g.fillRect(((i*137)%w),i*64,3,64);} }
+  });
+  floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping; floorTex.repeat.set(kind==='wa'?3:4, kind==='wa'?3:4);
+  const floor = mesh(new THREE.PlaneGeometry(14,14), M(0xffffff,{map:floorTex, roughness:.9}), 0, floorY, 0, false);
+  floor.rotation.x = -Math.PI/2; room.add(floor);
+  // walls
+  const wallCol = kind==='wa'? 0xe9dcc0 : kind==='chu'? 0xf3d9b0 : 0xf2e4ea;
+  const wallMat = M(wallCol, {roughness:.95});
+  const back = mesh(new THREE.PlaneGeometry(14,6), wallMat, 0, 3, -3.4, false); room.add(back);
+  const l = mesh(new THREE.PlaneGeometry(10,6), wallMat, -3.6, 3, 0, false); l.rotation.y = Math.PI/2; room.add(l);
+  const r = mesh(new THREE.PlaneGeometry(10,6), wallMat, 3.6, 3, 0, false); r.rotation.y = -Math.PI/2; room.add(r);
+  // sign board
+  const signTex = canvasTex(1024,256,(g,w,h)=>{
+    g.fillStyle = kind==='wa'?'#f9f3e3':'#ffffff'; g.fillRect(0,0,w,h);
+    g.strokeStyle = '#7b3fa0'; g.lineWidth=14; g.strokeRect(10,10,w-20,h-20);
+    g.fillStyle='#3a2433'; g.textAlign='center'; g.textBaseline='middle';
+    g.font = '900 92px "Dela Gothic One", sans-serif'; g.fillText('本日のマナー講座', w/2, h*.42);
+    g.fillStyle='#ff3b8a'; g.font = '800 44px "M PLUS Rounded 1c", sans-serif';
+    const sub = '〜'+(game.signLabel||'和食・基本の御膳編')+'〜　講師：ザマス先生'; let fs = 44; while (fs>24){ g.font = '800 '+fs+'px "M PLUS Rounded 1c", sans-serif'; if (g.measureText(sub).width < w-70) break; fs -= 2; } g.fillText(sub, w/2, h*.8);
+  });
+  try { Promise.all([document.fonts.load('900 92px "Dela Gothic One"'), document.fonts.load('800 44px "M PLUS Rounded 1c"')]).then(()=>signTex._redraw()).catch(()=>{}); } catch(e){}
+  const sign = mesh(new THREE.PlaneGeometry(2.6,.65), M(0xffffff,{map:signTex,roughness:1}), 0, floorY+2.35, -3.38, false); room.add(sign);
+  // decoration
+  if (kind==='wa'){
+    const tok = mesh(new THREE.BoxGeometry(1.1,.08,.5), M(0x6b4a2a), -2.2, floorY+.04, -3.1); room.add(tok);
+    const vase = mesh(new THREE.CylinderGeometry(.08,.12,.35,16), M(0x355e8a), -2.2, floorY+.26, -3.1); room.add(vase);
+    const scroll = mesh(new THREE.PlaneGeometry(.5,1.4), M(0xf5efe0), -2.2, floorY+1.2, -3.38, false); room.add(scroll);
+    const sh = canvasTex(128,384,(g,w,h)=>{g.fillStyle='#f5efe0';g.fillRect(0,0,w,h);g.fillStyle='#222';g.font='900 80px serif';g.textAlign='center';['作','法','道'].forEach((c,i)=>g.fillText(c,w/2,100+i*110));});
+    scroll.material.map = sh; scroll.material.needsUpdate = true;
+  } else if (kind==='chu'){
+    for (let i=-1;i<=1;i+=2){ const lan = mesh(new THREE.SphereGeometry(.22,16,12), M(0xe02020,{emissive:0x551100}), i*1.9, floorY+2.4, -2.6); lan.scale.y=.8; room.add(lan);
+      const tass = mesh(new THREE.CylinderGeometry(.03,.03,.3,6), M(0xffcc33), i*1.9, floorY+2.1, -2.6); room.add(tass); }
+  } else {
+    const can = new THREE.Group(); can.position.set(-2.3, floorY, -3); room.add(can);
+    can.add(mesh(new THREE.CylinderGeometry(.04,.04,1.6,8), M(0xc9a24a,{metalness:.6,roughness:.3}), 0,.8,0));
+    for (let i=-1;i<=1;i++){ can.add(mesh(new THREE.CylinderGeometry(.02,.02,.2,8), M(0xfff8e0,{emissive:0x332200}), i*.15, 1.7, 0)); }
+    const fr = mesh(new THREE.PlaneGeometry(.9,.7), M(0xc9a24a), 2.1, floorY+1.7, -3.38, false); room.add(fr);
+    const pic = canvasTex(256,200,(g,w,h)=>{ const gr=g.createLinearGradient(0,0,0,h); gr.addColorStop(0,'#9ec9ff'); gr.addColorStop(1,'#f6e0b0'); g.fillStyle=gr; g.fillRect(0,0,w,h); g.fillStyle='#4a7a3a'; g.beginPath(); g.moveTo(0,h); g.lineTo(80,90); g.lineTo(150,140); g.lineTo(210,70); g.lineTo(w,h); g.fill(); });
+    room.add(mesh(new THREE.PlaneGeometry(.78,.58), M(0xffffff,{map:pic}), 2.1, floorY+1.7, -3.37, false));
+  }
+}
+
+/* =========================================================
+   TEACHER
+   ========================================================= */
+const teacher = new THREE.Group(); scene.add(teacher);
+const T = {};
+(function buildTeacher(){
+  const dressM = M(0x7b3fa0, {roughness:.5}), skinM = M(0xf6d2bb, {roughness:.6}), hairM = M(0x5a2f4a, {roughness:.5});
+  const dress = mesh(new THREE.CylinderGeometry(.2,.48,1.05,20), dressM, 0,.525,0); teacher.add(dress);
+  const body = new THREE.Group(); body.position.y = 1.05; teacher.add(body); T.body = body;
+  body.add(mesh(new THREE.CylinderGeometry(.17,.21,.42,18), dressM, 0,.2,0));
+  const collar = mesh(new THREE.TorusGeometry(.1,.035,8,20), M(0xffffff), 0,.42,0); collar.rotation.x = Math.PI/2; body.add(collar);
+  for (let i=0;i<14;i++){ const a = (i/14)*Math.PI*2; const pr = mesh(new THREE.SphereGeometry(.018,8,6), M(0xfffaf0,{roughness:.2,metalness:.2}), Math.sin(a)*.13, .37 - Math.cos(a)*.0 , Math.cos(a)*.13); if (Math.cos(a)>-.3){ pr.position.y = .37 - (Math.cos(a)+.3)*.06; } body.add(pr); }
+  const head = new THREE.Group(); head.position.y = .62; body.add(head); T.head = head;
+  const face = mesh(new THREE.SphereGeometry(.17,24,18), skinM); head.add(face); T.face = face;
+  const hair = mesh(new THREE.SphereGeometry(.185,24,18,0,Math.PI*2,0,Math.PI*.62), hairM, 0,.02,-.02); hair.rotation.x = -.35; head.add(hair);
+  const bun = mesh(new THREE.SphereGeometry(.11,16,12), hairM, 0,.2,-.07); head.add(bun);
+  const bun2 = mesh(new THREE.TorusGeometry(.06,.025,8,16), M(0xff3b8a), 0,.17,-.07); bun2.rotation.x = Math.PI/2; head.add(bun2);
+  // eyes
+  const eyeM = M(0x1a1020, {roughness:.3});
+  [-1,1].forEach(s=>{ head.add(mesh(new THREE.SphereGeometry(.018,10,8), eyeM, s*.06,.02,.155)); });
+  // brows
+  T.brows = [-1,1].map(s=>{ const b = mesh(new THREE.BoxGeometry(.07,.012,.01), hairM, s*.062,.085,.16); head.add(b); b.userData.s = s; return b; });
+  // cat-eye glasses
+  const shape = new THREE.Shape();
+  shape.moveTo(-.05,-.025); shape.quadraticCurveTo(-.06,.03,-.02,.035); shape.lineTo(.04,.04); shape.lineTo(.085,.075);
+  shape.quadraticCurveTo(.07,.02,.055,-.01); shape.quadraticCurveTo(.03,-.045,-.01,-.04); shape.quadraticCurveTo(-.045,-.04,-.05,-.025);
+  const hole = new THREE.Path(); hole.absellipse(.005,0,.038,.026,0,Math.PI*2,true); shape.holes.push(hole);
+  const gGeo = new THREE.ExtrudeGeometry(shape, {depth:.008, bevelEnabled:false});
+  const gM = M(0xff3b8a, {roughness:.25, metalness:.2});
+  T.glasses = new THREE.Group(); T.glasses.position.set(0,.02,.165); head.add(T.glasses);
+  [-1,1].forEach(s=>{ const g = mesh(gGeo, gM, s*.065, 0, 0); g.scale.x = s; T.glasses.add(g);
+    const lens = mesh(new THREE.CircleGeometry(.036,16), new THREE.MeshStandardMaterial({color:0xddeeff,transparent:true,opacity:.35,roughness:.05}), s*.07,0,.004,false); lens.scale.y=.72; T.glasses.add(lens); });
+  T.glasses.add(mesh(new THREE.BoxGeometry(.03,.008,.008), gM, 0,.01,.004));
+  // chain
+  [-1,1].forEach(s=>{ const ch = mesh(new THREE.TorusGeometry(.13,.004,4,16,Math.PI*.6), M(0xd4af37,{metalness:.8,roughness:.3}), s*.14,-.08,.06); ch.rotation.set(0, s*Math.PI/2, -Math.PI*.8); head.add(ch); });
+  // nose, cheeks, mouth
+  head.add(mesh(new THREE.ConeGeometry(.018,.05,8), skinM, 0,-.02,.175)).rotation.x = Math.PI/2;
+  [-1,1].forEach(s=>{ const ck = mesh(new THREE.CircleGeometry(.028,12), new THREE.MeshBasicMaterial({color:0xff9ab8,transparent:true,opacity:.6}), s*.09,-.04,.148,false); ck.rotation.y = s*.5; head.add(ck); });
+  T.mouth = mesh(new THREE.SphereGeometry(.03,12,8), M(0xc0244a,{roughness:.3}), 0,-.085,.15); T.mouth.scale.set(1,.25,.5); head.add(T.mouth);
+  // earrings
+  [-1,1].forEach(s=>head.add(mesh(new THREE.SphereGeometry(.02,8,6), M(0xffffff,{roughness:.1}), s*.168,-.06,0)));
+  // arms
+  const mkArm = (s)=>{ const sh = new THREE.Group(); sh.position.set(s*.22,.36,0); body.add(sh);
+    sh.add(mesh(new THREE.SphereGeometry(.07,12,10), dressM));
+    const up = mesh(new THREE.CylinderGeometry(.05,.045,.3,10), dressM, 0,-.15,0); sh.add(up);
+    const el = new THREE.Group(); el.position.y = -.3; sh.add(el);
+    el.add(mesh(new THREE.CylinderGeometry(.042,.035,.28,10), skinM, 0,-.14,0));
+    const hand = mesh(new THREE.SphereGeometry(.045,10,8), skinM, 0,-.29,0); el.add(hand);
+    return {sh, el, hand}; };
+  T.armR = mkArm(-1); T.armL = mkArm(1);
+  // pointer stick (in right arm = viewer's left)
+  T.stick = mesh(new THREE.CylinderGeometry(.006,.012,.62,6), M(0x8a5a2a), 0,-.3-.3,0);
+  T.stickTip = mesh(new THREE.SphereGeometry(.016,8,6), M(0xff3b8a), 0,-.31,0); T.stick.add(T.stickTip);
+  T.armR.el.add(T.stick);
+  // anger mark sprite
+  const angTex = canvasTex(128,128,(g)=>{ g.font='100px sans-serif'; g.textAlign='center'; g.textBaseline='middle'; g.fillText('💢',64,70); });
+  T.anger = new THREE.Sprite(new THREE.SpriteMaterial({map:angTex, transparent:true, depthTest:false})); T.anger.scale.set(.18,.18,1); T.anger.position.set(.17,.17,.05); T.anger.visible=false; head.add(T.anger);
+  const shockTex = canvasTex(128,128,(g)=>{ g.font='900 100px sans-serif'; g.fillStyle='#ff2d55'; g.textAlign='center'; g.textBaseline='middle'; g.fillText('!!',64,70); });
+  T.shock = new THREE.Sprite(new THREE.SpriteMaterial({map:shockTex, transparent:true, depthTest:false})); T.shock.scale.set(.25,.25,1); T.shock.position.set(0,.35,0); T.shock.visible=false; head.add(T.shock);
+})();
+const tState = {talk:0, scold:0, happy:0, anger:0, fallen:0, fallT:0};
+function resetTeacher(kind){
+  teacher.position.set(0, kind==='wa'? floorY - .47 : floorY, -1.45);
+  teacher.rotation.set(0,0,0);
+  tState.talk=0; tState.scold=0; tState.happy=0; tState.fallen=0; tState.fallT=0;
+  T.shock.visible = false; T.anger.visible = false;
+}
+function teacherTalk(sec=1.2, mood){ tState.talk = Math.max(tState.talk, sec); if (mood==='scold') tState.scold = 1.2; if (mood==='happy') tState.happy = 1.0; }
+function updateTeacher(dt, t){
+  if (tState.fallen){
+    tState.fallT += dt; const k = Math.min(1, tState.fallT/0.55);
+    teacher.rotation.x = -1.45 * (k*k); teacher.position.z = -1.45 - k*.9; teacher.position.y = (game.kind==='wa'? floorY-.47 : floorY) + Math.sin(k*Math.PI)*.35;
+    T.shock.visible = true; T.shock.position.y = .35 + Math.sin(t*20)*.02;
+    T.armR.sh.rotation.z = -2.6; T.armL.sh.rotation.z = 2.6; T.mouth.scale.set(1.2,1.2,.6);
+    return;
+  }
+  tState.talk = Math.max(0, tState.talk-dt); tState.scold = Math.max(0, tState.scold-dt); tState.happy = Math.max(0, tState.happy-dt);
+  const ang = game.anger/100;
+  // breathing / sway
+  T.body.rotation.z = Math.sin(t*1.3)*.03; T.body.position.y = 1.05 + Math.sin(t*2.2)*.008;
+  // head
+  if (tState.scold>0){ T.head.rotation.y = Math.sin(t*28)*.18*tState.scold; T.head.rotation.x = -.05; }
+  else { T.head.rotation.y = Math.sin(t*.7)*.12; T.head.rotation.x = -.12 + Math.sin(t*.9)*.03; }
+  T.head.rotation.z = tState.happy>0 ? Math.sin(t*6)*.1 : 0;
+  // mouth
+  const open = tState.talk>0 ? (.25 + Math.abs(Math.sin(t*22))*.9) : (tState.happy>0? .35 : .2);
+  T.mouth.scale.set(tState.scold>0?1.3:1, open, .5);
+  // brows
+  T.brows.forEach(b=>{ const s=b.userData.s; b.rotation.z = s * (tState.scold>0 ? -.55 : (-.15 - ang*.35)); b.position.y = .085 - (tState.scold>0?.01:0); });
+  // face redness
+  const red = Math.min(1, ang*.8 + (tState.scold>0?.35:0));
+  T.face.material.color.setRGB(0.965, 0.82 - red*.35, 0.73 - red*.4);
+  T.anger.visible = ang > .45 || tState.scold>0; if (T.anger.visible){ const s = .16 + Math.abs(Math.sin(t*8))*.05; T.anger.scale.set(s,s,1); }
+  // glasses glint push
+  T.glasses.position.y = .02 + (tState.scold>0 ? Math.abs(Math.sin(t*14))*.008 : 0);
+  // arms: stick wags when scolding, taps palm otherwise
+  if (tState.scold>0){ T.armR.sh.rotation.set(-1.1 + Math.sin(t*25)*.35, 0, -.25); T.armR.el.rotation.x = -.6; }
+  else { T.armR.sh.rotation.set(-.55 + Math.sin(t*3)*.12, 0, -.15); T.armR.el.rotation.x = -.9; }
+  T.armL.sh.rotation.set(-.3, 0, .55); T.armL.el.rotation.set(-1.6, 0, 0);
+}
+
+/* =========================================================
+   TABLE + DISHES
+   ========================================================= */
+let tableG = null;          // group at (0,TOP,0); dishes children
+const dishes = {};          // key -> {g, food:[meshes]}
+const highlight = mesh(new THREE.TorusGeometry(.13,.012,8,32), new THREE.MeshBasicMaterial({color:0xffe14d}), 0,0,0,false);
+highlight.rotation.x = Math.PI/2; highlight.visible = false; scene.add(highlight);
+let lazySusan = null, susanSpin = 0;
+
+function addDish(key, g, foods, x, z, rot=0, pieces=false){ g.position.set(x, 0, z); g.rotation.y = rot; tableG.add(g); dishes[key] = {g, foods, eaten:0, pieces, r:g.userData.r || .12}; }
+
+const C = {
+  white: M(0xfdfcf8,{roughness:.25}), lacquerR: M(0x8a1414,{roughness:.25}), lacquerB: M(0x1a0d0d,{roughness:.25}),
+  wood: M(0x7a4a24), silver: M(0xd8d8de,{metalness:.9,roughness:.25}), gold: M(0xd4af37,{metalness:.7,roughness:.3})
+};
+
+function buildTable(kind){
+  if (tableG) scene.remove(tableG);
+  Object.keys(dishes).forEach(k=>delete dishes[k]);
+  tableG = new THREE.Group(); tableG.position.set(0, TOP, 0); scene.add(tableG);
+  lazySusan = null; susanSpin = 0;
+  const legH = TOP - floorY;
+  if (kind==='wa'){
+    const top = mesh(new THREE.CylinderGeometry(.82,.82,.05,40), M(0x8a5530,{roughness:.45}), 0,-.025,0); tableG.add(top);
+    const rim = mesh(new THREE.TorusGeometry(.82,.02,8,48), M(0x6a3d1f), 0,-.02,0); rim.rotation.x = Math.PI/2; tableG.add(rim);
+    for (let i=0;i<4;i++){ const a = i*Math.PI/2+Math.PI/4; tableG.add(mesh(new THREE.BoxGeometry(.06,legH,.06), C.wood, Math.cos(a)*.55, -legH/2, Math.sin(a)*.55)); }
+    const layout = game.layout || 'gozen';
+    const mkRice = (x,z)=>{ const g = new THREE.Group(); g.add(mesh(bowlGeo(.075,.065), M(0xf3ead8,{roughness:.3})));
+      const rice = mesh(new THREE.SphereGeometry(.068,16,10,0,Math.PI*2,0,Math.PI/2), M(0xffffff,{roughness:.8}), 0,.045,0); rice.scale.y=.75; g.add(rice); addDish('rice', g, [rice], x, z); };
+    const mkSoup = (x,z)=>{ const g = new THREE.Group(); g.add(mesh(bowlGeo(.075,.07), C.lacquerR));
+      const soup = mesh(new THREE.CylinderGeometry(.066,.05,.01,24), M(0x8a5a2a,{roughness:.2}), 0,.055,0); g.add(soup);
+      for (let i=0;i<5;i++) g.add(mesh(new THREE.BoxGeometry(.012,.006,.012), M(0xf5f0e0), rand(-.03,.03), .062, rand(-.03,.03)));
+      addDish('soup', g, [soup], x, z); };
+    const mkFish = (x,z,sc,plateW)=>{ const g = new THREE.Group(); g.userData.r = .16*sc;
+      g.add(mesh(new THREE.BoxGeometry(plateW,.02,.13*sc), C.white, 0,.01,0));
+      const fish = new THREE.Group(); fish.position.y = .035*sc; fish.scale.setScalar(sc); fish.rotation.y = Math.PI; g.add(fish);   // head to the left
+      const fb = mesh(new THREE.SphereGeometry(.1,16,10), M(0x9aa2ad,{roughness:.35,metalness:.3})); fb.scale.set(1,.28,.32); fish.add(fb);
+      const tail = mesh(new THREE.ConeGeometry(.035,.06,4), M(0x7a828d), -.12,0,0); tail.rotation.z = Math.PI/2; fish.add(tail);
+      fish.add(mesh(new THREE.SphereGeometry(.008,6,6), M(0x111111), .075,.008,-.022));
+      fish.add(mesh(new THREE.BoxGeometry(.05,.003,.04), M(0x3a2a1a), 0,.028,0));
+      fish.add(mesh(new THREE.BoxGeometry(.04,.003,.03), M(0x3a2a1a), .04,.026,0));
+      g.add(mesh(new THREE.ConeGeometry(.02*sc,.025*sc,10), M(0xf2f2ea), plateW*.36,.03,.03*sc));
+      addDish('fish', g, [fish], x, z); return g; };
+    const mkHashi = (x,z)=>{ const g = new THREE.Group(); g.userData.r = .14;
+      g.add(mesh(new THREE.BoxGeometry(.03,.012,.02), M(0x9ac0d0,{roughness:.2}), .1,.006,0));
+      [-.008,.008].forEach(dz=>{ const cs = mesh(new THREE.CylinderGeometry(.0035,.006,.23,6), M(0x3a1f12,{roughness:.3}), 0,.016,dz); cs.rotation.z = Math.PI/2; g.add(cs); });
+      addDish('hashi', g, [], x, z); };
+    if (layout==='sushi'){
+      // geta board with nigiri
+      const g = new THREE.Group(); g.userData.r = .22;
+      g.add(mesh(new THREE.BoxGeometry(.42,.03,.17), M(0xc9a26a,{roughness:.7}), 0,.035,0));
+      [-.15,.15].forEach(x=>g.add(mesh(new THREE.BoxGeometry(.02,.03,.15), M(0xb08a52), x,.012,0)));
+      const netas = [0xc8102e, 0xff8c5a, 0xf2f2f2, 0xf5d000, 0xff6f61];
+      const pcs = [];
+      netas.forEach((col,i)=>{ const n = new THREE.Group(); n.position.set(-.16+i*.08, .05, 0);
+        const shari = mesh(new THREE.BoxGeometry(.045,.022,.03), M(0xffffff,{roughness:.9}), 0,.011,0); n.add(shari);
+        const neta = mesh(new THREE.BoxGeometry(.06,.01,.036), M(col,{roughness:.35}), 0,.027,0); neta.rotation.z = .08; n.add(neta);
+        if (col===0xf5d000){ n.add(mesh(new THREE.BoxGeometry(.008,.024,.032), M(0x111a11), 0,.02,0)); }
+        if (col===0xf2f2f2){ neta.material = M(0xf4f4f4,{roughness:.3}); n.add(mesh(new THREE.BoxGeometry(.05,.002,.004), M(0xff9f80), 0,.033,0)); }
+        g.add(n); pcs.push(n); });
+      addDish('sushi', g, pcs, 0, .02, 0, true);
+      // gunkan
+      const gk = new THREE.Group();
+      gk.add(mesh(new THREE.CylinderGeometry(.028,.028,.04,16), M(0x14201a,{roughness:.6}), 0,.02,0));
+      const ik = []; for (let i=0;i<7;i++){ const b = mesh(new THREE.SphereGeometry(.009,8,6), M(0xff5a1a,{roughness:.1,emissive:0x330800}), rand(-.014,.014), .042, rand(-.014,.014)); gk.add(b); ik.push(b); }
+      addDish('gunkan', gk, ik, .3, .2);
+      // gari
+      const ga = new THREE.Group(); const gm = M(0xffc8cf,{roughness:.6}); const gp = [];
+      for (let i=0;i<5;i++){ const sl = mesh(new THREE.CylinderGeometry(.02,.02,.003,10), gm, rand(-.015,.015), .004+i*.003, rand(-.015,.015)); sl.rotation.x = rand(-.3,.3); ga.add(sl); gp.push(sl); }
+      addDish('gari', ga, gp, -.3, .18, 0, true);
+      // shoyu dish
+      const sh = new THREE.Group(); sh.add(mesh(plateGeo(.045,.012), C.white));
+      const so = mesh(new THREE.CylinderGeometry(.03,.03,.002,16), M(0x2a0d05,{roughness:.1}), 0,.008,0); sh.add(so);
+      addDish('shoyu', sh, [], .15, .3);
+      // yunomi
+      const yn = new THREE.Group(); yn.add(mesh(new THREE.CylinderGeometry(.035,.03,.09,16), M(0x6b7f5a,{roughness:.5}), 0,.045,0));
+      const te = mesh(new THREE.CylinderGeometry(.031,.031,.004,16), M(0x9aaa3a), 0,.082,0); yn.add(te);
+      addDish('tea', yn, [te], .42, -.12);
+      mkHashi(-.05, .42);
+    } else if (layout==='fish'){
+      const tray = mesh(new THREE.BoxGeometry(1.0,.02,.62), C.lacquerB, 0,.01,.08); tableG.add(tray);
+      const fg = mkFish(0, -.02, 1.55, .5);
+      const su = new THREE.Group(); const sd = mesh(new THREE.SphereGeometry(.022,12,8,0,Math.PI*2,0,Math.PI/2), M(0x3f9a2a,{roughness:.4}), 0,0,0); sd.rotation.x = -Math.PI/2; su.add(sd);
+      su.add(mesh(new THREE.CircleGeometry(.02,12), M(0xd8f070), 0,0,.001)).rotation.set(0,0,0);
+      su.position.y = .045; addDish('sudachi', su, [sd], .2, .06);
+      const hj = new THREE.Group(); const stem = mesh(new THREE.CylinderGeometry(.004,.004,.12,6), M(0xff6f9a), 0,.03,0); stem.rotation.z = 1.2; hj.add(stem);
+      hj.add(mesh(new THREE.SphereGeometry(.012,8,6), M(0xfff0f0), .055,.008,0));
+      addDish('hajikami', hj, [stem], -.22, .06);
+      mkRice(-.2, .3); mkSoup(.2, .3); mkHashi(0, .46);
+    } else {
+      const tray = mesh(new THREE.BoxGeometry(.9,.02,.55), C.lacquerB, 0,.01,.12); tableG.add(tray);
+      mkRice(-.18, .26); mkSoup(.18, .26); mkFish(0, -.05, 1, .3);
+      let g = new THREE.Group(); g.add(mesh(new THREE.CylinderGeometry(.04,.035,.012,16), M(0x355e8a,{roughness:.3}),0,.006,0));
+      const tk = mesh(new THREE.BoxGeometry(.04,.012,.025), M(0xf0d040), 0,.018,0); g.add(tk);
+      addDish('pickle', g, [tk], -.32, .0);
+      g = new THREE.Group(); g.add(mesh(bowlGeo(.05,.04), M(0xd9c7a0,{roughness:.4})));
+      const ims = []; [[-.012,0],[.014,.008],[0,-.015]].forEach(([x,z])=>{ const im = mesh(new THREE.SphereGeometry(.017,10,8), M(0xd8c39a,{roughness:.5}), x,.035,z); g.add(im); ims.push(im); });
+      g.add(mesh(new THREE.ConeGeometry(.008,.02,6), M(0xff8a2a), .02,.04,-.01));
+      addDish('nimono', g, ims, .32, .0);
+      mkHashi(0, .44);
+    }
+  } else if (kind==='yo'){
+    const layout = game.layout || 'full';
+    const cloth = mesh(new THREE.BoxGeometry(1.7,.03,1.25), M(0xffffff,{roughness:.9}), 0,-.015,0); tableG.add(cloth);
+    const drape = mesh(new THREE.BoxGeometry(1.74,.22,1.29), M(0xfbfbfb,{roughness:.95}), 0,-.13,0); tableG.add(drape);
+    [[-.75,-.5],[.75,-.5],[-.75,.5],[.75,.5]].forEach(([x,z])=>tableG.add(mesh(new THREE.CylinderGeometry(.03,.025,legH-.2,8), C.wood, x,-(legH+.2)/2-.02, z)));
+    const runner = mesh(new THREE.BoxGeometry(1.72,.002,.3), M(layout==='tea'?0x3f8a6a:0x7b3fa0), 0,.002,-.35); tableG.add(runner);
+    const V = THREE.Vector2;
+    const glassM = new THREE.MeshStandardMaterial({color:0xffffff, transparent:true, opacity:.28, roughness:.05, metalness:.1, side:THREE.DoubleSide});
+    const mkBread = (x,z)=>{ const g = new THREE.Group(); g.add(mesh(plateGeo(.06,.012), C.white));
+      const br = mesh(new THREE.SphereGeometry(.045,14,10), M(0xd49a4a,{roughness:.8}), 0,.03,0); br.scale.set(1.2,.7,.9); g.add(br); addDish('bread', g, [br], x, z); };
+    const mkWine = (x,z)=>{ const g = new THREE.Group();
+      g.add(mesh(new THREE.LatheGeometry([new V(0,0),new V(.035,0),new V(.035,.004),new V(.004,.008),new V(.004,.09),new V(.03,.11),new V(.042,.16),new V(.036,.2)],20), glassM));
+      const wine = mesh(new THREE.CylinderGeometry(.035,.022,.035,16), M(0x7a0020,{roughness:.1,transparent:true,opacity:.9}), 0,.125,0); g.add(wine);
+      addDish('wine', g, [wine], x, z); };
+    const mkWater = (x,z)=>{ const g = new THREE.Group(); g.add(mesh(new THREE.CylinderGeometry(.032,.028,.1,16,1,true), glassM, 0,.05,0));
+      g.add(mesh(new THREE.CylinderGeometry(.03,.027,.07,16), new THREE.MeshStandardMaterial({color:0xcfefff,transparent:true,opacity:.35}), 0,.035,0)); addDish('water', g, [], x, z); };
+    const mkNapkin = (x,z)=>{ const g = new THREE.Group(); g.add(mesh(new THREE.ConeGeometry(.05,.11,4), M(0xff9ab8,{roughness:.9}), 0,.055,0)); addDish('napkin', g, [], x, z); };
+    const mkSimpleCutlery = (x,z,w,spoon)=>{ const g = new THREE.Group(); g.userData.r = w+.04;
+      g.add(mesh(new THREE.BoxGeometry(.012,.004,.2), C.silver, -w,.004,0)); g.add(mesh(new THREE.BoxGeometry(.024,.004,.045), C.silver, -w,.004,-.11));
+      g.add(mesh(new THREE.BoxGeometry(.014,.004,.21), C.silver, w,.004,0));
+      if (spoon){ g.add(mesh(new THREE.BoxGeometry(.01,.004,.15), C.silver, w+.04,.004,.02)); const bowl = mesh(new THREE.SphereGeometry(.02,10,6), C.silver, w+.04,.006,-.07); bowl.scale.set(1,.25,1.4); g.add(bowl); }
+      addDish('cutlery', g, [], x, z); };
+    if (layout==='steak'){
+      let g = new THREE.Group(); g.userData.r = .2;
+      g.add(mesh(plateGeo(.19,.022), C.white));
+      const st = new THREE.Group(); st.position.set(-.02,.04,0); g.add(st);
+      const slab = mesh(new THREE.CylinderGeometry(.1,.105,.05,24), M(0x5e2c12,{roughness:.55})); slab.scale.z = .72; st.add(slab);
+      [-.04,0,.04].forEach(x=>{ const gm = mesh(new THREE.BoxGeometry(.006,.002,.12), M(0x241006), x,.026,0); gm.rotation.y = .6; st.add(gm); });
+      const veg = new THREE.Group(); veg.position.set(.1,.03,.05); g.add(veg);
+      const car = mesh(new THREE.ConeGeometry(.014,.06,8), M(0xff7a1a,{roughness:.5})); car.rotation.z = Math.PI/2; veg.add(car);
+      [[0,.035],[.025,.045]].forEach(([x,z])=>veg.add(mesh(new THREE.SphereGeometry(.018,8,6), M(0x2f8a2f), x,.005,z)));
+      veg.add(mesh(new THREE.BoxGeometry(.03,.025,.03), M(0xf0d070), -.03,.0,.045));
+      addDish('steak', g, [st, veg], 0, .17);
+      mkSimpleCutlery(0, .17, .24); mkWine(.33,-.18); mkBread(-.36,-.12); mkNapkin(0,.46); mkWater(.42,-.02);
+    } else if (layout==='pasta'){
+      let g = new THREE.Group(); g.userData.r = .19;
+      g.add(mesh(plateGeo(.18,.04), C.white));
+      const pa = new THREE.Group(); pa.position.y = .04; g.add(pa);
+      const knot = mesh(new THREE.TorusKnotGeometry(.055,.014,80,8,3,7), M(0xf2d27a,{roughness:.6})); knot.scale.y = .45; knot.rotation.x = Math.PI/2; pa.add(knot);
+      const sauce = mesh(new THREE.SphereGeometry(.05,14,8,0,Math.PI*2,0,Math.PI/2), M(0xd0301a,{roughness:.3}), 0,.01,0); sauce.scale.y = .35; pa.add(sauce);
+      [[.02,.01],[-.02,-.02]].forEach(([x,z])=>{ const lf = mesh(new THREE.SphereGeometry(.012,6,4), M(0x2f9a2f), x,.026,z); lf.scale.y=.3; pa.add(lf); });
+      addDish('pasta', g, [pa], 0, .15);
+      mkSimpleCutlery(0, .15, .23, true);
+      g = new THREE.Group(); g.add(mesh(bowlGeo(.035,.03), C.white)); const ch = mesh(new THREE.CylinderGeometry(.03,.02,.008,12), M(0xfff6d8,{roughness:.9}), 0,.024,0); g.add(ch);
+      addDish('cheese', g, [ch], .3, -.08);
+      mkBread(-.36,-.1); mkWater(.38,-.25); mkNapkin(0,.46);
+    } else if (layout==='tea'){
+      // 3-tier stand
+      let g = new THREE.Group(); g.userData.r = .16; const pcs = [];
+      g.add(mesh(new THREE.CylinderGeometry(.006,.006,.42,8), C.gold, 0,.21,0));
+      g.add(mesh(new THREE.TorusGeometry(.03,.006,6,16), C.gold, 0,.44,0));
+      [[.13,.01],[.105,.17],[.085,.32]].forEach(([r,y],tier)=>{ g.add(mesh(plateGeo(r,.018), C.white, 0,y,0));
+        const n = tier===0?5:tier===1?3:3;
+        for (let i=0;i<n;i++){ const a = i/n*Math.PI*2+.3, rr = r*.55; let f;
+          if (tier===0){ f = mesh(new THREE.CylinderGeometry(.03,.03,.022,3), M(0xfaf6ea,{roughness:.8})); f.add(mesh(new THREE.CylinderGeometry(.029,.029,.004,3), M(0x7ab85a), 0,0,0)); }
+          else if (tier===1){ f = mesh(new THREE.CylinderGeometry(.025,.028,.03,14), M(0xd9a050,{roughness:.8})); }
+          else { f = mesh(new THREE.BoxGeometry(.035,.03,.035), M([0xff9ab8,0x7b3fa0,0xfff0a0][i],{roughness:.5})); f.add(mesh(new THREE.SphereGeometry(.008,6,6), M(0xe0102a), 0,.02,0)); }
+          f.position.set(Math.cos(a)*rr, y+.025, Math.sin(a)*rr); f.rotation.y = a; g.add(f); pcs.push(f); } });
+      addDish('stand', g, pcs, -.05, -.12, 0, true);
+      // scone plate
+      g = new THREE.Group(); g.add(mesh(plateGeo(.085,.015), C.white));
+      const sc = mesh(new THREE.CylinderGeometry(.03,.034,.04,16), M(0xd9a050,{roughness:.8}), -.02,.03,0); g.add(sc);
+      g.add(mesh(new THREE.CylinderGeometry(.018,.016,.02,12), M(0xfffbe8), .035,.02,-.03));
+      g.add(mesh(new THREE.CylinderGeometry(.018,.016,.02,12), M(0xb0102a,{roughness:.3}), .04,.02,.025));
+      addDish('scone', g, [sc], -.28, .27);
+      // cup & saucer
+      g = new THREE.Group(); g.add(mesh(plateGeo(.065,.012), M(0xffffff,{roughness:.2})));
+      g.add(mesh(new THREE.LatheGeometry([new V(0,0),new V(.02,0),new V(.022,.004),new V(.04,.04),new V(.046,.05),new V(.043,.05),new V(.037,.04),new V(.018,.008),new V(0,.008)],20), M(0xffffff,{roughness:.2,side:THREE.DoubleSide}), 0,.01,0));
+      const hd = mesh(new THREE.TorusGeometry(.014,.004,6,12), M(0xffffff), .048,.04,0); g.add(hd);
+      const tea = mesh(new THREE.CylinderGeometry(.039,.03,.004,16), M(0x9a4a12,{roughness:.1}), 0,.05,0); g.add(tea);
+      g.add(mesh(new THREE.BoxGeometry(.008,.003,.07), C.silver, -.02,.014,.045));
+      addDish('cup', g, [tea], .2, .27);
+      // pot
+      g = new THREE.Group(); const pot = mesh(new THREE.SphereGeometry(.07,16,12), M(0xf4f0ff,{roughness:.2}), 0,.07,0); pot.scale.y = .85; g.add(pot);
+      const sp = mesh(new THREE.ConeGeometry(.015,.08,8), M(0xf4f0ff), .08,.08,0); sp.rotation.z = -1; g.add(sp);
+      g.add(mesh(new THREE.TorusGeometry(.03,.006,6,12), M(0xf4f0ff), -.075,.075,0));
+      g.add(mesh(new THREE.SphereGeometry(.012,8,6), C.gold, 0,.135,0));
+      addDish('pot', g, [], .33, -.22);
+      // cake
+      g = new THREE.Group(); g.add(mesh(plateGeo(.07,.012), C.white));
+      const ck = mesh(new THREE.CylinderGeometry(.05,.05,.045,3,1,false,0,Math.PI/2.5), M(0xfff0d8,{roughness:.6}), 0,.03,0); g.add(ck);
+      ck.add(mesh(new THREE.SphereGeometry(.01,6,6), M(0xe0102a), .02,.026,.02));
+      addDish('cake', g, [ck], .02, .4);
+    } else {
+      // full course (original)
+      let g = new THREE.Group(); g.userData.r = .19;
+      g.add(mesh(plateGeo(.2,.02), C.gold)); g.add(mesh(plateGeo(.16,.025), C.white, 0,.012,0));
+      const steak = new THREE.Group(); steak.position.y = .05; g.add(steak);
+      const st = mesh(new THREE.CylinderGeometry(.075,.08,.035,20), M(0x6b3518,{roughness:.6})); st.scale.z = .75; steak.add(st);
+      steak.add(mesh(new THREE.BoxGeometry(.11,.002,.008), M(0x2a1208), 0,.018,0));
+      [-.07,.07].forEach(x=>steak.add(mesh(new THREE.SphereGeometry(.018,8,6), M(0x2f8a2f), x,-.005,.05)));
+      addDish('steak', g, [steak], 0, .2);
+      g = new THREE.Group(); g.add(mesh(plateGeo(.11,.035), C.white));
+      const sp = mesh(new THREE.CylinderGeometry(.075,.065,.008,24), M(0xf2c75a,{roughness:.2}), 0,.028,0); g.add(sp);
+      addDish('soup', g, [sp], .02, -.12);
+      mkBread(-.36,-.08);
+      g = new THREE.Group(); g.add(mesh(plateGeo(.075,.014), C.white));
+      const rc = mesh(new THREE.SphereGeometry(.05,14,8,0,Math.PI*2,0,Math.PI/2), M(0xffffff,{roughness:.85}), 0,.01,0); rc.scale.y = .6; g.add(rc);
+      addDish('rice', g, [rc], .36, -.08);
+      mkWine(.32,-.3); mkNapkin(0,.43);
+      g = new THREE.Group(); g.userData.r = .28;
+      [-.25,-.22,-.19].forEach((x,i)=>{ g.add(mesh(new THREE.BoxGeometry(.012,.004,.2-i*.01), C.silver, x,.004,0)); g.add(mesh(new THREE.BoxGeometry(.022,.004,.04), C.silver, x,.004,-.11+i*.005)); });
+      [.19,.22,.25].forEach((x,i)=>{ g.add(mesh(new THREE.BoxGeometry(.012,.004,.21-i*.01), C.silver, x,.004,0)); });
+      g.add(mesh(new THREE.BoxGeometry(.016,.004,.18), C.silver, .28,.004,0));
+      addDish('cutlery', g, [], 0, .2);
+    }
+  } else {
+    const layout = game.layout || 'entaku';
+    const top = mesh(new THREE.CylinderGeometry(.9,.9,.05,40), M(0xffffff,{roughness:.9}), 0,-.025,0); tableG.add(top);
+    const skirt = mesh(new THREE.CylinderGeometry(.92,.92,.2,40,1,true), M(0xb5121b,{roughness:.6, side:THREE.DoubleSide}), 0,-.12,0); tableG.add(skirt);
+    tableG.add(mesh(new THREE.CylinderGeometry(.1,.25,legH-.05,16), M(0x3a1010), 0,-(legH)/2-.03,0));
+    const mkSusan = ()=>{ lazySusan = new THREE.Group(); lazySusan.position.set(0,.01,-.22); tableG.add(lazySusan);
+      lazySusan.add(mesh(new THREE.CylinderGeometry(.5,.5,.02,40), new THREE.MeshStandardMaterial({color:0xcfe8ff,transparent:true,opacity:.55,roughness:.05}), 0,.01,0)); };
+    const onSusan = (key, g, foods, x, z, pieces=false)=>{ g.position.set(x,.02,z); lazySusan.add(g); dishes[key] = {g, foods, eaten:0, pieces, r:g.userData.r||.14}; };
+    const mkRamen = (x,z,sc=1)=>{ const g = new THREE.Group(); g.userData.r=.14*sc; g.scale.setScalar(sc);
+      g.add(mesh(bowlGeo(.12,.085), M(0xffffff,{roughness:.3})));
+      const band = mesh(new THREE.TorusGeometry(.105,.004,6,32), M(0xd1001a), 0,.07,0); band.rotation.x = Math.PI/2; g.add(band);
+      const broth = mesh(new THREE.CylinderGeometry(.108,.08,.01,28), M(0xc98a3a,{roughness:.15}), 0,.07,0); g.add(broth);
+      const nm = mesh(new THREE.TorusGeometry(.04,.012,6,16), M(0xf5d77a), 0,.077,0); nm.rotation.x=Math.PI/2; g.add(nm);
+      const egg = mesh(new THREE.SphereGeometry(.025,10,8), M(0xfff5e0), .05,.078,.02); egg.scale.y=.5; g.add(egg);
+      const cs = mesh(new THREE.CylinderGeometry(.03,.03,.006,14), M(0xb06a3a), -.05,.078,-.02); g.add(cs);
+      const nr = mesh(new THREE.BoxGeometry(.045,.002,.03), M(0x14201a), 0,.08,-.06); nr.rotation.x = -.6; g.add(nr);
+      addDish('ramen', g, [broth, nm, egg, cs], x, z); };
+    const mkXlb = (x,z)=>{ const g = new THREE.Group();
+      g.add(mesh(new THREE.CylinderGeometry(.09,.09,.05,20,1,true), M(0xd9b77a,{side:THREE.DoubleSide}), 0,.025,0));
+      g.add(mesh(new THREE.CylinderGeometry(.088,.088,.005,20), M(0xd9b77a), 0,.005,0));
+      const xs = []; [[-.035,-.025],[.035,-.025],[0,.035]].forEach(([x,z])=>{ const b = new THREE.Group(); b.position.set(x,.03,z); const m = mesh(new THREE.SphereGeometry(.03,12,8), M(0xfaf3e6,{roughness:.6})); m.scale.y=.8; b.add(m); b.add(mesh(new THREE.ConeGeometry(.012,.02,8), M(0xfaf3e6), 0,.025,0)); g.add(b); xs.push(b); });
+      addDish('xlb', g, xs, x, z, 0, true); };
+    const mkPlate = (x,z)=>{ const g = new THREE.Group(); g.add(mesh(plateGeo(.07,.015), C.white)); addDish('plate', g, [], x, z); };
+    const mkRenge = (x,z,r=.3)=>{ const g = new THREE.Group(); g.add(mesh(new THREE.BoxGeometry(.04,.015,.1), C.white, 0,.008,0)); g.add(mesh(new THREE.BoxGeometry(.015,.01,.06), C.white, 0,.015,.07)); addDish('renge', g, [], x, z, r); };
+    const mkTea = (x,z,col=0xb88a2a)=>{ const g = new THREE.Group(); g.add(mesh(new THREE.CylinderGeometry(.03,.022,.045,14), M(0xf0f7f0,{roughness:.2}), 0,.022,0));
+      const tea = mesh(new THREE.CylinderGeometry(.027,.027,.004,14), M(col), 0,.04,0); g.add(tea); addDish('tea', g, [tea], x, z); };
+    const mkHashiV = (x,z)=>{ const g = new THREE.Group(); g.userData.r = .14;
+      g.add(mesh(new THREE.BoxGeometry(.03,.012,.02), M(0xd4af37,{roughness:.3}), 0,.006,-.1));
+      [-.007,.007].forEach(dx=>{ const cs = mesh(new THREE.CylinderGeometry(.004,.005,.25,6), M(0xfafaf0,{roughness:.3}), dx,.016,0); cs.rotation.x = Math.PI/2; g.add(cs); });
+      addDish('hashi', g, [], x, z); };
+    if (layout==='dimsum'){
+      // steamer tower
+      let g = new THREE.Group(); g.userData.r = .14; const sm = [];
+      const bam = M(0xd9b77a,{side:THREE.DoubleSide});
+      [0,.055].forEach(y=>g.add(mesh(new THREE.CylinderGeometry(.11,.11,.05,24,1,true), bam, 0,y+.025,0)));
+      g.add(mesh(new THREE.CylinderGeometry(.108,.108,.005,24), M(0xd9b77a), 0,.06,0));
+      g.add(mesh(new THREE.CylinderGeometry(.11,.11,.05,24,1,true), bam, 0,.135,0));
+      [[-.045,-.03],[.045,-.03],[0,.045]].forEach(([x,z])=>{ const s = new THREE.Group(); s.position.set(x,.115,z);
+        s.add(mesh(new THREE.CylinderGeometry(.025,.022,.035,12), M(0xf5d77a,{roughness:.6}))); s.add(mesh(new THREE.SphereGeometry(.006,6,6), M(0xff7a1a), 0,.02,0)); g.add(s); sm.push(s); });
+      const lid = mesh(new THREE.CylinderGeometry(.112,.112,.008,24), M(0xc9a060), .17,.004,.02); g.add(lid);
+      addDish('seiro', g, sm, 0, -.1, 0, true);
+      mkXlb(-.3, .15);
+      // teapot (clay)
+      g = new THREE.Group(); const pt = mesh(new THREE.SphereGeometry(.065,16,12), M(0x8a3a1a,{roughness:.6}), 0,.06,0); pt.scale.y=.8; g.add(pt);
+      const lid2 = mesh(new THREE.CylinderGeometry(.03,.032,.012,14), M(0x7a3014), 0,.112,0); g.add(lid2);
+      const spt = mesh(new THREE.ConeGeometry(.013,.07,8), M(0x8a3a1a), .075,.07,0); spt.rotation.z = -1; g.add(spt);
+      g.add(mesh(new THREE.TorusGeometry(.03,.007,6,12), M(0x8a3a1a), -.07,.065,0));
+      addDish('teapot', g, [], .32, -.18);
+      mkTea(.3, .26);
+      g = new THREE.Group(); g.add(mesh(plateGeo(.035,.012), C.white)); const ry = mesh(new THREE.CylinderGeometry(.022,.022,.004,12), M(0xd0200a,{roughness:.1}), 0,.008,0); g.add(ry);
+      addDish('rayu', g, [ry], .12, .32);
+      mkPlate(-.06, .36); mkHashiV(.06, .38); mkRenge(-.26, .42);
+    } else if (layout==='noodle'){
+      mkRamen(0, .02, 1.35); mkRenge(.24, .34); mkHashiV(.36, .3);
+      let g = new THREE.Group(); g.userData.r = .13; g.add(mesh(plateGeo(.12,.015), C.white)); const gy = [];
+      for (let i=0;i<5;i++){ const d = mesh(new THREE.SphereGeometry(.026,10,6,0,Math.PI), M(0xe8c070,{roughness:.6}), -.06+i*.03, .012, 0); d.rotation.set(0,Math.PI/2,0); d.scale.set(1,.5,.55); g.add(d); gy.push(d); }
+      addDish('gyoza', g, gy, -.3, .16, .3, true);
+      g = new THREE.Group(); g.add(mesh(plateGeo(.035,.012), C.white)); const tr = mesh(new THREE.CylinderGeometry(.022,.022,.004,12), M(0x5a2a0a,{roughness:.1}), 0,.008,0); g.add(tr);
+      addDish('tare', g, [tr], -.16, .38);
+      g = new THREE.Group(); g.userData.r = .09;
+      [[0xeeeeee,.35],[0xc0200a,.9],[0x2a0d05,.95]].forEach(([c,o],i)=>{ g.add(mesh(new THREE.CylinderGeometry(.016,.018,.08,10), new THREE.MeshStandardMaterial({color:c,transparent:true,opacity:o,roughness:.1}), -.04+i*.04,.04,0));
+        g.add(mesh(new THREE.CylinderGeometry(.008,.01,.02,8), M(0xd1001a), -.04+i*.04,.09,0)); });
+      addDish('condiment', g, [], .35, -.15);
+    } else if (layout==='duck'){
+      mkSusan();
+      let g = new THREE.Group(); g.userData.r = .2; g.add(mesh(plateGeo(.2,.025), C.white));
+      const dk = new THREE.Group(); dk.position.set(-.02,.05,-.05); g.add(dk);
+      const body = mesh(new THREE.SphereGeometry(.09,18,12), M(0x8a3a10,{roughness:.25,metalness:.1})); body.scale.set(1.3,.6,.85); dk.add(body);
+      const neck = mesh(new THREE.CylinderGeometry(.018,.025,.08,10), M(0x7a3010,{roughness:.25}), .13,.02,0); neck.rotation.z = -1.2; dk.add(neck);
+      dk.add(mesh(new THREE.SphereGeometry(.028,10,8), M(0x7a3010,{roughness:.25}), .17,.04,0));
+      const sl = [];
+      for (let i=0;i<6;i++){ const p = mesh(new THREE.BoxGeometry(.04,.006,.025), M(0x9a4a14,{roughness:.2}), -.09+i*.035,.03,.1); p.rotation.y = .4; g.add(p); sl.push(p); }
+      onSusan('duck', g, sl, 0, .02, true);
+      // pancakes steamer
+      g = new THREE.Group(); g.add(mesh(new THREE.CylinderGeometry(.08,.08,.04,20,1,true), M(0xd9b77a,{side:THREE.DoubleSide}), 0,.02,0));
+      const bs = []; for (let i=0;i<4;i++){ const b = mesh(new THREE.CylinderGeometry(.065,.065,.004,20), M(0xfaf6ea,{roughness:.9}), 0,.008+i*.005,0); g.add(b); bs.push(b); }
+      const lid = mesh(new THREE.CylinderGeometry(.082,.082,.008,20), M(0xc9a060), 0,.044,0); g.add(lid); g.userData.lid = lid;
+      addDish('bing', g, bs, -.3, .2, 0, true);
+      g = new THREE.Group(); g.add(mesh(plateGeo(.04,.012), C.white)); const tm = mesh(new THREE.CylinderGeometry(.026,.026,.006,12), M(0x3a1608,{roughness:.2}), 0,.009,0); g.add(tm);
+      addDish('sauce', g, [tm], -.12, .38);
+      g = new THREE.Group(); g.add(mesh(plateGeo(.06,.012), C.white));
+      for (let i=0;i<4;i++){ g.add(mesh(new THREE.BoxGeometry(.006,.006,.07), M(i%2?0xf0f6e0:0x3f9a2a), -.015+i*.01,.012,0)); }
+      addDish('negi', g, [], .2, .32);
+      g = new THREE.Group(); g.add(mesh(new THREE.CylinderGeometry(.018,.015,.06,12), new THREE.MeshStandardMaterial({color:0xffffff,transparent:true,opacity:.35,roughness:.05}), 0,.03,0));
+      const lq = mesh(new THREE.CylinderGeometry(.016,.014,.035,12), M(0xf0e0a0,{transparent:true,opacity:.7}), 0,.02,0); g.add(lq);
+      addDish('tea', g, [lq], .38, .14);
+      mkPlate(0, .48); mkHashiV(.1, .5);
+      addDish('susan', new THREE.Group(), [], 0, -.22);
+    } else {
+      mkSusan();
+      const big = (x,z,food)=>{ const g = new THREE.Group(); g.position.set(x,.02,z); g.add(mesh(plateGeo(.13,.025), C.white)); g.add(food()); lazySusan.add(g); };
+      big(-.25,0,()=>{ const m = mesh(new THREE.SphereGeometry(.08,12,8,0,Math.PI*2,0,Math.PI/2), M(0xff7a1a,{roughness:.4}),0,.012,0); m.scale.y=.5; return m; });
+      big(.25,.05,()=>{ const m = mesh(new THREE.SphereGeometry(.085,12,8,0,Math.PI*2,0,Math.PI/2), M(0xe8e0c0),0,.012,0); m.scale.y=.45; return m; });
+      big(0,-.28,()=>{ const m = mesh(new THREE.SphereGeometry(.08,12,8,0,Math.PI*2,0,Math.PI/2), M(0x2f8a2f),0,.012,0); m.scale.y=.4; return m; });
+      mkRamen(.1,.3); mkXlb(-.32,.25); mkPlate(-.12,.48); mkRenge(.32,.45); mkTea(.42,.2);
+      addDish('susan', new THREE.Group(), [], 0, -.22);
+    }
+  }
+  tableG.traverse(o=>{ if (o.isMesh){ o.castShadow = true; o.receiveShadow = true; }});
+}
+function eat(key, amount=.34){
+  const d = dishes[key]; if (!d) return; d.eaten = Math.min(1, d.eaten + amount);
+  if (d.pieces){ const n = Math.round(d.eaten*d.foods.length); d.foods.forEach((f,i)=>{ f.visible = i >= n; }); return; }
+  d.foods.forEach(f=>{ const s = Math.max(.05, 1 - d.eaten); f.userData.base = f.userData.base || f.scale.clone(); f.scale.set(f.userData.base.x*s, f.userData.base.y*s, f.userData.base.z*s); if (d.eaten>=1) f.visible = false; });
+}
+function setHighlight(key){
+  const d = key && dishes[key];
+  if (!d){ highlight.visible = false; return; }
+  const p = new THREE.Vector3(); d.g.getWorldPosition(p);
+  highlight.position.set(p.x, TOP+.004, p.z); highlight.userData.r = d.r; highlight.visible = true;
+}
+
+/* =========================================================
+   FLIP PHYSICS
+   ========================================================= */
+const bodies = [];
+const particles = [];
+let shake = 0;
+function startFlip(power){
+  const p = clamp(power, .45, 1.25);
+  Object.values(dishes).forEach(d=>{
+    if (!d.g.parent) return;
+    scene.attach(d.g);
+    bodies.push({o:d.g, v:new THREE.Vector3(rand(-1.6,1.6), rand(3,5.5)*p, rand(-2.5,-4.5)*p), w:new THREE.Vector3(rand(-12,12), rand(-10,10), rand(-12,12)), r:.04});
+  });
+  if (lazySusan){ scene.attach(lazySusan); bodies.push({o:lazySusan, v:new THREE.Vector3(rand(-1,1),4.2*p,-3.2*p), w:new THREE.Vector3(-9,rand(-6,6),rand(-3,3)), r:.02}); }
+  bodies.push({o:tableG, v:new THREE.Vector3(rand(-.3,.3), 3.4*p, -2.4*p), w:new THREE.Vector3(-7.5*p, rand(-1,1), rand(-1.5,1.5)), r:.08, table:true});
+  const cols = game.kind==='wa'? [0xffffff,0x8a5a2a,0x9aa2ad,0xf0d040] : game.kind==='yo'? [0x6b3518,0xf2c75a,0xd49a4a,0x7a0020,0x2f8a2f] : [0xff7a1a,0xc98a3a,0xf5d77a,0x2f8a2f,0xfaf3e6];
+  for (let i=0;i<60;i++){
+    const m = mesh(new THREE.SphereGeometry(rand(.008,.022),6,5), M(pick(cols)), rand(-.4,.4), TOP+.05, rand(-.3,.4), false);
+    scene.add(m); particles.push({o:m, v:new THREE.Vector3(rand(-2.5,2.5), rand(2,6)*p, rand(-1,-5)*p), life:3});
+  }
+  highlight.visible = false; shake = .5;
+}
+function updatePhysics(dt){
+  const g = -9.8;
+  bodies.forEach(b=>{
+    b.v.y += g*dt; b.o.position.addScaledVector(b.v, dt);
+    b.o.rotation.x += b.w.x*dt; b.o.rotation.y += b.w.y*dt; b.o.rotation.z += b.w.z*dt;
+    const minY = floorY + b.r;
+    if (b.o.position.y < minY){ b.o.position.y = minY; if (Math.abs(b.v.y)>1.2){ noise(.12,.15,1800); } b.v.y *= -.32; b.v.x *= .6; b.v.z *= .6; b.w.multiplyScalar(.55); }
+    if (b.o.position.z < -3.2){ b.o.position.z = -3.2; b.v.z *= -.4; }
+    if (Math.abs(b.o.position.x) > 3.4){ b.o.position.x = Math.sign(b.o.position.x)*3.4; b.v.x *= -.4; }
+  });
+  for (let i=particles.length-1;i>=0;i--){ const p = particles[i]; p.v.y += g*dt; p.o.position.addScaledVector(p.v, dt); if (p.o.position.y<floorY+.01){ p.o.position.y = floorY+.01; p.v.set(0,0,0);} }
+}
+function clearPhysics(){ bodies.length = 0; particles.forEach(p=>scene.remove(p.o)); particles.length = 0; }
+
+/* =========================================================
+   COURSE DATA
+   ========================================================= */
+const COURSES = {
+  wa: { name:'和食', emoji:'🍱', chapters:[
+   { id:'gozen', name:'基本の御膳編', layout:'gozen', steps:[
+    {type:'choice', target:null, q:'お料理がそろったザマス。食べ始める前に？', opts:[{t:'手を合わせて「いただきます」',ok:1},{t:'黙って食べ始める'},{t:'お箸を持ったまま手を合わせる'}],
+      exp:'お箸を持つ<b>前に</b>手を合わせて「いただきます」ザマス。'},
+    {type:'seq', target:'hashi', q:'お箸の取り上げ方ザマス。正しい順番でタップ！', items:['右手で上からつまみ上げる','左手を下に添えて支える','右手を下に回して持ち直す'],
+      exp:'「三手（みて）で取る」のが美しい所作ザマス。'},
+    {type:'choice', target:'soup', q:'さて、最初に口をつけるのはどれザマス？', opts:[{t:'お味噌汁をひと口',ok:1},{t:'ご飯を一気にかき込む'},{t:'焼き魚の皮から'}],
+      exp:'まず汁物で口と箸先をしめらせるのが和食の基本ザマス。'},
+    {type:'swipe', target:'soup', q:'お味噌汁をいただくザマス。お椀はどうするザマス？', dirs:{up:'持ち上げる',down:'置いたまま顔を近づける'}, ans:'up',
+      exp:'和食ではお椀は<b>持ち上げて</b>いただくザマス。犬食いは厳禁！'},
+    {type:'timing', target:'soup', q:'静かにすするザマス！緑のところでタップ', btn:'ずずっ', speed:1, eat:.5,
+      exp:'すする音は控えめに、が上品ザマス。'},
+    {type:'choice', target:null, q:'ご飯とおかず、どう食べ進めるザマス？', opts:[{t:'ご飯・汁・おかずを交互に',ok:1},{t:'おかずだけ先に全部'},{t:'ご飯におかずを乗せて丼に'}],
+      exp:'ご飯・汁物・おかずを<b>交互に</b>いただく「三角食べ」がきれいザマス。'},
+    {type:'mash', target:'rice', q:'ご飯はよく噛むザマス。きっちり<b>30回</b>！', btn:'もぐもぐ', done:'ごっくん', goal:30, time:14, eat:.5,
+      exp:'ひと口30回が目安ザマス。'},
+    {type:'choice', target:'rice', q:'ご飯のおかわりをお願いするザマス。お茶碗は？', opts:[{t:'ひと口分残して両手で渡す',ok:1},{t:'空にして片手で差し出す'},{t:'お茶碗をお箸でチンチン鳴らす'}], eat:.5,
+      exp:'おかわりは<b>ひと口残して両手で</b>、が昔ながらの作法とされるザマス。食器を鳴らすのは論外！'},
+    {type:'seq', target:'hashi', q:'ごちそうさまの流れザマス。正しい順番で！', items:['お箸を箸置きに戻す','お椀のふたを元に戻す','手を合わせて「ごちそうさま」'],
+      exp:'食べ始めの状態に戻して締めるザマス。'}
+   ]},
+   { id:'hashi', name:'お箸編', layout:'gozen', steps:[
+    {type:'seq', target:'hashi', q:'お箸の取り上げ方ザマス。正しい順番でタップ！', items:['右手で上からつまみ上げる','左手を下に添えて支える','右手を下に回して持ち直す'],
+      exp:'「三手（みて）で取る」のが美しい所作ザマス。'},
+    {type:'choice', target:'hashi', q:'お箸を正しく持ったザマス。動かすのは？', opts:[{t:'上のお箸だけ',ok:1},{t:'下のお箸だけ'},{t:'2本いっしょに'}],
+      exp:'下のお箸は固定して、<b>上のお箸だけ</b>を動かすザマス。'},
+    {type:'choice', target:null, q:'次のおかず、どれにするか迷ってきたザマス…', opts:[{t:'お箸を空中でさまよわせる'},{t:'一度お箸を置いて考える',ok:1},{t:'あれこれ箸先でつつく'}],
+      exp:'お箸をうろうろさせる「<b>迷い箸</b>」はタブーザマス。'},
+    {type:'choice', target:'nimono', q:'煮物の里いもがつるつる滑って、つかめないザマス', opts:[{t:'お箸でブスッと突き刺す'},{t:'小鉢を手に持ち、落ち着いてつまむ',ok:1},{t:'指でつまむ'}], eat:.4,
+      exp:'突き刺す「<b>刺し箸</b>」はNG。小鉢を持てば口まで安全ザマス。'},
+    {type:'swipe', target:'nimono', q:'煮物のおつゆが垂れそう！どうするザマス？', dirs:{up:'小鉢を持ち上げて口元で受ける',down:'空いた手を下に添えて受ける'}, ans:'up', eat:.3,
+      exp:'手で受ける「<b>手皿</b>」も実はマナー違反。器を持ち上げて受けるザマス。'},
+    {type:'choice', target:'pickle', q:'遠くのお漬物が食べたいザマス', opts:[{t:'お箸で器を引き寄せる'},{t:'器を手で持って手前に置く',ok:1},{t:'身を乗り出して取る'}], eat:.5,
+      exp:'お箸で器を動かす「<b>寄せ箸</b>」はNGザマス。'},
+    {type:'timing', target:'hashi', q:'ちょっとひと休み。お箸を箸置きに<b>そっと</b>置くザマス', btn:'そっ…', speed:1.3,
+      exp:'カチャンと音を立てずに置くザマス。'},
+    {type:'choice', target:'hashi', q:'食事の途中でお箸を休めるときは？', opts:[{t:'器の上に橋のように渡す'},{t:'箸置きに置く',ok:1},{t:'ご飯に突き立てる'}],
+      exp:'器に渡す「<b>渡し箸</b>」も、ご飯に立てる「<b>立て箸</b>」もNGザマス。'},
+    {type:'choice', target:'fish', q:'お隣の人に焼き魚を取り分けてあげたいザマス', opts:[{t:'お箸からお箸へ直接渡す'},{t:'取り皿に乗せて渡す',ok:1},{t:'相手の口へ運ぶ'}], eat:.4,
+      exp:'お箸どうしで受け渡す「<b>箸渡し</b>」は仏事を連想させるのでNGザマス。'},
+    {type:'choice', target:'rice', q:'お箸の先にご飯粒がついたザマス', opts:[{t:'箸先をなめて取る'},{t:'次のひと口と一緒にいただく',ok:1},{t:'お茶碗のふちでこそげ落とす'}], eat:.5,
+      exp:'箸先をなめる「<b>ねぶり箸</b>」はNGザマス。'}
+   ]},
+   { id:'fish', name:'焼き魚編', layout:'fish', steps:[
+    {type:'choice', target:'fish', q:'尾頭付きの焼き魚、正しい向きは？', opts:[{t:'頭が左・お腹が手前',ok:1},{t:'頭が右・お腹が手前'},{t:'頭が左・背中が手前'}],
+      exp:'尾頭付きは<b>頭が左、お腹が手前</b>が基本ザマス。'},
+    {type:'choice', target:'sudachi', q:'すだちを搾るザマス。どうやって？', opts:[{t:'片手で覆うようにして搾る',ok:1},{t:'高く掲げて一気に搾る'},{t:'お箸で突き刺して搾る'}], eat:.6,
+      exp:'果汁が飛ばないよう<b>手で覆って</b>搾るザマス。'},
+    {type:'choice', target:'fish', q:'どこから食べ始めるザマス？', opts:[{t:'頭の近くの背から、尾に向かって',ok:1},{t:'尾から頭に向かって'},{t:'お腹の真ん中から'}],
+      exp:'上の身を<b>頭側から尾へ</b>向かって食べ進めるザマス。'},
+    {type:'timing', target:'fish', q:'上の身をひと口大にほぐすザマス。ぐちゃぐちゃにしないで！', btn:'ほぐす', speed:1.2, eat:.3,
+      exp:'中骨に沿って、ひと口ずつほぐすと美しいザマス。'},
+    {type:'choice', target:'fish', q:'上の身を食べ終えたザマス。下の身は？', opts:[{t:'中骨を外して奥に置き、下の身を食べる',ok:1},{t:'魚をひっくり返す'},{t:'骨のすき間からほじくる'}], eat:.3,
+      exp:'魚を<b>裏返すのはNG</b>。中骨を頭ごと外すザマス。'},
+    {type:'swipe', target:'fish', q:'外した中骨、どこに置くザマス？', dirs:{up:'お皿の奥',down:'お皿の手前'}, ans:'up',
+      exp:'骨や皮は<b>お皿の奥（向こう側）</b>にまとめるザマス。'},
+    {type:'choice', target:null, q:'あら、口の中に小骨が…', opts:[{t:'口元を手で隠して取り出す',ok:1},{t:'ペッと吐き出す'},{t:'無理やり飲み込む'}],
+      exp:'<b>口元を手で隠して</b>そっと取り出し、お皿の隅に置くザマス。'},
+    {type:'choice', target:'hajikami', q:'添えてある「はじかみ（谷中しょうが）」は？', opts:[{t:'魚を食べた後の口直しにいただく',ok:1},{t:'飾りなので残す'},{t:'最初に食べる'}], eat:1,
+      exp:'はじかみは食後の<b>口直し</b>ザマス。'},
+    {type:'choice', target:'fish', q:'食べ終わったザマス。お皿の上は？', opts:[{t:'骨や皮を奥の隅にまとめる',ok:1},{t:'散らかったままでOK'},{t:'骨をお茶碗に入れる'}], eat:1,
+      exp:'残った骨や皮は<b>奥の隅にまとめる</b>ザマス。懐紙をかぶせるとなお上品ザマス。'}
+   ]},
+   { id:'sushi', name:'お寿司編', layout:'sushi', steps:[
+    {type:'choice', target:'sushi', q:'にぎり寿司、何で食べるザマス？', opts:[{t:'手でもお箸でもOK',ok:1},{t:'必ずお箸'},{t:'必ずフォーク'}],
+      exp:'にぎりは<b>手でもお箸でも</b>OKザマス。'},
+    {type:'choice', target:'shoyu', q:'お醤油はどこにつけるザマス？', opts:[{t:'ネタの先に少しだけ',ok:1},{t:'シャリにたっぷり'},{t:'全体をドボン'}],
+      exp:'シャリにつけると崩れるザマス。<b>ネタの先に少し</b>！'},
+    {type:'timing', target:'shoyu', q:'ネタの先にお醤油を<b>ちょん</b>とつけるザマス。つけすぎ注意！', btn:'ちょん', speed:1.4,
+      exp:'お醤油はほんの少しで十分ザマス。'},
+    {type:'swipe', target:'sushi', q:'口に運ぶときの向きは？', dirs:{up:'ネタが下（舌に当たる）',down:'シャリが下'}, ans:'up', eat:.25,
+      exp:'<b>ネタを下</b>にすると、ネタの味が舌に直接届くザマス。'},
+    {type:'choice', target:'sushi', q:'大きなにぎり。どう食べるザマス？', opts:[{t:'ひと口でいただく',ok:1},{t:'半分かじって置く'},{t:'お箸で切り分ける'}], eat:.25,
+      exp:'にぎりは<b>ひと口</b>が基本。かじりかけを戻すのはNGザマス。'},
+    {type:'choice', target:'gunkan', q:'いくらの軍艦巻き。お醤油は？', opts:[{t:'ガリにお醤油をつけて上から塗る',ok:1},{t:'逆さにしてお醤油にドボン'},{t:'小皿ごと上からかける'}], eat:1,
+      exp:'軍艦は傾けるとこぼれるザマス。<b>ガリを刷毛がわり</b>にするザマス。'},
+    {type:'choice', target:'gari', q:'ガリ（しょうがの甘酢漬け）はいつ食べるザマス？', opts:[{t:'ネタとネタの合間の口直しに',ok:1},{t:'最後にまとめて'},{t:'ご飯がわりにたくさん'}], eat:.5,
+      exp:'ガリは<b>口直し</b>。次のネタの味をリセットするザマス。'},
+    {type:'choice', target:'sushi', q:'食べる順番、おすすめは？', opts:[{t:'白身などあっさり → こってり',ok:1},{t:'一番脂っこい大トロから'},{t:'甘い玉子から'}], eat:.25,
+      exp:'<b>淡白なものから濃いものへ</b>が、味がわかりやすいとされるザマス。'},
+    {type:'choice', target:'tea', q:'お店の人にお茶をお願いするザマス', opts:[{t:'「お茶をください」',ok:1},{t:'「あがり一丁！」'},{t:'「おあいそ！」'}], eat:.6,
+      exp:'「あがり」「おあいそ」は本来<b>お店側の言葉</b>。お客は普通に言えばいいザマス。'}
+   ]}
+  ]},
+  yo: { name:'洋食', emoji:'🍽️', chapters:[
+   { id:'full', name:'フルコース編', layout:'yo', steps:[
+    {type:'choice', target:'napkin', q:'まずはナプキン。どうするザマス？', opts:[{t:'首にかけてガード'},{t:'二つ折りにしてひざの上',ok:1},{t:'テーブルに置いたまま'}],
+      exp:'ナプキンは<b>二つ折りにしてひざの上</b>ザマス。'},
+    {type:'choice', target:'cutlery', q:'ナイフとフォークがたくさん。どれから使うザマス？', opts:[{t:'外側から順に',ok:1},{t:'内側から順に'},{t:'持ちやすいもの'}],
+      exp:'カトラリーは料理ごとに<b>外側から</b>使うザマス。'},
+    {type:'swipe', target:'soup', q:'スープをすくうザマス。スプーンを動かす方向は？', dirs:{up:'奥へ',down:'手前へ'}, ans:'up',
+      exp:'イギリス式は<b>手前から奥へ</b>すくうザマス（フランス式は逆の場合もあるザマス）。'},
+    {type:'timing', target:'soup', q:'音を立てずに飲むザマス！緑でタップ', btn:'いただく', speed:1.15, eat:.6,
+      exp:'スープはすすらず、口に流し込むように、ザマス。'},
+    {type:'choice', target:'bread', q:'パンはどう食べるザマス？', opts:[{t:'丸ごとかぶりつく'},{t:'一口大にちぎって食べる',ok:1},{t:'ナイフで切る'}], eat:.5,
+      exp:'パンは<b>手でひと口大にちぎって</b>いただくザマス。'},
+    {type:'timing', target:'steak', q:'お肉を切るザマス。ギコギコ音を立てずに、一瞬で！', btn:'切る', speed:1.6, eat:.4,
+      exp:'ナイフは引くときに切ると静かザマス。'},
+    {type:'mash', target:'wine', q:'ワインを回す（スワリング）のは<b>ちょうど3回</b>ザマス', btn:'くるっ', done:'いただく', goal:3, time:6, eat:.5,
+      exp:'回しすぎは品がないザマス。'},
+    {type:'choice', target:'rice', q:'ライスはどうやって食べるザマス？', opts:[{t:'フォークの腹ですくう',ok:1},{t:'お皿を持ち上げてかき込む'},{t:'手でつまむ'}], eat:.6,
+      exp:'<b>フォークの腹</b>ですくってOKザマス。背に乗せる必要はないザマス。'},
+    {type:'choice', target:'steak', q:'ちょっとひと休み。ナイフとフォークは？', opts:[{t:'お皿の上にハの字に置く',ok:1},{t:'お皿の上に揃えて置く'},{t:'テーブルに直置き'}], eat:.3,
+      exp:'揃えると「下げてOK」の合図になるザマス。休憩は<b>ハの字</b>！'},
+    {type:'choice', target:'steak', q:'ごちそうさま。カトラリーの置き方は？', opts:[{t:'揃えて斜めに置く',ok:1},{t:'ハの字に置く'},{t:'×の字にクロス'}], eat:1,
+      exp:'食べ終わりは<b>揃えて斜め</b>に置くザマス。'}
+   ]},
+   { id:'steak', name:'ステーキ編', layout:'steak', steps:[
+    {type:'choice', target:'cutlery', q:'ナイフとフォーク、どう持つザマス？', opts:[{t:'右手にナイフ、左手にフォーク',ok:1},{t:'左手にナイフ、右手にフォーク'},{t:'両方右手でまとめて'}],
+      exp:'<b>右手にナイフ、左手にフォーク</b>。人差し指を背に添えると安定するザマス。'},
+    {type:'choice', target:'steak', q:'お肉はどう切り進めるザマス？', opts:[{t:'左端からひと口ずつ切って食べる',ok:1},{t:'最初に全部切り分ける'},{t:'真ん中から大胆に'}],
+      exp:'最初に全部切ると肉汁が流れて冷めるザマス。<b>左からひと口ずつ</b>！'},
+    {type:'timing', target:'steak', q:'ひと口大に切るザマス。ギコギコせず、引くときにスッと！', btn:'切る', speed:1.5, eat:.25,
+      exp:'ナイフは<b>引くときに切る</b>と音も出ず、きれいに切れるザマス。'},
+    {type:'choice', target:'steak', q:'付け合わせの野菜は？', opts:[{t:'お肉と一緒にいただく',ok:1},{t:'飾りなので残す'},{t:'お隣の人のお皿へ'}], eat:.25,
+      exp:'付け合わせも料理の一部。<b>一緒にいただく</b>ザマス。'},
+    {type:'mash', target:'steak', q:'お肉はじっくり味わうザマス。<b>ちょうど15回</b>噛むザマス', btn:'もぐもぐ', done:'ごっくん', goal:15, time:9, eat:.2,
+      exp:'急いで飲み込むのは品がないザマス。'},
+    {type:'choice', target:'wine', q:'ワインを注いでもらうザマス。グラスは？', opts:[{t:'テーブルに置いたまま',ok:1},{t:'持ち上げて受ける'},{t:'手で押さえてガード'}],
+      exp:'洋食ではグラスは<b>置いたまま</b>注いでもらうザマス。'},
+    {type:'choice', target:'cutlery', q:'あら、フォークを床に落としたザマス！', opts:[{t:'自分で拾う'},{t:'お店の人を呼んで替えてもらう',ok:1},{t:'足で隅に寄せる'}],
+      exp:'自分で拾わず、<b>お店の人にお願いする</b>ザマス。'},
+    {type:'choice', target:'napkin', q:'口元が汚れたザマス。どう拭く？', opts:[{t:'ナプキンの内側で軽く押さえる',ok:1},{t:'テーブルクロスで拭く'},{t:'手の甲でぬぐう'}],
+      exp:'<b>ナプキンの内側</b>を使えば、汚れが見えないザマス。'},
+    {type:'swipe', target:'cutlery', q:'食べ終わり。ナイフの刃の向きは？', dirs:{up:'外側（向こう向き）',down:'内側（自分向き）'}, ans:'down', eat:1,
+      exp:'ナイフの刃は<b>自分側（内側）</b>に向けて置くザマス。'}
+   ]},
+   { id:'pasta', name:'パスタ編', layout:'pasta', steps:[
+    {type:'choice', target:'cutlery', q:'スパゲッティ、何で食べるザマス？', opts:[{t:'フォークだけで巻く',ok:1},{t:'スプーンが絶対に必須'},{t:'お箸をもらう'}],
+      exp:'本場イタリアでは<b>フォークだけ</b>が一般的ザマス（スプーンを添えても日本では問題なしザマス）。'},
+    {type:'swipe', target:'pasta', q:'フォークを回すのはお皿のどこで？', dirs:{up:'お皿の端（ふち近く）',down:'お皿の真ん中'}, ans:'up',
+      exp:'少量を<b>お皿の端</b>に寄せて巻くと、きれいにまとまるザマス。'},
+    {type:'seq', target:'pasta', q:'パスタの巻き方ザマス。正しい順番で！', items:['少量をお皿の端に寄せる','フォークを立ててくるくる回す','ひと口サイズで口へ運ぶ'],
+      exp:'欲張らず、<b>ひと口分だけ</b>巻くのがコツザマス。'},
+    {type:'mash', target:'pasta', q:'くるくる巻くのは<b>ちょうど4回</b>ザマス。巻きすぎは団子になるザマス', btn:'くるっ', done:'パクッ', goal:4, time:6, eat:.3,
+      exp:'巻きすぎると大きくなって口に入らないザマス。'},
+    {type:'timing', target:'pasta', q:'すすらずに、静かにいただくザマス！', btn:'パクッ', speed:1.3, eat:.3,
+      exp:'パスタは<b>すすらない</b>のが洋食のマナーザマス。'},
+    {type:'choice', target:'pasta', q:'麺が長くて巻きにくいザマス…', opts:[{t:'少量ずつ巻き直す',ok:1},{t:'ナイフで細かく切る'},{t:'噛み切ってお皿に戻す'}],
+      exp:'パスタは<b>切らずに少量ずつ</b>巻くザマス。噛み切って戻すのは論外ザマス。'},
+    {type:'choice', target:'cheese', q:'魚介のパスタに粉チーズは？', opts:[{t:'かけないのが一般的',ok:1},{t:'山盛りかける'},{t:'パンにかける'}],
+      exp:'イタリアでは<b>魚介のパスタにはチーズをかけない</b>ことが多いザマス。'},
+    {type:'choice', target:'napkin', q:'トマトソースがはねたザマス！', opts:[{t:'ナプキンでそっと押さえる',ok:1},{t:'こすって落とす'},{t:'舐める'}], eat:.2,
+      exp:'こすると広がるザマス。<b>押さえて</b>吸い取るザマス。'},
+    {type:'choice', target:'cutlery', q:'ごちそうさま。フォークとスプーンは？', opts:[{t:'揃えてお皿の上に斜めに置く',ok:1},{t:'お皿の外に置く'},{t:'×の字にクロス'}], eat:1,
+      exp:'<b>揃えて斜めに</b>置けば「下げてOK」の合図ザマス。'}
+   ]},
+   { id:'tea', name:'アフタヌーンティー編', layout:'tea', steps:[
+    {type:'choice', target:'stand', q:'3段スタンド、どの順でいただくザマス？', opts:[{t:'下段 → 中段 → 上段',ok:1},{t:'上段 → 中段 → 下段'},{t:'ケーキから'}], eat:.4,
+      exp:'<b>下段のサンドイッチ → 中段のスコーン → 上段のケーキ</b>が伝統的な順番ザマス。'},
+    {type:'choice', target:'cup', q:'ティーカップの持ち方は？', opts:[{t:'取っ手を指でつまむ',ok:1},{t:'取っ手に指を通す'},{t:'両手で包み込む'}],
+      exp:'指は通さず、<b>取っ手をつまむ</b>のが英国流ザマス。'},
+    {type:'swipe', target:'cup', q:'テーブルで紅茶を飲むザマス。ソーサーは？', dirs:{up:'ソーサーごと持ち上げる',down:'ソーサーは置いたまま'}, ans:'down',
+      exp:'テーブルの席では<b>ソーサーは置いたまま</b>、カップだけを持ち上げるザマス。'},
+    {type:'timing', target:'cup', q:'お砂糖を混ぜるザマス。スプーンをカップに当てず、静かに！', btn:'まぜる', speed:1.25,
+      exp:'カチャカチャ音を立てないよう、<b>前後に静かに</b>混ぜるザマス。'},
+    {type:'choice', target:'cup', q:'混ぜ終わったスプーンは？', opts:[{t:'ソーサーのカップの向こう側に置く',ok:1},{t:'カップに入れたまま'},{t:'舐めてからテーブルへ'}], eat:.5,
+      exp:'スプーンは<b>ソーサーの奥側</b>に置くザマス。'},
+    {type:'seq', target:'scone', q:'スコーンの食べ方ザマス。正しい順番で！', items:['手で横に二つに割る','ひと口分にクリームとジャムを塗る','ひと口ずついただく'], eat:.5,
+      exp:'ナイフで切らず<b>手で割る</b>ザマス。塗るのはひと口分ずつ！'},
+    {type:'choice', target:'scone', q:'スコーンのクリーム、どう塗るザマス？', opts:[{t:'ひと口分ずつ塗る',ok:1},{t:'最初に全部に塗りたくる'},{t:'スプーンで直接口へ'}], eat:.5,
+      exp:'食べる分だけ<b>ひと口ずつ</b>塗るのが上品ザマス。'},
+    {type:'choice', target:'cake', q:'ケーキはどこから食べるザマス？', opts:[{t:'左端（とがった方）からひと口ずつ',ok:1},{t:'真ん中にフォークを刺す'},{t:'倒してから食べる'}], eat:1,
+      exp:'<b>左側からひと口ずつ</b>切り進めるザマス。'},
+    {type:'choice', target:'pot', q:'紅茶のおかわりが欲しいザマス', opts:[{t:'お店の人に声をかけて頼む',ok:1},{t:'ポットを高く掲げて振る'},{t:'カップをスプーンで鳴らす'}],
+      exp:'食器を鳴らしたり振ったりせず、<b>お店の人にお願い</b>するザマス。'}
+   ]}
+  ]},
+  chu: { name:'中華', emoji:'🥟', chapters:[
+   { id:'entaku', name:'円卓編', layout:'chu', steps:[
+    {type:'choice', target:'susan', q:'回転テーブル、どっちに回すザマス？', opts:[{t:'↻ 時計回り',ok:1},{t:'↺ 反時計回り'},{t:'勢いよくぶん回す'}], spin:1,
+      exp:'回転テーブルは<b>時計回り</b>が基本ザマス。'},
+    {type:'choice', target:'susan', q:'大皿料理、最初に取るのは誰ザマス？', opts:[{t:'自分から'},{t:'主賓（目上の人）から',ok:1},{t:'早い者勝ち'}],
+      exp:'料理は<b>主賓から</b>取るザマス。'},
+    {type:'choice', target:'plate', q:'別の料理に行くとき、取り皿は？', opts:[{t:'新しい取り皿に替える',ok:1},{t:'同じお皿に盛り重ねる'},{t:'大皿から直接食べる'}],
+      exp:'味が混ざらないよう<b>新しいお皿</b>に替えるザマス。'},
+    {type:'swipe', target:'ramen', q:'ラーメンの器、持ち上げる？置いたまま？', dirs:{up:'持ち上げる',down:'置いたまま'}, ans:'down',
+      exp:'中国料理では器は<b>テーブルに置いたまま</b>いただくザマス。'},
+    {type:'seq', target:'renge', q:'レンゲの持ち方ザマス。正しい順番で！', items:['柄の溝に人差し指を入れる','親指と中指で柄を挟む','麺をレンゲに乗せる'],
+      exp:'レンゲは人差し指を溝に、親指と中指で挟むザマス。'},
+    {type:'timing', target:'ramen', q:'麺はすすりすぎず静かにいただくザマス！', btn:'ちゅるっ', speed:1.35, eat:.5,
+      exp:'レンゲを受け皿にして静かに、ザマス。'},
+    {type:'mash', target:'xlb', q:'小籠包は熱いザマス。フーフーは<b>ちょうど5回</b>！', btn:'フー', done:'パクッ', goal:5, time:7, eat:.67,
+      exp:'冷ましすぎもスープが冷めて台無しザマス。'},
+    {type:'choice', target:'tea', q:'乾杯ザマス！目上の方とグラスを合わせるときの高さは？', opts:[{t:'相手より少し低く',ok:1},{t:'相手より高く掲げる'},{t:'勢いよくぶつける'}],
+      exp:'目上の方には<b>少し低い位置</b>で合わせるのが気遣いザマス。'},
+    {type:'choice', target:'tea', q:'お茶を注いでもらったザマス。どうする？', opts:[{t:'指でテーブルを軽くトントン',ok:1},{t:'無言で飲む'},{t:'注ぎ返して張り合う'}], eat:.6,
+      exp:'指でトントンは感謝を表すしぐさ（叩指礼）ザマス。'},
+    {type:'choice', target:'ramen', q:'食べ終わりザマス。お料理は？', opts:[{t:'一滴残らず完食'},{t:'ほんの少しだけ残す',ok:1},{t:'全部おかわり'}], eat:1,
+      exp:'伝統的には「十分いただいた」の印に<b>少し残す</b>とされるザマス（地域や世代で考え方はいろいろザマス）。'}
+   ]},
+   { id:'dimsum', name:'飲茶（点心）編', layout:'dimsum', steps:[
+    {type:'choice', target:'teapot', q:'飲茶の始まりザマス。お茶はまず？', opts:[{t:'周りの人のカップに注いでから自分に',ok:1},{t:'自分の分だけ注ぐ'},{t:'ポットから直接飲む'}],
+      exp:'まずは<b>周りの人から</b>注ぐのが気配りザマス。'},
+    {type:'choice', target:'tea', q:'お茶を注いでもらったザマス。どうする？', opts:[{t:'指でテーブルを軽くトントン',ok:1},{t:'無言で一気飲み'},{t:'注ぎ返して張り合う'}], eat:.4,
+      exp:'指でトントンは感謝を表すしぐさ（<b>叩指礼</b>）ザマス。'},
+    {type:'seq', target:'xlb', q:'小籠包の食べ方ザマス。正しい順番で！', items:['レンゲに乗せる','皮に小さく穴を開けてスープを飲む','酢じょうゆと生姜でいただく'], eat:.34,
+      exp:'いきなり丸ごとかぶると<b>熱いスープでやけど</b>するザマス。'},
+    {type:'timing', target:'xlb', q:'小籠包を持ち上げるザマス。皮を破らないよう、そっと！', btn:'そっと', speed:1.4, eat:.33,
+      exp:'皮の上の方（ひだ）をつまむと破れにくいザマス。'},
+    {type:'choice', target:'hashi', q:'中国では、お箸はどう置くザマス？', opts:[{t:'縦向き（自分に向けてまっすぐ）',ok:1},{t:'横向き（手前に平行）'},{t:'お皿に立てる'}],
+      exp:'中国料理では<b>お箸は縦向き</b>に置くのが一般的ザマス。'},
+    {type:'choice', target:'rayu', q:'ラー油を使いたいザマス', opts:[{t:'小皿に取ってつける',ok:1},{t:'点心に直接たっぷりかける'},{t:'せいろに流し込む'}],
+      exp:'みんなで食べる点心には直接かけず、<b>小皿に取る</b>ザマス。'},
+    {type:'choice', target:'seiro', q:'みんなの点心、残り1個ザマス', opts:[{t:'周りに声をかけてから取る',ok:1},{t:'黙ってサッと取る'},{t:'半分かじって戻す'}], eat:.67,
+      exp:'最後の1個は<b>ひと声かけて</b>から、が大人ザマス。'},
+    {type:'choice', target:'teapot', q:'ポットのお茶がなくなったザマス', opts:[{t:'ふたを少しずらして置いておく',ok:1},{t:'ポットを振って音を立てる'},{t:'大声で「お茶！」'}],
+      exp:'<b>ふたをずらす</b>のは「お湯を足してください」の合図ザマス。'},
+    {type:'swipe', target:'seiro', q:'食べ終わったせいろはどうするザマス？', dirs:{up:'重ねてテーブルの端へ',down:'あちこちに置いたまま'}, ans:'up', eat:1,
+      exp:'空いたせいろは<b>重ねて端へ</b>。お店の人も片付けやすいザマス。'}
+   ]},
+   { id:'noodle', name:'麺編', layout:'noodle', steps:[
+    {type:'choice', target:'ramen', q:'麺が運ばれてきたザマス。まずは？', opts:[{t:'スープをレンゲでひと口味わう',ok:1},{t:'コショウを山盛りかける'},{t:'のびるまで写真を撮り続ける'}],
+      exp:'まずは<b>そのままのスープ</b>を味わうのが作った人への礼儀ザマス。'},
+    {type:'choice', target:'renge', q:'レンゲの持ち方は？', opts:[{t:'溝に人差し指を入れ、親指と中指で挟む',ok:1},{t:'グーでしっかり握る'},{t:'スプーンのように下から持つ'}],
+      exp:'<b>溝に人差し指</b>、親指と中指で挟むと安定するザマス。'},
+    {type:'swipe', target:'ramen', q:'中華麺の器、持ち上げる？置いたまま？', dirs:{up:'持ち上げる',down:'置いたまま'}, ans:'down',
+      exp:'中国料理では器は<b>置いたまま</b>、レンゲを受け皿にするザマス。'},
+    {type:'timing', target:'ramen', q:'麺をレンゲに<b>ひと口分</b>だけ取るザマス！', btn:'とる', speed:1.3, eat:.25,
+      exp:'欲張ってたくさん取るとスープが飛ぶザマス。'},
+    {type:'mash', target:'ramen', q:'熱い麺を冷ますザマス。フーフーは<b>ちょうど3回</b>！', btn:'フー', done:'いただく', goal:3, time:5, eat:.25,
+      exp:'吹きすぎるとスープが飛び散るザマス。'},
+    {type:'choice', target:'tare', q:'餃子のタレはどうするザマス？', opts:[{t:'小皿で酢・しょうゆ・ラー油を合わせる',ok:1},{t:'餃子のお皿に直接かける'},{t:'ラーメンのスープで代用'}],
+      exp:'タレは<b>小皿で</b>好みに合わせるザマス。'},
+    {type:'choice', target:'gyoza', q:'餃子がひと口で食べきれないザマス', opts:[{t:'お箸で持ったまま、ふた口で食べきる',ok:1},{t:'かじったものをお皿に戻す'},{t:'かじったものをタレに戻す'}], eat:.6,
+      exp:'かじりかけを<b>大皿や小皿に戻さない</b>のが鉄則ザマス。'},
+    {type:'choice', target:'condiment', q:'卓上の調味料、使うタイミングは？', opts:[{t:'味をみてから少しずつ',ok:1},{t:'食べる前に全部入れる'},{t:'お隣の器にもサービスで'}], eat:.25,
+      exp:'まず味をみてから<b>少しずつ</b>足すザマス。'},
+    {type:'choice', target:'ramen', q:'食べ終わってお店を出るときは？', opts:[{t:'「ごちそうさまでした」と伝える',ok:1},{t:'無言で出る'},{t:'器をひっくり返して完食アピール'}], eat:1,
+      exp:'<b>ひと言のお礼</b>が一番のマナーザマス。'}
+   ]},
+   { id:'duck', name:'北京ダック編', layout:'duck', steps:[
+    {type:'choice', target:'duck', q:'北京ダック、主役はどこザマス？', opts:[{t:'パリパリの皮',ok:1},{t:'骨'},{t:'くちばし'}],
+      exp:'北京ダックは<b>パリパリの皮</b>を味わう料理ザマス。'},
+    {type:'choice', target:'duck', q:'回ってきた大皿。何枚取るザマス？', opts:[{t:'人数を考えて自分の分だけ',ok:1},{t:'好きなだけ全部'},{t:'お皿ごと手元に置く'}], eat:.34,
+      exp:'円卓では<b>全員に行き渡るように</b>取るザマス。'},
+    {type:'seq', target:'bing', q:'北京ダックの包み方ザマス。正しい順番で！', items:['薄餅（カオヤービン）を広げる','甜麺醤を薄く塗る','ねぎ・きゅうりとダックを乗せる','くるっと包む'], eat:.25,
+      exp:'<b>広げる → 塗る → 乗せる → 包む</b>ザマス。'},
+    {type:'choice', target:'sauce', q:'甜麺醤（味噌だれ）の量は？', opts:[{t:'薄く塗る',ok:1},{t:'たっぷり山盛り'},{t:'ダックを浸す'}],
+      exp:'たれが多いと<b>皮の香ばしさ</b>が消えるザマス。'},
+    {type:'timing', target:'bing', q:'具がはみ出さないよう、くるっと包むザマス！', btn:'くるっ', speed:1.35, eat:.25,
+      exp:'下側を先に折り込むと、具がこぼれないザマス。'},
+    {type:'choice', target:'bing', q:'包んだダック、どうやって食べるザマス？', opts:[{t:'手で持って食べてOK',ok:1},{t:'ナイフとフォークで切る'},{t:'お箸でほぐして食べる'}], eat:.25,
+      exp:'包んだら<b>手で持って</b>かぶりついてOKザマス。'},
+    {type:'swipe', target:'bing', q:'薄餅を取ったら、せいろのふたは？', dirs:{up:'すぐ閉める',down:'開けっぱなし'}, ans:'up',
+      exp:'薄餅が乾かないよう<b>すぐ閉める</b>ザマス。'},
+    {type:'mash', target:'duck', q:'香ばしい皮をじっくり味わうザマス。<b>ちょうど12回</b>噛むザマス', btn:'もぐもぐ', done:'ごっくん', goal:12, time:8, eat:.33,
+      exp:'皮の香ばしさは噛むほど広がるザマス。'},
+    {type:'choice', target:'tea', q:'「乾杯（カンペイ）！」でもお酒は弱いザマス…', opts:[{t:'「随意（スイイー）」と言って少しだけ飲む',ok:1},{t:'無理して一気に飲み干す'},{t:'グラスを伏せて拒否'}], eat:.6,
+      exp:'中国の「乾杯」は飲み干す意味。<b>「随意」</b>と言えば自分のペースでOKザマス。'}
+   ]}
+  ]}
+};
+function chapterOf(kind, id){ const cs = COURSES[kind].chapters; return cs.find(c=>c.id===id) || cs[0]; }
+
+const LINES = {
+  start:['本日のマナー講座を始めるザマス','よろしくて？始めるザマスよ','背筋を伸ばして。始めるザマス'],
+  perfect:['よろしいザマス','まあ、及第点ザマスね','ふん、悪くないザマス','当然ザマス','…やるザマスね'],
+  near:['…ギリギリザマス','今ちょっと音がしたザマス','角度が2度ズレてるザマス','私の若い頃はもっと優雅だったザマス','その程度で満足しないでほしいザマス','惜しい、が一番ダメザマス'],
+  miss:['ザマーーース！！','信じられないザマス！','親の顔が見てみたいザマス','それでも人間ザマスか！','はぁ…がっかりザマス'],
+  timeout:['いつまで待たせるザマス！','時は金なりザマス！','固まってないで動くザマス！'],
+  warn:['…あら？大丈夫ザマスか？','手が震えてるザマスよ','まだ迷ってるザマス？','あと3秒ザマス…2…','ほら、ほらほら…'],
+  overcount:['あら…？今、何回目ザマス？','数えてるザマスか…？'],
+  nitpick:['背筋が曲がってるザマス','ひじをつかない！','その目つき、失礼ザマス','咀嚼音が聞こえる気がするザマス','今ため息ついたザマス？','笑顔が足りないザマス','髪を触らないザマス','呼吸がうるさいザマス','靴下の色が食事に合ってないザマス','まばたきが多いザマス'],
+  clear:['…ま、今日のところは合格にしてあげるザマス','次回もビシビシいくザマスよ'],
+  fail:['もう結構ザマス！出ていくザマス！','落第ザマス！お帰りはあちら！'],
+  flip:['ザ、ザマァァァス！？','なんて野蛮な…ザマス…','わ、私のマナー講座がぁぁ']
+};
+
+/* =========================================================
+   GAME STATE
+   ========================================================= */
+const game = { state:'title', kind:'wa', ch:'gozen', chapter:null, layout:'gozen', signLabel:'', idx:0, steps:[], anger:0, ira:0, score:0, perf:0, near:0, miss:0, kogoto:0, step:null, stepT:0, nextNitpick:0 };
+
+let bubbleTimer = 0;
+function say(text, mood){
+  const b = $('bubble'); b.textContent = text; b.className = 'show' + (mood==='scold'?' angry':'');
+  bubbleTimer = Math.max(1.8, text.length*.12);
+  teacherTalk(Math.min(2, text.length*.09), mood); speak(text);
+}
+function toast(text){ const t = $('toast'); t.textContent = text; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(()=>t.classList.remove('show'), 3500); }
+function bigText(text, ms=1400){ const b = $('bigText'); b.textContent = text; b.classList.add('show'); clearTimeout(bigText._t); bigText._t = setTimeout(()=>b.classList.remove('show'), ms); }
+
+function addAnger(v){ game.anger = clamp(game.anger+v, 0, 100); }
+function addIra(v){ game.ira = clamp(game.ira+v, 0, 100); }
+function kogoto(text, ira=8){ game.kogoto++; addIra(ira); say(text, 'scold'); }
+function updateHud(){
+  $('angerBar').firstElementChild.style.width = game.anger+'%';
+  $('iraBar').firstElementChild.style.width = game.ira+'%';
+  $('stepInfo').textContent = COURSES[game.kind].name+'・'+game.chapter.name+' '+Math.min(game.idx+1, game.steps.length)+' / '+game.steps.length;
+  const f = $('flip'); f.querySelector('.fill').style.height = game.ira+'%'; f.classList.toggle('hot', game.ira>=70);
+}
+
+function show(id, on=true){ $(id).classList.toggle('hidden', !on); }
+function startGame(kind, chId){
+  audio();
+  const ch = chapterOf(kind, chId);
+  game.kind = kind; game.ch = ch.id; game.chapter = ch; game.layout = ch.layout; game.signLabel = COURSES[kind].name+'・'+ch.name;
+  game.steps = ch.steps; game.idx = 0; game.anger = 0; game.ira = 0; game.score = 0; game.perf=0; game.near=0; game.miss=0; game.kogoto=0;
+  clearPhysics(); buildRoom(kind); buildTable(kind); resetTeacher(kind);
+  show('title', false); show('result', false); show('hud'); show('panel'); show('flip');
+  game.state = 'intro'; updateHud();
+  $('task').innerHTML = '本日のお献立：<b>'+COURSES[kind].name+'・'+ch.name+'</b><small>先生の機嫌を損ねずに最後まで食べきるザマス</small>';
+  $('timer').style.visibility = 'hidden'; $('ctrl').innerHTML = '';
+  say(pick(LINES.start));
+  setTimeout(()=>{ if (game.state==='intro') beginStep(); }, 1900);
+}
+
+function beginStep(){
+  const s = game.steps[game.idx]; game.step = s; game.state = 'step'; game.stepT = 0; game.warned = false; game.resolved = false;
+  game.nextNitpick = rand(4.5, 8);
+  updateHud(); setHighlight(s.target);
+  const ctrl = $('ctrl'); ctrl.innerHTML = '';
+  $('timer').style.visibility = 'visible';
+  $('task').innerHTML = s.q;
+  s.limit = s.type==='seq'?11 : s.type==='mash'? s.time : s.type==='timing'? 7 : 7.5;
+  if (s.type==='choice'){
+    shuffle(s.opts).forEach(o=>{ const b = btn(o.t); b.onclick = ()=>{ sfx.tap(); resolve(o.ok?'perfect':'miss'); }; ctrl.appendChild(b); });
+  } else if (s.type==='seq'){
+    game.seqPos = 0;
+    const wrap = document.createElement('div'); wrap.style.cssText='display:flex;flex-direction:column;gap:7px';
+    shuffle(s.items.map((t,i)=>({t,i}))).forEach(o=>{ const b = btn(o.t); b.onclick = ()=>{
+      if (game.resolved) return;
+      if (o.i===game.seqPos){ sfx.tap(); b.disabled = true; b.textContent = (o.i+1)+'. '+o.t; game.seqPos++; if (game.seqPos===s.items.length) resolve('perfect'); }
+      else { resolve('miss'); }
+    }; wrap.appendChild(b); });
+    ctrl.appendChild(wrap);
+  } else if (s.type==='swipe'){
+    ctrl.innerHTML = '<div class="spad" id="spad"><div class="half up"><b>↑</b>'+s.dirs.up+'</div><div class="half dn"><b>↓</b>'+s.dirs.down+'</div><div class="hand">👆</div></div>'+
+      '<div class="spadNote">枠の中を指で<b>上</b>か<b>下</b>になぞる（上半分・下半分をタップでもOK）</div>';
+    const pad = $('spad'); let st = null;
+    pad.onpointerdown = e=>{ e.preventDefault(); e.stopPropagation(); st = {x:e.clientX, y:e.clientY};
+      const r = pad.getBoundingClientRect(); pad.querySelector(e.clientY < r.top+r.height/2 ? '.up' : '.dn').classList.add('on'); };
+    pad.onpointerup = e=>{ e.stopPropagation(); pad.querySelectorAll('.on').forEach(x=>x.classList.remove('on')); if (!st) return;
+      const dy = e.clientY - st.y; const r = pad.getBoundingClientRect(); st = null;
+      if (Math.abs(dy) >= 25) swipeAnswer(dy<0?'up':'down');
+      else swipeAnswer(e.clientY < r.top+r.height/2 ? 'up' : 'down'); };
+    pad.onpointercancel = ()=>{ st = null; };
+  } else if (s.type==='timing'){
+    ctrl.innerHTML = '<div class="gauge" id="gauge"><div class="cur" id="cur"></div></div>';
+    const b = btn(s.btn, 'pink big'); b.onclick = ()=>{ sfx.tap(); timingHit(); }; ctrl.appendChild(b);
+    $('gauge').onpointerdown = (e)=>{ e.preventDefault(); timingHit(); };
+    game.gp = 0;
+  } else if (s.type==='mash'){
+    game.mash = 0;
+    const cnt = document.createElement('div'); cnt.id = 'mashCount'; cnt.textContent = '0'; ctrl.appendChild(cnt);
+    const row = document.createElement('div'); row.className = 'row';
+    const b = btn(s.btn, 'pink big'); b.onpointerdown = (e)=>{ e.preventDefault(); if (game.resolved) return; game.mash++; sfx.mash(game.mash);
+      b.classList.add('pressed'); setTimeout(()=>b.classList.remove('pressed'),70);
+      cnt.textContent = (s.goal>10 && game.mash>10) ? '？？' : game.mash;
+      if (game.mash===s.goal+1 && !game.warned){ game.warned = true; kogoto(pick(LINES.overcount), 4); }
+      if (s.target) { const d = dishes[s.target]; if (d) d.g.position.y = .01; setTimeout(()=>{ if(d && d.g.parent===tableG) d.g.position.y = 0; }, 60); }
+    };
+    const d = btn(s.done, 'purple big'); d.style.flex = '.7'; d.onclick = ()=>mashDone();
+    row.appendChild(b); row.appendChild(d); ctrl.appendChild(row);
+    if (s.goal>10) $('task').innerHTML += '<small>※10回を超えたらカウントは見えないザマス。自分で数えるザマス</small>';
+  }
+}
+function btn(text, cls=''){ const b = document.createElement('button'); b.className = 'btn '+cls; b.innerHTML = text; return b; }
+
+function timingHit(){
+  if (game.resolved || !game.step || game.step.type!=='timing') return;
+  const p = game.gp; const d = Math.abs(p-.5);
+  resolve(d<=.05?'perfect': d<=.22?'near':'miss');
+}
+function mashDone(){
+  if (game.resolved) return; const s = game.step; const diff = Math.abs(game.mash - s.goal);
+  const nearTol = Math.max(1, Math.round(s.goal*.07));
+  $('mashCount').textContent = game.mash + '回';
+  resolve(diff===0?'perfect': diff<=nearTol?'near':'miss', diff===0?null:('（'+game.mash+'回でした）'));
+}
+
+function resolve(kind, extra){
+  if (game.resolved) return; game.resolved = true; game.state = 'feedback';
+  const s = game.step;
+  let line, mood;
+  if (kind==='perfect'){ game.score += 100; game.perf++; addAnger(-4); sfx.perfect(); line = pick(LINES.perfect); mood='happy'; }
+  else if (kind==='near'){ game.score += 60; game.near++; addAnger(9); sfx.near(); line = pick(LINES.near); mood='scold'; }
+  else { game.miss++; addAnger(kind==='timeout'?22:26); sfx.miss(); line = pick(kind==='timeout'?LINES.timeout:LINES.miss); mood='scold'; shake = .18; }
+  if (mood==='scold') kogoto(line, kind==='near'?11:7); else say(line, mood);
+  if (s.eat && kind!=='miss' && kind!=='timeout') eat(s.target, s.eat);
+  if (s.spin && kind==='perfect') susanSpin = 1.2;
+  if (kind!=='perfect' && s.type==='swipe'){ /* nothing extra */ }
+  const badge = {perfect:['◎','b-perfect'], near:['△','b-near'], miss:['×','b-miss'], timeout:['×','b-miss']}[kind];
+  $('timer').style.visibility = 'hidden';
+  $('ctrl').innerHTML = '<div id="feedback"><div class="badge '+badge[1]+'">'+badge[0]+'</div><div class="exp">'+(extra?'<b>'+extra+'</b><br>':'')+s.exp+'</div></div><div id="tapNext">タップで次へ ▶</div>';
+  updateHud();
+  game.fbT = 0;
+  if (game.ira >= 100){ setTimeout(()=>{ if (game.state==='feedback'||game.state==='step') { bigText('堪忍袋の緒が切れた！', 1200); setTimeout(()=>doFlip(true), 700); } }, 900); return; }
+  if (game.anger >= 100){ setTimeout(()=>failOut(), 1300); return; }
+}
+function nextStep(){
+  if (game.state!=='feedback' || game.fbT < .6) return;
+  if (game.ira>=100 || game.anger>=100) return;
+  game.idx++;
+  if (game.idx >= game.steps.length){ clearOut(); return; }
+  if (Math.random()<.4){ kogoto(pick(LINES.nitpick), 7); updateHud(); if (game.ira>=100){ game.state='busy'; bigText('堪忍袋の緒が切れた！',1200); setTimeout(()=>doFlip(true),700); return; } }
+  beginStep();
+}
+$('panel').addEventListener('click', ()=>{ if (game.state==='feedback') nextStep(); });
+
+/* ---------- swipe input ---------- */
+let sw = null;
+window.addEventListener('pointerdown', e=>{ if (e.target.closest && e.target.closest('#spad,#flip')) return; if (game.state==='step' && game.step && game.step.type==='swipe') sw = {x:e.clientX, y:e.clientY}; });
+window.addEventListener('pointerup', e=>{
+  if (!sw || game.state!=='step' || !game.step || game.step.type!=='swipe'){ sw = null; return; }
+  const dx = e.clientX - sw.x, dy = e.clientY - sw.y; sw = null;
+  if (Math.hypot(dx,dy) < 35) return;
+  const dir = Math.abs(dx)>Math.abs(dy) ? (dx>0?'right':'left') : (dy>0?'down':'up');
+  swipeAnswer(dir);
+});
+window.addEventListener('keydown', e=>{
+  const map = {ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right'};
+  if (map[e.key] && game.state==='step' && game.step.type==='swipe') swipeAnswer(map[e.key]);
+  if ((e.key===' '||e.key==='Enter') && game.state==='step' && game.step.type==='timing'){ e.preventDefault(); timingHit(); }
+  if ((e.key===' '||e.key==='Enter') && game.state==='feedback'){ e.preventDefault(); nextStep(); }
+});
+function swipeAnswer(dir){
+  const s = game.step; if (game.resolved || !s.dirs[dir]) return;
+  sfx.tap();
+  const d = dishes[s.target]; if (d && dir==='up'){ swLift = {d, t:0}; }
+  resolve(dir===s.ans?'perfect':'miss');
+}
+let swLift = null;
+
+/* ---------- flip button ---------- */
+const flipBtn = $('flip'); let flipHold = null;
+flipBtn.addEventListener('pointerdown', e=>{ e.preventDefault(); e.stopPropagation(); if (!(game.state==='step'||game.state==='feedback'||game.state==='intro')) return; flipHold = performance.now(); flipBtn.classList.add('charging'); audio(); });
+const endHold = ()=>{ flipHold = null; flipBtn.classList.remove('charging'); flipBtn.style.setProperty('--p', 0); };
+flipBtn.addEventListener('pointerup', endHold); flipBtn.addEventListener('pointerleave', endHold); flipBtn.addEventListener('pointercancel', endHold);
+flipBtn.addEventListener('contextmenu', e=>e.preventDefault());
+
+let flipInfo = null;
+function doFlip(auto){
+  if (game.state==='flipping' || game.state==='result') return;
+  game.state = 'flipping'; endHold();
+  show('panel', false); show('flip', false);
+  const power = .55 + game.ira/100*.7;
+  flipInfo = {auto, ira:game.ira, t:0, power};
+  try { speechSynthesis.cancel(); } catch(e){}
+  bigText('ちゃぶ台返しッ！！', 1600);
+  sfx.crash(); startFlip(power);
+  setTimeout(()=>{ tState.fallen = 1; say(pick(LINES.flip), 'scold'); }, 300);
+  setTimeout(()=>showResult('flip'), 3600);
+}
+function failOut(){
+  if (game.state==='result'||game.state==='flipping') return;
+  game.state = 'busy'; say(pick(LINES.fail), 'scold'); bigText('落第ザマス', 1500); sfx.miss();
+  setTimeout(()=>showResult('fail'), 2400);
+}
+function clearOut(){
+  game.state = 'busy'; setHighlight(null); say(pick(LINES.clear), 'happy'); sfx.ding(); bigText('ごちそうさま！', 1300);
+  show('panel', false);
+  setTimeout(()=>showResult('clear'), 2200);
+}
+
+/* =========================================================
+   RESULT
+   ========================================================= */
+function showResult(type){
+  game.state = 'result'; show('hud', false); show('panel', false); show('flip', false); $('bubble').className = '';
+  const n = game.steps.length, pct = game.score / (n*100);
+  let rank, title, sub;
+  const cname = COURSES[game.kind].name+'・'+game.chapter.name;
+  if (type==='flip'){
+    let dist = 0; bodies.forEach(b=>{ if(!b.table) dist = Math.max(dist, Math.hypot(b.o.position.x, b.o.position.z)); });
+    const sukatto = Math.round(clamp(flipInfo.ira*.7 + dist*12 + (game.idx/n)*10, 5, 100));
+    rank = '返'; title = flipInfo.auto ? '堪忍袋の緒、ブチ切れ' : 'マナー講座 強制終了';
+    sub = 'スカッと度 <b>'+sukatto+'%</b><br>'+(sukatto>=80?'称号：昭和の頑固おやじ':sukatto>=50?'称号：ちゃぶ台職人':'称号：ちょっとムッとした人');
+    game._share = '「本日のマナー講座ザマス」'+cname+'コースで'+(game.idx+1)+'問目にちゃぶ台返し！スカッと度'+sukatto+'%🍽️💥';
+  } else if (type==='fail'){
+    rank = '落'; title = '出禁ザマス'; sub = cname+'コース '+(game.idx+1)+'問目で先生がキレました';
+    game._share = '「本日のマナー講座ザマス」'+cname+'コースで落第…先生に出禁を言い渡されたザマス';
+  } else {
+    rank = pct>=.9?'S':pct>=.75?'A':pct>=.55?'B':'C';
+    title = {S:'マナー講師認定ザマス', A:'なかなかやるザマス', B:'まだまだザマス', C:'赤点ザマス'}[rank];
+    sub = cname+'コース完食！ スコア <b>'+game.score+'</b> / '+(n*100);
+    const bk = 'best_'+game.kind+'_'+game.ch; const best = store.get(bk) || 0; if (game.score > best){ store.set(bk, game.score); sub += '<br>🎉 自己ベスト更新！'; }
+    game._share = '「本日のマナー講座ザマス」'+cname+'コースでランク'+rank+'（'+game.score+'点）「'+title+'」';
+  }
+  $('rRank').textContent = rank; $('rTitle').textContent = title; $('rSub').innerHTML = sub;
+  $('rTable').innerHTML = '<tr><td>◎ 完璧</td><td>'+game.perf+'</td></tr><tr><td>△ ギリギリ</td><td>'+game.near+'</td></tr><tr><td>× しくじり</td><td>'+game.miss+'</td></tr><tr><td>言われた小言</td><td>'+game.kogoto+'回</td></tr><tr><td>最終イライラ度</td><td>'+Math.round(game.ira)+'%</td></tr>';
+  const txt = game._share + '\n#' + HASHTAG;
+  $('share').href = 'https://twitter.com/intent/tweet?text='+encodeURIComponent(txt)+(SHARE_URL?'&url='+encodeURIComponent(SHARE_URL):'');
+  show('result');
+}
+$('again').onclick = ()=>{ sfx.tap(); startGame(game.kind, game.ch); };
+$('toTitle').onclick = ()=>{ sfx.tap(); toTitle(); };
+function toTitle(){
+  game.state = 'title'; show('result', false); show('hud', false); show('panel', false); show('flip', false); $('bubble').className='';
+  document.querySelectorAll('[data-best]').forEach(el=>{ const cs = COURSES[el.dataset.best].chapters;
+    if (cs.length>1){ const done = cs.filter(c=>store.get('best_'+el.dataset.best+'_'+c.id)).length; el.textContent = cs.length+'編　（'+done+'編クリア）'; }
+    else { const b = store.get('best_'+el.dataset.best+'_'+cs[0].id); el.textContent = b ? '自己ベスト '+b+'点' : '未挑戦'; } });
+  game.kind = 'wa'; game.layout = 'gozen'; game.signLabel = '';
+  clearPhysics(); buildRoom('wa'); buildTable('wa'); resetTeacher('wa');
+  show('chapters', false); show('title');
+}
+document.querySelectorAll('.course').forEach(b=>b.onclick = ()=>{ sfx.tap(); try{ speechSynthesis.cancel(); }catch(e){}
+  const k = b.dataset.c; const cs = COURSES[k].chapters;
+  if (cs.length===1){ startGame(k, cs[0].id); return; }
+  $('chHead').textContent = COURSES[k].emoji+' '+COURSES[k].name+'コース';
+  const list = $('chList'); list.innerHTML = '';
+  cs.forEach(c=>{ const best = store.get('best_'+k+'_'+c.id);
+    const bt = document.createElement('button'); bt.className = 'btn course';
+    bt.innerHTML = '<span><span class="nm">'+c.name+'</span><span class="bs">全'+c.steps.length+'問　'+(best?'自己ベスト '+best+'点':'未挑戦')+'</span></span>';
+    bt.onclick = ()=>{ sfx.tap(); show('chapters', false); startGame(k, c.id); }; list.appendChild(bt); });
+  show('title', false); show('chapters');
+});
+$('chBack').onclick = ()=>{ sfx.tap(); show('chapters', false); show('title'); };
+$('toTitle').textContent = 'コースを選び直す';
+
+/* =========================================================
+   LOOP
+   ========================================================= */
+function resize(){
+  const w = window.innerWidth, h = window.innerHeight; renderer.setSize(w, h, false);
+  const asp = w/h; camera.aspect = asp;
+  const wantH = 58*Math.PI/180;                                      // horizontal fov wanted
+  let v = 2*Math.atan(Math.tan(wantH/2)/asp); v = clamp(v, 50*Math.PI/180, 74*Math.PI/180);
+  camera.fov = v*180/Math.PI;
+  const hNow = 2*Math.atan(Math.tan(v/2)*asp);
+  camDist = Math.max(1, Math.tan(wantH/2)/Math.tan(hNow/2));
+  camera.updateProjectionMatrix();
+}
+window.addEventListener('resize', resize); resize();
+
+let last = performance.now(), time = 0;
+const camPos = new THREE.Vector3(), headP = new THREE.Vector3();
+function loop(now){
+  requestAnimationFrame(loop);
+  const dt = Math.min(.05, (now-last)/1000); last = now; time += dt;
+
+  // flip hold
+  if (flipHold){ const p = (now-flipHold)/500; flipBtn.style.setProperty('--p', Math.min(1,p)); if (p>=1) doFlip(false); }
+
+  // step logic
+  if (game.state==='step'){
+    const s = game.step; game.stepT += dt;
+    const left = s.limit - game.stepT;
+    $('timer').firstElementChild.style.width = clamp(left/s.limit*100,0,100)+'%';
+    if (s.type==='timing'){
+      const sp = s.speed * (1 + game.idx*.04);
+      game.gp = .5 + .5*Math.sin(game.stepT*2.6*sp);
+      const cur = $('cur'); if (cur) cur.style.left = (game.gp*100)+'%';
+    }
+    if (!game.warned && left < 2.6 && s.type!=='mash'){ game.warned = true; sfx.warn(); kogoto(pick(LINES.warn), 5); updateHud(); }
+    if (left <= 0){ if (s.type==='mash') mashDone(); else resolve('timeout'); }
+    else {
+      game.nextNitpick -= dt;
+      if (game.nextNitpick <= 0 && bubbleTimer<=0){ game.nextNitpick = rand(6,11); if (Math.random()<.55){ kogoto(pick(LINES.nitpick), 6); updateHud(); if (game.ira>=100){ game.state='busy'; bigText('堪忍袋の緒が切れた！',1200); setTimeout(()=>doFlip(true),700);} } }
+    }
+  }
+  if (game.state==='feedback'){ game.fbT += dt; }
+  if (bubbleTimer>0){ bubbleTimer -= dt; if (bubbleTimer<=0) $('bubble').classList.remove('show'); }
+
+  updateTeacher(dt, time);
+  if (bodies.length) updatePhysics(dt);
+  if (highlight.visible){ const s = (highlight.userData.r||.12)/.13 * (1 + Math.sin(time*6)*.08); highlight.scale.set(s,s,s); highlight.material.color.setHSL(.14, 1, .55+Math.sin(time*6)*.1); }
+  if (lazySusan && susanSpin>0){ lazySusan.rotation.y -= dt*2.2*susanSpin; susanSpin = Math.max(0, susanSpin - dt*.6); }
+  else if (lazySusan && !bodies.length) lazySusan.rotation.y -= dt*.05;
+  if (swLift){ swLift.t += dt; const k = swLift.t<.5 ? swLift.t/.5 : Math.max(0, 1-(swLift.t-.9)/.5); if (swLift.d.g.parent===tableG) swLift.d.g.position.y = k*.22; if (swLift.t>1.4){ if (swLift.d.g.parent===tableG) swLift.d.g.position.y=0; swLift=null; } }
+
+  // camera
+  camPos.copy(CAM_BASE).sub(CAM_LOOK).multiplyScalar(camDist).add(CAM_LOOK);
+  camPos.y += Math.sin(time*1.1)*.006;
+  if (game.state==='title'){ camPos.x += Math.sin(time*.3)*.25; }
+  if (shake>0){ shake = Math.max(0, shake-dt); camPos.x += rand(-1,1)*shake*.12; camPos.y += rand(-1,1)*shake*.12; }
+  camera.position.copy(camPos); camera.lookAt(CAM_LOOK);
+  // bubble follows the teacher's head
+  if (bubbleTimer>0){ T.head.getWorldPosition(headP); headP.y += .3; headP.project(camera);
+    const bb = $('bubble'); const x = (headP.x*.5+.5)*innerWidth, y = (-headP.y*.5+.5)*innerHeight;
+    bb.style.left = clamp(x, bb.offsetWidth/2+6, innerWidth-bb.offsetWidth/2-6)+'px'; bb.style.top = clamp(y, bb.offsetHeight+60, innerHeight)+'px'; }
+
+  renderer.render(scene, camera);
+}
+
+/* boot */
+buildRoom('wa'); buildTable('wa'); resetTeacher('wa');
+document.fonts && document.fonts.ready && document.fonts.ready.then(()=>{ if (game.state==='title'){ buildRoom(game.kind); } });
+$('loading').remove();
+toTitle();
+requestAnimationFrame(loop);
+
+// debug hook for automated checks
+window.__zamasu = {game, startGame, doFlip, resolve, nextStep};
+})();
+</script>
+</body>
