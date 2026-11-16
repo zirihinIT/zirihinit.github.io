@@ -74,7 +74,7 @@
   .act.on{background:var(--yellow);border-color:#e8c860}
   .empty{text-align:center;color:var(--soft);padding:40px 10px;font-size:19px;line-height:1.8}
   /* show mode */
-  .ov{position:fixed;inset:0;background:rgba(255,248,241,.97);display:none;flex-direction:column;
+  .ov{position:fixed;inset:0;background:#fff8f1;display:none;flex-direction:column;
     align-items:center;justify-content:center;padding:28px;text-align:center;z-index:10}
   .ov.on{display:flex}
   .ov .bigemo{font-size:70px}
@@ -173,6 +173,7 @@ const CATS = [
     {id:"greet", name:"👋 あいさつ", color:"#ffd6de"},
   {id:"care", name:"💗 気づかい", color:"#c7e3ff"},
   {id:"work", name:"🧺 おしごと", color:"#bfe8d6"},
+  {id:"task", name:"📦 作業", color:"#ffe0c2"},
   {id:"talk", name:"💬 会話", color:"#e2d6ff"},
   {id:"feel", name:"😊 気持ち", color:"#ffe59e"},
   {id:"mine", name:"✏️ 自分の言葉", color:"#ffd9b8"},
@@ -212,6 +213,18 @@ const P = [
   {c:"work", e:"⏰", jp:"急いでね／早くやろう", k:"イクマナタ カラム", s:"ඉක්මනට කරමු", m:"「みんなで早くやろう」。命令っぽくならない、やさしい急かし方です。"},
   {c:"work", e:"🌟", jp:"すごい！上手！", k:"ニヤマイ！", s:"නියමයි!", m:"ほめ言葉。言われるとみんな笑顔に。"},
   {c:"work", e:"😌", jp:"だいじょうぶ／問題ないよ", k:"プラシュナヤク ネー", s:"ප්‍රශ්නයක් නෑ", m:"「ありがとう」へのお返しにも。"},
+  // 作業
+  {c:"task", e:"🤲", jp:"同じ物だから一緒にして", k:"メーワー エカマ デー、エカタ ダーンナ", s:"මේවා එකම දේ, එකට දාන්න", m:"「エカタ ダーンナ（一緒に入れて）」だけでも伝わります。"},
+  {c:"task", e:"↔️", jp:"違うから別にして", k:"メーワー ウェナス、ウェナ ウェナマ ティヤンナ", s:"මේවා වෙනස්, වෙන වෙනම තියන්න", m:"「ウェナ ウェナマ」＝別々に"},
+  {c:"task", e:"🔢", jp:"あと幾つ？", k:"タワ キーヤク ティエナワダ？", s:"තව කීයක් තියෙනවද?", m:"「タワ キーヤダ？」と短くしてもOK。"},
+  {c:"task", e:"🛒", jp:"運んで", k:"メーカ ゲニヤンナ", s:"මේක ගෙනියන්න", m:"「これを持って行って」。指さしながら言うと伝わりやすいです。"},
+  {c:"task", e:"👉", jp:"右", k:"ダクナ", s:"දකුණ", m:"「右に」は ダクナタ"},
+  {c:"task", e:"👈", jp:"左", k:"ワマ", s:"වම", m:"「左に」は ワマタ"},
+  {c:"task", e:"🎯", jp:"真ん中", k:"メダ", s:"මැද", m:"「真ん中に」は メダタ"},
+  {c:"task", e:"🧱", jp:"並べて", k:"ペーリヤタ ティヤンナ", s:"පේළියට තියන්න", m:"「一列に置いて」という意味。"},
+  {c:"task", e:"📏", jp:"測って", k:"マニンナ", s:"මනින්න", m:"長さ・大きさを測るとき。重さを量るときは「キランナ」。"},
+  {c:"task", e:"📦", jp:"箱に入れて", k:"ペッティヤタ ダーンナ", s:"පෙට්ටියට දාන්න", m:""},
+  {c:"task", e:"🗃️", jp:"コンテナに入れて", k:"コンテナー エカタ ダーンナ", s:"කන්ටේනර් එකට දාන්න", m:"スリランカでも「コンテナ」は英語のまま使います。"},
   // 会話
   {c:"talk", e:"⭕", jp:"はい", k:"オウ", s:"ඔව්", m:""},
   {c:"talk", e:"❌", jp:"いいえ", k:"ネー", s:"නෑ", m:""},
@@ -234,6 +247,8 @@ let mine = [];
 try{ mine = JSON.parse(localStorage.getItem("si-mine")||"[]"); }catch(e){}
 const saveMine = ()=>{ try{ localStorage.setItem("si-mine", JSON.stringify(mine)); return true; }catch(e){ return false; } };
 const allP = ()=>P.concat(mine);
+// カタカナは単語の途中で改行しない（スペースのところだけで折り返す）
+const kanaHTML = k=>String(k||"").split(/\s+/).map(w=>`<span class="nw">${esc(w)}</span>`).join(" ");
 const esc = t=>String(t||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
 let cat = "greet", shown = [], idx = 0;
@@ -262,7 +277,7 @@ function render(){
         <div class="emo" style="background:${colorOf(p.c)}">${p.e}</div>
         <div class="body">
           <div class="jp">${esc(p.jp)}</div>
-          <div class="kana">${esc(p.k)}</div>
+          <div class="kana">${kanaHTML(p.k)}</div>
           ${p.s?`<div class="si">${esc(p.s)}</div>`:""}
         </div>
       </div>
@@ -304,7 +319,7 @@ $("fSave").onclick=()=>{
 function open(i){
   idx = (i+shown.length)%shown.length;
   const p = shown[idx];
-  $("oEmo").textContent=p.e; $("oSi").textContent=p.s; $("oKana").textContent=p.k; $("oJp").textContent=p.jp;
+  $("oEmo").textContent=p.e; $("oSi").textContent=p.s; $("oKana").innerHTML=kanaHTML(p.k); $("oJp").textContent=p.jp;
   $("oTip").textContent=p.m; $("oTip").style.display=p.m?"block":"none";
   $("ov").classList.add("on");
 }
