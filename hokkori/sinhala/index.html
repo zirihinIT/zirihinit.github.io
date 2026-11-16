@@ -34,15 +34,19 @@
   body{margin:0;background:var(--bg);color:var(--ink);font-family:"Zen Maru Gothic",sans-serif;
     background-image:radial-gradient(#ffe3d3 1.2px,transparent 1.2px);background-size:22px 22px;}
   .wrap{max-width:720px;margin:0 auto;padding:18px 14px 90px}
-  .guide{background:#fff;border-radius:22px;padding:16px 18px;margin:14px 0 18px;box-shadow:0 3px 0 var(--line);font-size:18px;line-height:1.9}
+  .guide{background:#fff;border-radius:22px;padding:16px 18px;margin:14px 0 18px;box-shadow:0 3px 0 var(--line);font-size:18px;line-height:1.5}
+  .guide ol{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+  .guide li{display:flex;gap:6px}
+  .guide li .n{flex:0 0 auto}
+  .nw{white-space:nowrap}
   .guide b{color:var(--pinkd)}
-  .guide .t{font-weight:900;font-size:19px;margin-bottom:4px}
+  .guide .t{font-weight:900;font-size:19px;margin-bottom:10px}
   .sec{font-size:20px;font-weight:900;margin:6px 4px 10px}
   header{text-align:center;padding:14px 0 8px}
   .logo{font-size:42px;line-height:1}
   h1{font-size:30px;margin:6px 0 2px;font-weight:900;letter-spacing:.04em}
   h1 span{color:var(--pinkd)}
-  .sub{color:var(--soft);font-size:17px;margin:0}
+  .sub{color:var(--soft);font-size:17px;margin:4px 0 0;line-height:1.6}
   .search{display:flex;align-items:center;gap:8px;background:#fff;border:2px solid var(--line);
     border-radius:999px;padding:10px 16px;margin:16px 0 12px}
   .search input{border:0;outline:0;font:inherit;font-size:16px;width:100%;background:transparent;color:var(--ink)}
@@ -50,6 +54,7 @@
   .tabs::-webkit-scrollbar{display:none}
   .tab{border:2px solid var(--line);font:inherit;font-weight:900;font-size:19px;padding:14px 8px;border-radius:18px;
     background:#fff;color:var(--ink);box-shadow:0 2px 0 var(--line);cursor:pointer}
+  .tab:last-child:nth-child(odd){grid-column:1 / -1}
   .tab.on{background:var(--pink);color:#fff;border-color:var(--pinkd);box-shadow:0 3px 0 var(--pinkd)}
   .hint{font-size:13px;color:var(--soft);text-align:center;margin:4px 0 14px}
   .list{display:grid;gap:16px}
@@ -105,13 +110,16 @@
   <header>
     <div class="logo">🐘🌺</div>
     <h1>ほっこり<span>シンハラ語</span></h1>
-    <p class="sub">スリランカの仲間と、ひとことから仲良くなろう</p>
+    <p class="sub">スリランカの仲間と、<br>ひとことから仲良くなろう</p>
   </header>
   <div class="guide">
     <div class="t">📖 つかいかた</div>
-    ① 下のボタンで、使いたい場面をえらぶ<br>
-    ② <b>ピンクのカタカナ</b>をそのまま読む<br>
-    ③ 伝わらないときは<b>「👀 相手に見せる」</b>を押して、画面を見せる<br>④ 新しい言葉は<b>「✏️ 自分の言葉」</b>から追加できる
+    <ol>
+      <li><span class="n">①</span><span>下のボタンで<span class="nw">場面をえらぶ</span></span></li>
+      <li><span class="n">②</span><span><b>ピンクのカタカナ</b>を<span class="nw">そのまま読む</span></span></li>
+      <li><span class="n">③</span><span>伝わらないときは<br><b class="nw">「👀 相手に見せる」</b>を押す</span></li>
+      <li><span class="n">④</span><span>新しい言葉は<br><b class="nw">「✏️ 自分の言葉」</b>から追加</span></li>
+    </ol>
   </div>
   <div class="tabs" id="tabs"></div>
   <div class="sec" id="secTitle"></div>
