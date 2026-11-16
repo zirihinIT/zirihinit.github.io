@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>zirihinIT｜スマホで遊べるクソゲー置き場</title>
-<meta name="description" content="スマホのブラウザですぐ遊べる単発クソゲーの置き場。インストール不要、タップするだけ。">
+<title>キャップ雪だるま｜スマホで遊べるブラウザゲーム置き場</title>
+<meta name="description" content="スマホのブラウザですぐ遊べるブラウザゲームの置き場。インストール不要、タップするだけ。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://zirihinit.github.io/games/">
-<meta property="og:title" content="zirihinIT｜スマホで遊べるクソゲー置き場">
-<meta property="og:description" content="スマホのブラウザですぐ遊べる単発クソゲーの置き場。インストール不要、タップするだけ。">
+<meta property="og:title" content="キャップ雪だるま｜スマホで遊べるブラウザゲーム置き場">
+<meta property="og:description" content="スマホのブラウザですぐ遊べるブラウザゲームの置き場。インストール不要、タップするだけ。">
 <meta property="og:image" content="https://zirihinit.github.io/gekiochi/ogp.png">
 <meta name="twitter:card" content="summary_large_image">
 <style>
@@ -17,7 +17,8 @@
   body { background:var(--bg); color:var(--fg);
     font-family:"Hiragino Kaku Gothic ProN","Hiragino Sans","Noto Sans JP",Meiryo,sans-serif;
     -webkit-text-size-adjust:100%; }
-  header { padding:36px 20px 24px; text-align:center; border-top:8px solid var(--accent); }
+  header { padding:20px 20px 24px; text-align:center; }
+  body { border-top:8px solid var(--accent); }
   header p { color:var(--sub); font-size:15px; font-weight:700; }
   header h1 { font-size:clamp(34px,9vw,56px); font-weight:900; color:var(--accent); line-height:1.2; margin:4px 0 10px; }
   header small { color:var(--sub); font-size:13px; }
@@ -33,16 +34,20 @@
   .body p { font-size:14px; color:var(--sub); line-height:1.6; }
   .play { display:inline-block; margin-top:10px; background:var(--accent); color:#16161d;
     font-weight:900; font-size:14px; padding:6px 16px; border-radius:999px; }
-  .back { display:inline-block; margin-top:14px; color:var(--sub); font-size:13px; text-decoration:none; }
+  .topnav { max-width:960px; margin:0 auto; padding:14px 16px 0; }
+  .home { display:inline-flex; align-items:center; gap:6px; min-height:44px; padding:8px 18px 8px 14px;
+    border-radius:999px; font-size:15px; font-weight:800; text-decoration:none; border:2px solid; }
+  .home:active { transform:scale(.96); }
+  .home { color:var(--accent); background:var(--card); border-color:var(--accent); }
   footer { text-align:center; color:var(--sub); font-size:12px; padding:0 16px 32px; }
 </style>
 </head>
 <body>
+<nav class="topnav"><a class="home" href="../">🏠 キャップ雪だるまトップ</a></nav>
 <header>
   <p>スマホで遊べる</p>
-  <h1>クソゲー置き場</h1>
-  <small>インストール不要。タップしたらすぐ遊べます。</small><br>
-  <a class="back" href="../">← zirihinIT トップへ</a>
+  <h1>ブラウザゲーム置き場</h1>
+  <small>インストール不要。タップしたらすぐ遊べます。</small>
 </header>
 <main>
   <a class="card" href="./zamasu/">
@@ -76,6 +81,6 @@
       <span class="play">▶ 遊ぶ</span></div>
   </a>
 </main>
-<footer>© zirihinIT</footer>
+<footer>© キャップ雪だるま</footer>
 </body>
 </html>
