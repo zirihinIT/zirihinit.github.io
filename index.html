@@ -3,296 +3,77 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ほっこりシンハラ語</title>
-<meta name="theme-color" content="#ffb8c6">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="シンハラ語">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="icon" type="image/png" href="icon-192.png">
-<link rel="manifest" href="manifest.json">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Noto+Sans+Sinhala:wght@500;700&display=swap" rel="stylesheet">
+<title>zirihinIT｜スマホで遊べるクソゲー置き場</title>
+<meta name="description" content="スマホのブラウザですぐ遊べる単発クソゲーの置き場。インストール不要、タップするだけ。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://zirihinit.github.io/">
+<meta property="og:title" content="zirihinIT｜スマホで遊べるクソゲー置き場">
+<meta property="og:description" content="スマホのブラウザですぐ遊べる単発クソゲーの置き場。インストール不要、タップするだけ。">
+<meta property="og:image" content="https://zirihinit.github.io/ogp.png">
+<meta name="twitter:card" content="summary_large_image">
 <style>
-  :root{
-    --bg:#fff8f1; --card:#ffffff; --ink:#5a4636; --soft:#7a6656;
-    --pink:#ffb8c6; --pinkd:#f0839b; --mint:#bfe8d6; --mintd:#5cb894;
-    --yellow:#ffe59e; --sky:#c7e3ff; --lav:#e2d6ff; --line:#f1e4d6;
-  }
-  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Zen Maru Gothic",sans-serif;
-    background-image:radial-gradient(#ffe3d3 1.2px,transparent 1.2px);background-size:22px 22px;}
-  .wrap{max-width:720px;margin:0 auto;padding:18px 14px 90px}
-  .guide{background:#fff;border-radius:22px;padding:16px 18px;margin:14px 0 18px;box-shadow:0 3px 0 var(--line);font-size:18px;line-height:1.9}
-  .guide b{color:var(--pinkd)}
-  .guide .t{font-weight:900;font-size:19px;margin-bottom:4px}
-  .sec{font-size:20px;font-weight:900;margin:6px 4px 10px}
-  header{text-align:center;padding:14px 0 8px}
-  .logo{font-size:42px;line-height:1}
-  h1{font-size:30px;margin:6px 0 2px;font-weight:900;letter-spacing:.04em}
-  h1 span{color:var(--pinkd)}
-  .sub{color:var(--soft);font-size:17px;margin:0}
-  .search{display:flex;align-items:center;gap:8px;background:#fff;border:2px solid var(--line);
-    border-radius:999px;padding:10px 16px;margin:16px 0 12px}
-  .search input{border:0;outline:0;font:inherit;font-size:16px;width:100%;background:transparent;color:var(--ink)}
-  .tabs{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:4px 0 18px}
-  .tabs::-webkit-scrollbar{display:none}
-  .tab{border:2px solid var(--line);font:inherit;font-weight:900;font-size:19px;padding:14px 8px;border-radius:18px;
-    background:#fff;color:var(--ink);box-shadow:0 2px 0 var(--line);cursor:pointer}
-  .tab.on{background:var(--pink);color:#fff;border-color:var(--pinkd);box-shadow:0 3px 0 var(--pinkd)}
-  .hint{font-size:13px;color:var(--soft);text-align:center;margin:4px 0 14px}
-  .list{display:grid;gap:16px}
-  .card{background:var(--card);border-radius:24px;padding:18px 16px;display:flex;flex-direction:column;gap:10px;
-    box-shadow:0 3px 0 var(--line);border:2px solid transparent;cursor:pointer;transition:transform .12s}
-  .card:active{transform:scale(.98)}
-  .row{display:flex;gap:14px;align-items:center}
-  .emo{font-size:34px;width:60px;height:60px;flex:0 0 60px;border-radius:18px;display:grid;place-items:center}
-  .body{flex:1;min-width:0}
-  .jp{font-weight:900;font-size:22px}
-  .kana{font-size:27px;color:#e0607d;font-weight:900;margin-top:4px;letter-spacing:.03em;line-height:1.35}
-  .si{font-family:"Noto Sans Sinhala",sans-serif;font-size:18px;color:var(--soft);margin-top:2px}
-  .memo{font-size:16px;color:#3f8a6c;background:#eefaf4;border-radius:14px;padding:8px 12px;line-height:1.6}
-  .acts{display:flex;gap:10px}
-  .act{flex:1;border:2px solid var(--line);background:#fff;font:inherit;font-weight:900;font-size:17px;color:var(--ink);padding:12px 6px;border-radius:16px;cursor:pointer}
-  .act.show{background:var(--pink);border-color:var(--pinkd);color:#fff}
-  .act.on{background:var(--yellow);border-color:#e8c860}
-  .empty{text-align:center;color:var(--soft);padding:40px 10px;font-size:19px;line-height:1.8}
-  /* show mode */
-  .ov{position:fixed;inset:0;background:rgba(255,248,241,.97);display:none;flex-direction:column;
-    align-items:center;justify-content:center;padding:28px;text-align:center;z-index:10}
-  .ov.on{display:flex}
-  .ov .bigemo{font-size:70px}
-  .ov .bigsi{font-family:"Noto Sans Sinhala",sans-serif;font-weight:700;font-size:clamp(34px,9vw,60px);margin:14px 0 6px;line-height:1.35}
-  .ov .bigkana{font-size:clamp(26px,7vw,42px);font-weight:900;color:var(--pinkd)}
-  .ov .bigjp{font-size:24px;color:var(--soft);margin-top:10px}
-  .ov .tip{margin-top:18px;background:var(--mint);color:#2f6b55;border-radius:16px;padding:12px 16px;font-size:17px;max-width:480px;line-height:1.6}
-  .ovbtns{display:flex;gap:10px;margin-top:26px;flex-wrap:wrap;justify-content:center}
-  .btn{border:0;font:inherit;font-weight:900;font-size:20px;padding:16px 24px;border-radius:999px;cursor:pointer;
-    background:#fff;color:var(--ink);box-shadow:0 3px 0 var(--line)}
-  .btn.pk{background:var(--pink);color:#fff;box-shadow:0 3px 0 var(--pinkd)}
-  .addbtn{width:100%;border:3px dashed var(--pinkd);background:#fff;color:#e0607d;font:inherit;font-weight:900;font-size:21px;padding:18px;border-radius:22px;cursor:pointer;margin-bottom:16px}
-  .act.del{flex:0 0 auto;padding:12px 14px}
-  .act.del.sure{background:#ffe1e1;border-color:#e08080;color:#b04040}
-  .form{position:fixed;inset:0;background:rgba(90,70,54,.35);display:none;align-items:flex-end;justify-content:center;z-index:20}
-  .form.on{display:flex}
-  .sheet{background:var(--bg);width:100%;max-width:720px;max-height:92vh;overflow:auto;border-radius:28px 28px 0 0;padding:22px 18px 30px}
-  .sheet h2{margin:0 0 6px;font-size:23px;font-weight:900}
-  .sheet .lead{font-size:16px;color:var(--soft);line-height:1.7;margin:0 0 12px}
-  .sheet label{display:block;font-weight:900;font-size:18px;margin:14px 0 6px}
-  .sheet label small{font-weight:500;color:var(--soft);font-size:15px}
-  .sheet input{width:100%;font:inherit;font-size:19px;padding:14px;border-radius:16px;border:2px solid var(--line);background:#fff;color:var(--ink)}
-  .sheet input:focus{outline:none;border-color:var(--pink)}
-  .sheet input.si-in{font-family:"Noto Sans Sinhala",sans-serif}
-  .err{color:#c04040;font-size:16px;font-weight:700;min-height:22px;margin-top:10px}
-  .sheet .ovbtns{margin-top:14px}
-  .note{margin-top:26px;background:#fff;border-radius:20px;padding:16px 18px;font-size:17px;line-height:1.9;color:var(--soft);box-shadow:0 3px 0 var(--line)}
-  .note b{color:var(--ink)}
+  :root { --bg:#16161d; --card:#22222c; --fg:#fff; --sub:#b8b8c8; --accent:#ffd400; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--fg);
+    font-family:"Hiragino Kaku Gothic ProN","Hiragino Sans","Noto Sans JP",Meiryo,sans-serif;
+    -webkit-text-size-adjust:100%; }
+  header { padding:36px 20px 24px; text-align:center; border-top:8px solid var(--accent); }
+  header p { color:var(--sub); font-size:15px; font-weight:700; }
+  header h1 { font-size:clamp(34px,9vw,56px); font-weight:900; color:var(--accent); line-height:1.2; margin:4px 0 10px; }
+  header small { color:var(--sub); font-size:13px; }
+  main { max-width:960px; margin:0 auto; padding:8px 16px 40px;
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:18px; }
+  a.card { display:block; background:var(--card); border-radius:14px; overflow:hidden;
+    color:inherit; text-decoration:none; transition:transform .12s; }
+  a.card:active { transform:scale(.97); }
+  @media (hover:hover){ a.card:hover { transform:translateY(-4px); } }
+  a.card img { display:block; width:100%; aspect-ratio:1200/630; object-fit:cover; background:#000; }
+  .body { padding:12px 14px 16px; }
+  .body h2 { font-size:18px; font-weight:900; margin-bottom:6px; }
+  .body p { font-size:14px; color:var(--sub); line-height:1.6; }
+  .play { display:inline-block; margin-top:10px; background:var(--accent); color:#16161d;
+    font-weight:900; font-size:14px; padding:6px 16px; border-radius:999px; }
+  footer { text-align:center; color:var(--sub); font-size:12px; padding:0 16px 32px; }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div class="logo">🐘🌺</div>
-    <h1>ほっこり<span>シンハラ語</span></h1>
-    <p class="sub">スリランカの仲間と、ひとことから仲良くなろう</p>
-  </header>
-  <div class="guide">
-    <div class="t">📖 つかいかた</div>
-    ① 下のボタンで、使いたい場面をえらぶ<br>
-    ② <b>ピンクのカタカナ</b>をそのまま読む<br>
-    ③ 伝わらないときは<b>「👀 相手に見せる」</b>を押して、画面を見せる<br>④ 新しい言葉は<b>「✏️ 自分の言葉」</b>から追加できる
-  </div>
-  <div class="tabs" id="tabs"></div>
-  <div class="sec" id="secTitle"></div>
-  <div class="list" id="list"></div>
-
-  <div class="note">
-    <b>🌸 ちょっとしたコツ</b><br>
-    ・カタカナは「だいたいこんな音」の目安です。完璧じゃなくても笑顔で言えば伝わります。<br>
-    ・スリランカでは <b>「ご飯食べた？」</b> があいさつ代わり。気にかけてるよ、の気持ちが伝わります。<br>
-    ・相手がタミル語を話す人の場合もあります。まずは「アーユボーワン」で反応を見てみてね。<br>
-    ・お仕事仲間に「これで合ってる？」と聞いてみるのも、会話のきっかけになります。
-  </div>
-</div>
-
-<div class="ov" id="ov">
-  <div class="bigemo" id="oEmo"></div>
-  <div class="bigsi" id="oSi"></div>
-  <div class="bigkana" id="oKana"></div>
-  <div class="bigjp" id="oJp"></div>
-  <div class="tip" id="oTip"></div>
-  <div class="ovbtns">
-    <button class="btn" id="prev">◀ まえ</button>
-    <button class="btn pk" id="close">✕ とじる</button>
-    <button class="btn" id="next">つぎ ▶</button>
-  </div>
-</div>
-
-<div class="form" id="form">
-  <div class="sheet">
-    <h2>✏️ 言葉を追加する</h2>
-    <p class="lead">わからないときは、同僚さんに<br>「〇〇って何て言うの？」と聞いてみてね。<br>聞こえた音をカタカナで書けばOKです。</p>
-    <label>日本語 <small>（必ず）</small></label>
-    <input id="fJp" placeholder="例：急いでね">
-    <label>読み方（カタカナ） <small>（必ず）</small></label>
-    <input id="fK" placeholder="例：イクマナタ カラム">
-    <label>シンハラ文字 <small>（なくてもOK・同僚さんに書いてもらう）</small></label>
-    <input id="fS" class="si-in" placeholder="">
-    <label>メモ <small>（なくてもOK）</small></label>
-    <input id="fM" placeholder="例：〇〇さんに教えてもらった">
-    <div class="err" id="fErr"></div>
-    <div class="ovbtns">
-      <button class="btn" id="fCancel">やめる</button>
-      <button class="btn pk" id="fSave">💾 保存する</button>
-    </div>
-  </div>
-</div>
-
-<script>
-const CATS = [
-    {id:"greet", name:"👋 あいさつ", color:"#ffd6de"},
-  {id:"care", name:"💗 気づかい", color:"#c7e3ff"},
-  {id:"work", name:"🧺 おしごと", color:"#bfe8d6"},
-  {id:"talk", name:"💬 会話", color:"#e2d6ff"},
-  {id:"feel", name:"😊 気持ち", color:"#ffe59e"},
-  {id:"mine", name:"✏️ 自分の言葉", color:"#ffd9b8"},
-  {id:"fav", name:"⭐ 保存した言葉", color:"#ffe59e"},
-];
-const P = [
-  // あいさつ
-  {c:"greet", e:"🙏", jp:"こんにちは／おはよう", k:"アーユボーワン", s:"ආයුබෝවන්", m:"朝・昼・夜いつでも使える定番のあいさつ。両手を合わせて言うとさらに◎"},
-  {c:"greet", e:"☀️", jp:"おはよう", k:"スバ ウデーサナク", s:"සුබ උදෑසනක්", m:"「よい朝を」の意味。"},
-  {c:"greet", e:"😊", jp:"元気？", k:"コホマダ？", s:"කොහොමද?", m:"いちばん気軽な「元気？調子どう？」"},
-  {c:"greet", e:"👍", jp:"元気だよ", k:"ママ ホンディン", s:"මම හොඳින්", m:"「ホンディン」だけでもOK。"},
-  {c:"greet", e:"🍛", jp:"ご飯食べた？", k:"バト ケーワダ？", s:"බත් කෑවද?", m:"スリランカ流のあいさつ。言われたらうれしい一言です。"},
-  {c:"greet", e:"👋", jp:"また明日ね", k:"ヘタ ハンバウェム", s:"හෙට හම්බවෙමු", m:"「明日会おうね」"},
-  {c:"greet", e:"🚶", jp:"お先に／行ってきます", k:"ギヒン エンナム", s:"ගිහින් එන්නම්", m:"帰るときに。「行って、また来るね」という優しい言い方。"},
-  {c:"greet", e:"🌙", jp:"おやすみ", k:"スバ ラートリヤク", s:"සුබ රාත්‍රියක්", m:"「よい夜を」"},
-  {c:"greet", e:"💐", jp:"ありがとう", k:"ストゥーティ", s:"ස්තූතියි", m:""},
-  {c:"greet", e:"💝", jp:"本当にありがとう", k:"ボホマ ストゥーティ", s:"බොහොම ස්තූතියි", m:"「ボホマ」＝とっても"},
-  {c:"greet", e:"🙇", jp:"ごめんね／すみません", k:"サマーウェンナ", s:"සමාවෙන්න", m:"謝るときにも、呼びかけにも。"},
-  // 気づかい
-  {c:"care", e:"🍀", jp:"体調だいじょうぶ？", k:"サニーペンダ？", s:"සනීපෙන්ද?", m:"「元気にしてる？」体を気づかう言い方。"},
-  {c:"care", e:"😮‍💨", jp:"疲れた？", k:"マハンシダ？", s:"මහන්සි ද?", m:"「お疲れさま」の代わりに。"},
-  {c:"care", e:"☕", jp:"ちょっと休んでね", k:"ティカク ウィウェーカ ガンナ", s:"ටිකක් විවේක ගන්න", m:""},
-  {c:"care", e:"🍙", jp:"お腹すいた？", k:"バダギニダ？", s:"බඩගිනිද?", m:""},
-  {c:"care", e:"🩹", jp:"痛い？", k:"リデナワダ？", s:"රිදෙනවද?", m:"ケガしたときなどに。"},
-  {c:"care", e:"⚠️", jp:"気をつけてね", k:"パリッサメン", s:"පරිස්සමෙන්", m:"帰り道にも、作業中にも。"},
-  {c:"care", e:"✨", jp:"がんばって！", k:"ジャヤ ウェーワー", s:"ජය වේවා", m:"「うまくいきますように」という応援。"},
-  {c:"care", e:"🎂", jp:"お誕生日おめでとう", k:"スバ ウパンディナヤク", s:"සුබ උපන්දිනයක්", m:""},
-  // おしごと
-  {c:"work", e:"🤝", jp:"手伝おうか？", k:"ママ ウダウ カランナダ？", s:"මම උදව් කරන්නද?", m:""},
-  {c:"work", e:"🙋", jp:"手伝ってくれる？", k:"マタ ウダウ カランナ", s:"මට උදව් කරන්න", m:"「わたしを手伝って」"},
-  {c:"work", e:"⭕", jp:"OK！／わかった", k:"ハリ", s:"හරි", m:"いちばん使える一言！"},
-  {c:"work", e:"💡", jp:"わかった（理解できた）", k:"テールナー", s:"තේරුණා", m:""},
-  {c:"work", e:"🤔", jp:"わからない", k:"テールネー ネー", s:"තේරුණේ නෑ", m:""},
-  {c:"work", e:"🔁", jp:"もう一回言って", k:"アーイェト キヤンナ", s:"ආයෙත් කියන්න", m:""},
-  {c:"work", e:"🐢", jp:"ゆっくり言って", k:"ヘミン キヤンナ", s:"හෙමින් කියන්න", m:""},
-  {c:"work", e:"💪", jp:"さあ、仕事しよう！", k:"ウェダ カラム", s:"වැඩ කරමු", m:"「一緒にやろう」という明るい言い方。"},
-  {c:"work", e:"⏰", jp:"急いでね／早くやろう", k:"イクマナタ カラム", s:"ඉක්මනට කරමු", m:"「みんなで早くやろう」。命令っぽくならない、やさしい急かし方です。"},
-  {c:"work", e:"🌟", jp:"すごい！上手！", k:"ニヤマイ！", s:"නියමයි!", m:"ほめ言葉。言われるとみんな笑顔に。"},
-  {c:"work", e:"😌", jp:"だいじょうぶ／問題ないよ", k:"プラシュナヤク ネー", s:"ප්‍රශ්නයක් නෑ", m:"「ありがとう」へのお返しにも。"},
-  // 会話
-  {c:"talk", e:"⭕", jp:"はい", k:"オウ", s:"ඔව්", m:""},
-  {c:"talk", e:"❌", jp:"いいえ", k:"ネー", s:"නෑ", m:""},
-  {c:"talk", e:"📛", jp:"お名前は？", k:"オヤーゲー ナマ モカクダ？", s:"ඔයාගේ නම මොකක්ද?", m:""},
-  {c:"talk", e:"🌷", jp:"私の名前は〇〇です", k:"マゲー ナマ 〇〇", s:"මගේ නම ...", m:"〇〇に自分の名前を入れてね。"},
-  {c:"talk", e:"🫶", jp:"私たち友だちだね", k:"アピ ヤールウォー", s:"අපි යාළුවෝ", m:""},
-  {c:"talk", e:"👌", jp:"いいね", k:"ホンダイ", s:"හොඳයි", m:""},
-  // 気持ち
-  {c:"feel", e:"😋", jp:"おいしい！", k:"ラサイ！", s:"රසයි!", m:"差し入れのお返しにぴったり。"},
-  {c:"feel", e:"🥰", jp:"かわいい／きれい", k:"ラッサナイ", s:"ලස්සනයි", m:""},
-  {c:"feel", e:"😆", jp:"うれしい", k:"サトゥトゥイ", s:"සතුටුයි", m:""},
-  {c:"feel", e:"🥵", jp:"暑いね", k:"ラスネイ", s:"රස්නෙයි", m:""},
-  {c:"feel", e:"🥶", jp:"寒いね", k:"シータライ", s:"සීතලයි", m:"スリランカは常夏。日本の冬はとても寒く感じるそうです。"},
-];
-
-let favs = [];
-try{ favs = JSON.parse(localStorage.getItem("si-favs")||"[]"); }catch(e){}
-const saveFavs = ()=>{ try{ localStorage.setItem("si-favs", JSON.stringify(favs)); }catch(e){} };
-let mine = [];
-try{ mine = JSON.parse(localStorage.getItem("si-mine")||"[]"); }catch(e){}
-const saveMine = ()=>{ try{ localStorage.setItem("si-mine", JSON.stringify(mine)); return true; }catch(e){ return false; } };
-const allP = ()=>P.concat(mine);
-const esc = t=>String(t||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-
-let cat = "greet", shown = [], idx = 0;
-const $ = id => document.getElementById(id);
-const colorOf = c => (CATS.find(x=>x.id===c)||{}).color;
-
-function renderTabs(){
-  $("tabs").innerHTML = CATS.map(c=>`<button class="tab ${c.id===cat?'on':''}" data-c="${c.id}">${c.name}</button>`).join("");
-  $("tabs").querySelectorAll(".tab").forEach(b=>b.onclick=()=>{cat=b.dataset.c; render(); $("secTitle").scrollIntoView({behavior:"smooth"});});
-}
-function render(){
-  renderTabs();
-  $("secTitle").textContent = CATS.find(c=>c.id===cat).name;
-  shown = cat==="fav" ? allP().filter(p=>favs.includes(p.jp)) : allP().filter(p=>p.c===cat);
-  const add = cat==="mine" ? `<button class="addbtn" id="addBtn">＋ 言葉を追加する</button>` : "";
-  if(!shown.length){
-    $("list").innerHTML = add + `<div class="empty">${cat==="mine"
-      ? "まだありません。<br>上の「＋ 言葉を追加する」から<br>自分だけの言葉を作れます"
-      : "まだありません。<br>よく使う言葉の「☆ 保存する」を押すと<br>ここに集まります"}</div>`;
-    bindAdd(); return;
-  }
-  $("list").innerHTML = add + shown.map((p,i)=>{
-    const on = favs.includes(p.jp);
-    return `<div class="card">
-      <div class="row">
-        <div class="emo" style="background:${colorOf(p.c)}">${p.e}</div>
-        <div class="body">
-          <div class="jp">${esc(p.jp)}</div>
-          <div class="kana">${esc(p.k)}</div>
-          ${p.s?`<div class="si">${esc(p.s)}</div>`:""}
-        </div>
-      </div>
-      ${p.m?`<div class="memo">🌱 ${esc(p.m)}</div>`:""}
-      <div class="acts">
-        <button class="act show" data-i="${i}">👀 相手に見せる</button>
-        <button class="act fav ${on?'on':''}" data-f="${i}">${on?'⭐ 保存ずみ':'☆ 保存する'}</button>
-        ${p.id?`<button class="act del" data-d="${p.id}">🗑</button>`:""}
-      </div>
-    </div>`}).join("");
-  $("list").querySelectorAll(".show").forEach(b=>b.onclick=()=>open(+b.dataset.i));
-  $("list").querySelectorAll(".fav").forEach(b=>b.onclick=()=>{
-    const jp = shown[+b.dataset.f].jp;
-    favs = favs.includes(jp) ? favs.filter(x=>x!==jp) : [...favs, jp];
-    saveFavs(); render();
-  });
-  $("list").querySelectorAll(".del").forEach(b=>b.onclick=()=>{
-    if(!b.classList.contains("sure")){ b.classList.add("sure"); b.textContent="本当に消す？"; return; }
-    const item = mine.find(x=>x.id===b.dataset.d);
-    mine = mine.filter(x=>x.id!==b.dataset.d);
-    if(item){ favs = favs.filter(x=>x!==item.jp); saveFavs(); }
-    saveMine(); render();
-  });
-  bindAdd();
-}
-function bindAdd(){
-  const b = $("addBtn"); if(!b) return;
-  b.onclick = ()=>{ ["fJp","fK","fS","fM"].forEach(id=>$(id).value=""); $("fErr").textContent=""; $("form").classList.add("on"); };
-}
-$("fCancel").onclick=()=>$("form").classList.remove("on");
-$("fSave").onclick=()=>{
-  const jp=$("fJp").value.trim(), k=$("fK").value.trim();
-  if(!jp||!k){ $("fErr").textContent="日本語と読み方（カタカナ）を入れてね"; return; }
-  if(allP().some(p=>p.jp===jp)){ $("fErr").textContent="同じ日本語の言葉がもうあります"; return; }
-  mine.push({id:"m"+Date.now(), c:"mine", e:"📝", jp, k, s:$("fS").value.trim(), m:$("fM").value.trim()});
-  if(!saveMine()){ $("fErr").textContent="このブラウザでは保存できませんでした"; mine.pop(); return; }
-  $("form").classList.remove("on"); cat="mine"; render();
-};
-function open(i){
-  idx = (i+shown.length)%shown.length;
-  const p = shown[idx];
-  $("oEmo").textContent=p.e; $("oSi").textContent=p.s; $("oKana").textContent=p.k; $("oJp").textContent=p.jp;
-  $("oTip").textContent=p.m; $("oTip").style.display=p.m?"block":"none";
-  $("ov").classList.add("on");
-}
-$("close").onclick=()=>$("ov").classList.remove("on");
-$("prev").onclick=()=>open(idx-1);
-$("next").onclick=()=>open(idx+1);
-render();
-try{ if("serviceWorker" in navigator && window.top===window.self && location.protocol==="https:") navigator.serviceWorker.register("sw.js"); }catch(e){}
-</script>
+<header>
+  <p>スマホで遊べる</p>
+  <h1>クソゲー置き場</h1>
+  <small>インストール不要。タップしたらすぐ遊べます。</small>
+</header>
+<main>
+  <a class="card" href="./zamasu/">
+    <img src="./zamasu/ogp.png" alt="本日のマナー講座ザマス" loading="lazy">
+    <div class="body"><h2>本日のマナー講座ザマス</h2>
+      <p>マナー講師に怒られずに食べきれるか!? 和洋中 全12編。ムカついたらちゃぶ台返し💥</p>
+      <span class="play">▶ 遊ぶ</span></div>
+  </a>
+  <a class="card" href="./justender/">
+    <img src="./justender/card.png" alt="ジャストえんだ〜" loading="lazy">
+    <div class="body"><h2>ジャストえんだ〜</h2>
+      <p>エンダーチャレンジがスマホで。溜めの後のドラムに、ドンを合わせろ。誤差は1/100秒まで丸見え。</p>
+      <span class="play">▶ 遊ぶ</span></div>
+  </a>
+  <a class="card" href="./gekiochi/">
+    <img src="./gekiochi/ogp.png" alt="激落！！消しゴムバトル！！" loading="lazy">
+    <div class="body"><h2>激落！！消しゴムバトル！！</h2>
+      <p>消しゴムを指で弾いて、相手を机から叩き落とせ！ CPU戦・ネット対戦・ランクマッチ。</p>
+      <span class="play">▶ 遊ぶ</span></div>
+  </a>
+  <a class="card" href="./butaki/">
+    <img src="./butaki/ogp.png" alt="ブタもおだてりゃ木に登る" loading="lazy">
+    <div class="body"><h2>ブタもおだてりゃ木に登る</h2>
+      <p>木こりをよけて、おだてられながらブタが木を登り続けるクソゲー。どこまで登れるブー？</p>
+      <span class="play">▶ 遊ぶ</span></div>
+  </a>
+  <a class="card" href="./kamoshirenai/">
+    <img src="./kamoshirenai/ogp.png" alt="かもしれない運転" loading="lazy">
+    <div class="body"><h2>かもしれない運転</h2>
+      <p>迫りくる「かもしれない」をよけて、何m生き残れるか。</p>
+      <span class="play">▶ 遊ぶ</span></div>
+  </a>
+</main>
+<footer>© zirihinIT</footer>
 </body>
 </html>
