@@ -3,75 +3,62 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>zirihinIT｜スマホで遊べるクソゲー置き場</title>
-<meta name="description" content="スマホのブラウザですぐ遊べる単発クソゲーの置き場。インストール不要、タップするだけ。">
+<title>zirihinIT</title>
+<meta name="description" content="スマホですぐ遊べるゲームと、ゆるっと覚える言語アプリ。インストール不要。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://zirihinit.github.io/">
-<meta property="og:title" content="zirihinIT｜スマホで遊べるクソゲー置き場">
-<meta property="og:description" content="スマホのブラウザですぐ遊べる単発クソゲーの置き場。インストール不要、タップするだけ。">
-<meta property="og:image" content="https://zirihinit.github.io/ogp.png">
-<meta name="twitter:card" content="summary_large_image">
+<meta property="og:title" content="zirihinIT">
+<meta property="og:description" content="スマホですぐ遊べるゲームと、ゆるっと覚える言語アプリ。インストール不要。">
+<meta name="twitter:card" content="summary">
 <style>
-  :root { --bg:#16161d; --card:#22222c; --fg:#fff; --sub:#b8b8c8; --accent:#ffd400; }
+  :root { --bg:#f6f4f1; --fg:#333; --sub:#777; }
   * { box-sizing:border-box; margin:0; padding:0; }
-  body { background:var(--bg); color:var(--fg);
-    font-family:"Hiragino Kaku Gothic ProN","Hiragino Sans","Noto Sans JP",Meiryo,sans-serif;
+  body { background:var(--bg); color:var(--fg); min-height:100vh;
+    font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP",Meiryo,sans-serif;
     -webkit-text-size-adjust:100%; }
-  header { padding:36px 20px 24px; text-align:center; border-top:8px solid var(--accent); }
-  header p { color:var(--sub); font-size:15px; font-weight:700; }
-  header h1 { font-size:clamp(34px,9vw,56px); font-weight:900; color:var(--accent); line-height:1.2; margin:4px 0 10px; }
-  header small { color:var(--sub); font-size:13px; }
-  main { max-width:960px; margin:0 auto; padding:8px 16px 40px;
-    display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:18px; }
-  a.card { display:block; background:var(--card); border-radius:14px; overflow:hidden;
-    color:inherit; text-decoration:none; transition:transform .12s; }
-  a.card:active { transform:scale(.97); }
-  @media (hover:hover){ a.card:hover { transform:translateY(-4px); } }
-  a.card img { display:block; width:100%; aspect-ratio:1200/630; object-fit:cover; background:#000; }
-  .body { padding:12px 14px 16px; }
-  .body h2 { font-size:18px; font-weight:900; margin-bottom:6px; }
-  .body p { font-size:14px; color:var(--sub); line-height:1.6; }
-  .play { display:inline-block; margin-top:10px; background:var(--accent); color:#16161d;
-    font-weight:900; font-size:14px; padding:6px 16px; border-radius:999px; }
+  header { padding:48px 20px 28px; text-align:center; }
+  header h1 { font-size:clamp(30px,8vw,44px); font-weight:800; letter-spacing:.04em; }
+  header p { color:var(--sub); font-size:15px; margin-top:8px; }
+  main { max-width:820px; margin:0 auto; padding:0 18px 40px;
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:20px; }
+  a.door { display:block; border-radius:24px; padding:30px 24px 26px; text-decoration:none;
+    text-align:center; transition:transform .12s; box-shadow:0 6px 18px rgba(0,0,0,.08); }
+  a.door:active { transform:scale(.97); }
+  @media (hover:hover){ a.door:hover { transform:translateY(-4px); } }
+  .door .icon { font-size:48px; }
+  .door h2 { font-size:24px; font-weight:800; margin:10px 0 8px; }
+  .door p { font-size:15px; line-height:1.7; }
+  .door .go { display:inline-block; margin-top:16px; font-weight:800; font-size:15px;
+    padding:8px 22px; border-radius:999px; }
+  .games { background:#16161d; color:#fff; border-top:8px solid #ffd400; }
+  .games h2 { color:#ffd400; }
+  .games p { color:#b8b8c8; }
+  .games .go { background:#ffd400; color:#16161d; }
+  .hokkori { background:#fff8f1; color:#5a4a4a; border-top:8px solid #f59ab0;
+    font-family:"Hiragino Maru Gothic ProN","Hiragino Sans","Noto Sans JP",Meiryo,sans-serif; }
+  .hokkori h2 { color:#f59ab0; }
+  .hokkori p { color:#8f7f7f; }
+  .hokkori .go { background:#f59ab0; color:#fff; }
   footer { text-align:center; color:var(--sub); font-size:12px; padding:0 16px 32px; }
 </style>
 </head>
 <body>
 <header>
-  <p>スマホで遊べる</p>
-  <h1>クソゲー置き場</h1>
-  <small>インストール不要。タップしたらすぐ遊べます。</small>
+  <h1>zirihinIT</h1>
+  <p>スマホですぐ使える、ちいさなアプリ置き場</p>
 </header>
 <main>
-  <a class="card" href="./zamasu/">
-    <img src="./zamasu/ogp.png" alt="本日のマナー講座ザマス" loading="lazy">
-    <div class="body"><h2>本日のマナー講座ザマス</h2>
-      <p>マナー講師に怒られずに食べきれるか!? 和洋中 全12編。ムカついたらちゃぶ台返し💥</p>
-      <span class="play">▶ 遊ぶ</span></div>
+  <a class="door games" href="./games/">
+    <div class="icon">🎮</div>
+    <h2>ゲームはこちら</h2>
+    <p>タップしたらすぐ遊べる、<br>単発クソゲーの置き場です。</p>
+    <span class="go">▶ 遊びにいく</span>
   </a>
-  <a class="card" href="./justender/">
-    <img src="./justender/card.png" alt="ジャストえんだ〜" loading="lazy">
-    <div class="body"><h2>ジャストえんだ〜</h2>
-      <p>エンダーチャレンジがスマホで。溜めの後のドラムに、ドンを合わせろ。誤差は1/100秒まで丸見え。</p>
-      <span class="play">▶ 遊ぶ</span></div>
-  </a>
-  <a class="card" href="./gekiochi/">
-    <img src="./gekiochi/ogp.png" alt="激落！！消しゴムバトル！！" loading="lazy">
-    <div class="body"><h2>激落！！消しゴムバトル！！</h2>
-      <p>消しゴムを指で弾いて、相手を机から叩き落とせ！ CPU戦・ネット対戦・ランクマッチ。</p>
-      <span class="play">▶ 遊ぶ</span></div>
-  </a>
-  <a class="card" href="./butaki/">
-    <img src="./butaki/ogp.png" alt="ブタもおだてりゃ木に登る" loading="lazy">
-    <div class="body"><h2>ブタもおだてりゃ木に登る</h2>
-      <p>木こりをよけて、おだてられながらブタが木を登り続けるクソゲー。どこまで登れるブー？</p>
-      <span class="play">▶ 遊ぶ</span></div>
-  </a>
-  <a class="card" href="./kamoshirenai/">
-    <img src="./kamoshirenai/ogp.png" alt="かもしれない運転" loading="lazy">
-    <div class="body"><h2>かもしれない運転</h2>
-      <p>迫りくる「かもしれない」をよけて、何m生き残れるか。</p>
-      <span class="play">▶ 遊ぶ</span></div>
+  <a class="door hokkori" href="./hokkori/">
+    <div class="icon">🌸</div>
+    <h2>ほっこり言語はこちら</h2>
+    <p>職場やドラマで聞くひとことを、<br>ゆるっと覚える言語アプリ。</p>
+    <span class="go">ひらく</span>
   </a>
 </main>
 <footer>© zirihinIT</footer>
