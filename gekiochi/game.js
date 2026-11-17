@@ -624,7 +624,7 @@ const SKINS={
   s7:{name:'ぎんいろ',rar:2,body:0xc9d1da,sleeve:'#2c333d',tex:'silver',rough:0.25,metal:0.3,emis:0x30343a},s8:{name:'にじいろ',rar:2,body:0xff6ad5,sleeve:'#7b2ff7',tex:'rainbow',rough:0.3,anim:3},
   s9:{name:'まぼろし',rar:3,body:0xbfe6ff,sleeve:'#2a1d6e',emis:0x2a4fb0,anim:2,tex:'ghost'},
   // 特殊スキン（おもちゃっぽい形。見た目だけで性能は元の消しゴムのまま）
-  x1:{name:'カブトムシ',rar:4,body:0x5a2e12,sleeve:'#3a1d0a',model:'beetle'},x7:{name:'王冠',rar:4,body:0xffc928,sleeve:'#c21f3a',model:'crown'},
+  x1:{name:'カブトムシ',rar:5,body:0x5a2e12,sleeve:'#3a1d0a',model:'beetle'},x7:{name:'王冠',rar:4,body:0xffc928,sleeve:'#c21f3a',model:'crown'},
   x3:{name:'レンガ',rar:5,body:0xc0532f,sleeve:'#7a2f18',model:'brick'},x4:{name:'たまご寿司',rar:5,body:0xffd23f,sleeve:'#1b1430',model:'sushi'},
   x5:{name:'将棋の駒',rar:5,body:0xe8c27a,sleeve:'#3a2410',model:'shogi'},x6:{name:'牛乳パック',rar:5,body:0xffffff,sleeve:'#2f8cff',model:'milk'},
   x8:{name:'ハンバーガー',rar:5,body:0xd99a4e,sleeve:'#7a3d12',model:'burger'},x9:{name:'招き猫',rar:5,body:0xffffff,sleeve:'#e23b3b',model:'maneki'},
@@ -634,7 +634,7 @@ const TITLES={
   t1:{name:'かけだし',rar:0},t2:{name:'文房具マニア',rar:0},t3:{name:'えんぴつ派',rar:0},t4:{name:'定規使い',rar:0},
   t5:{name:'ギリギリ職人',rar:1},t6:{name:'机の端の住人',rar:1},t7:{name:'消しカス長者',rar:2},t8:{name:'休み時間の覇者',rar:2},
   t9:{name:'伝説の消しゴム',rar:3},
-  t10:{name:'激落王を倒した者',rar:4}};
+  t10:{name:'激落王を倒した者',rar:4},t11:{name:'勝ち抜きの鬼',rar:4}};
 const PRIZES=Object.assign({},SKINS,TITLES),safeSkin=v=>SKINS[v]?v:'',safeTitle=v=>TITLES[v]?v:'';
 const MY={skin:'',title:''};try{MY.skin=safeSkin(localStorage.getItem('gekiochiSkin'));MY.title=safeTitle(localStorage.getItem('gekiochiTitle'))}catch(e){}
 const skinOf=i=>i===(game.mode==='cpu'?0:game.me)?MY.skin:safeSkin(game.oppSkin),titleOf=i=>i===(game.mode==='cpu'?0:game.me)?MY.title:safeTitle(game.oppTitle);
@@ -947,7 +947,7 @@ let gtBest=0;try{gtBest=+localStorage.getItem('gekiochiBest')||0}catch(e){}
 function gtBestText(){$('bestTxt').textContent=gtBest?'自己ベスト：'+gtBest+'人激落':'どこまで勝ち抜ける？'}
 const allInv=()=>{const a=rkInv();UNL.forEach(x=>{if(PRIZES[x]&&!a.includes(x))a.push(x)});return a};
 // ボスを倒すと解放されるもの
-const GT_REWARDS={5:{id:'t10',name:'称号「激落王を倒した者」'},10:{id:'x1',name:'スキン「カブトムシ」'},20:{id:'x7',name:'スキン「王冠」'},15:{id:'e3',name:'おうごん消しゴム'}};
+const GT_REWARDS={5:{id:'t10',name:'称号「激落王を倒した者」'},10:{id:'e3',name:'おうごん消しゴム'},15:{id:'t11',name:'称号「勝ち抜きの鬼」'},20:{id:'x7',name:'スキン「王冠」'}};
 function gtReward(n){const R=GT_REWARDS[n];if(!R||!unlock(R.id))return;
   later(()=>{toast('🎉 解放！ '+R.name+(R.id==='e3'?'\n消しゴム選択で使えるよ':'\nきせかえで使えるよ'),4200,1);SFX.max()},1500)}
 function gtRecord(wins){if(wins<=gtBest)return false;gtBest=wins;try{localStorage.setItem('gekiochiBest',wins)}catch(e){}gtBestText();return true}
@@ -1560,7 +1560,7 @@ let pickSel=null;
 function pickRender(){if(pickSel===null||!PICK_LIST.includes(pickSel))pickSel=canPick(game.myType)?game.myType:0;const k=pickSel,T=ETYPES[k],lock=!canPick(k);
   document.querySelectorAll('#cards .card').forEach(b=>{const kk=+b.dataset.k,on=kk===k;b.classList.toggle('on',on);b.classList.toggle('lock',!canPick(kk));b.querySelector('.tn').textContent=canPick(kk)?ETYPES[kk].short:'？？？';b.setAttribute('aria-checked',on)});
   const p=$('pickInfo');p.style.setProperty('--c',CARDC[k]);p.style.setProperty('--b',hexC(k));p.classList.toggle('lock',lock);
-  p.innerHTML=`<div class="ic"><div class="eras k${k}" data-l="${T.label}"></div></div><div class="nm">${lock?'？？？':T.name}</div><div class="ds">${lock?'勝ち抜き戦で15人目の強敵を倒すと使えるようになる。':T.desc}</div>
+  p.innerHTML=`<div class="ic"><div class="eras k${k}" data-l="${T.label}"></div></div><div class="nm">${lock?'？？？':T.name}</div><div class="ds">${lock?'勝ち抜き戦で10人目の強敵を倒すと使えるようになる。':T.desc}</div>
   <div class="sts">${T.stats.map((v,j)=>`<div class="stat"><span>${STAT_NAMES[j]}</span><span class="bar">${[0,1,2,3,4].map(n=>`<i class="${!lock&&n<v?'on':''}"></i>`).join('')}</span></div>`).join('')}</div>`;
   $('bPickOk').disabled=lock;$('bPickOk').textContent=lock?'まだ使えない':'これで勝負！'}
 pickRender();
