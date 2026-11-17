@@ -6,16 +6,16 @@
 <title>本日のマナー講座ザマス</title>
 <meta name="description" content="マナー講師ザマス先生に怒られずに食べきれるか!? 和食・洋食・中華 全12編のお作法3Dゲーム。ムカついたらちゃぶ台返し。">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://zirihinit.github.io/games/zamasu/">
+<meta property="og:url" content="https://zirihinit.github.io/zamasu/">
 <meta property="og:title" content="本日のマナー講座ザマス">
 <meta property="og:description" content="マナー講師に怒られずに食べきれるか!? 和洋中 全12編。ムカついたらちゃぶ台返し💥">
-<meta property="og:image" content="https://zirihinit.github.io/games/zamasu/ogp.png">
+<meta property="og:image" content="https://zirihinit.github.io/zamasu/ogp.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="本日のマナー講座ザマス">
 <meta name="twitter:description" content="マナー講師に怒られずに食べきれるか!? 和洋中 全12編。ムカついたらちゃぶ台返し💥">
-<meta name="twitter:image" content="https://zirihinit.github.io/games/zamasu/ogp.png">
+<meta name="twitter:image" content="https://zirihinit.github.io/zamasu/ogp.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=M+PLUS+Rounded+1c:wght@500;800&display=swap" rel="stylesheet">
 <style>
@@ -195,7 +195,7 @@ a.btn{text-decoration:none;text-align:center;display:block}
 (function(){
 'use strict';
 // 公開先URL（GitHub Pages に置いたらここを書き換えると、シェア文にURLが入ります）
-const SHARE_URL = 'https://zirihinit.github.io/games/zamasu/';
+const SHARE_URL = 'https://zirihinit.github.io/zamasu/';
 const HASHTAG = '本日のマナー講座ザマス';
 
 const $ = id => document.getElementById(id);
@@ -485,14 +485,52 @@ function buildTable(kind){
       for (let i=0;i<5;i++) g.add(mesh(new THREE.BoxGeometry(.012,.006,.012), M(0xf5f0e0), rand(-.03,.03), .062, rand(-.03,.03)));
       addDish('soup', g, [soup], x, z); };
     const mkFish = (x,z,sc,plateW)=>{ const g = new THREE.Group(); g.userData.r = .16*sc;
-      g.add(mesh(new THREE.BoxGeometry(plateW,.02,.13*sc), C.white, 0,.01,0));
-      const fish = new THREE.Group(); fish.position.y = .035*sc; fish.scale.setScalar(sc); fish.rotation.y = Math.PI; g.add(fish);   // head to the left
-      const fb = mesh(new THREE.SphereGeometry(.1,16,10), M(0x9aa2ad,{roughness:.35,metalness:.3})); fb.scale.set(1,.28,.32); fish.add(fb);
-      const tail = mesh(new THREE.ConeGeometry(.035,.06,4), M(0x7a828d), -.12,0,0); tail.rotation.z = Math.PI/2; fish.add(tail);
-      fish.add(mesh(new THREE.SphereGeometry(.008,6,6), M(0x111111), .075,.008,-.022));
-      fish.add(mesh(new THREE.BoxGeometry(.05,.003,.04), M(0x3a2a1a), 0,.028,0));
-      fish.add(mesh(new THREE.BoxGeometry(.04,.003,.03), M(0x3a2a1a), .04,.026,0));
-      g.add(mesh(new THREE.ConeGeometry(.02*sc,.025*sc,10), M(0xf2f2ea), plateW*.36,.03,.03*sc));
+      // long rectangular plate (indigo), sits above the tray: no coplanar faces
+      const PT = .026;                                              // plate top height
+      g.add(mesh(new THREE.BoxGeometry(plateW,.014,.14*sc), M(0x23345a,{roughness:.3}), 0,.017,0));
+      g.add(mesh(new THREE.BoxGeometry(plateW*.92,.003,.12*sc), M(0x2c4170,{roughness:.25}), 0,PT-.0005,0));
+      // haran leaf under the fish
+      const leaf = mesh(new THREE.CircleGeometry(.1,24), M(0x2f7a32,{roughness:.5, side:THREE.DoubleSide}), 0,PT+.002,0, false);
+      leaf.rotation.x = -Math.PI/2; leaf.scale.set(1.25*sc,.42*sc,1); g.add(leaf);
+      const fish = new THREE.Group(); fish.scale.setScalar(sc); fish.position.y = PT+.004*sc+.026*sc; fish.rotation.y = Math.PI; g.add(fish);   // head to the left
+      // body with painted skin (vertex colors): dark back, silver belly, browning, grill marks
+      const bg = new THREE.SphereGeometry(.1,40,20);
+      const pos = bg.attributes.position, cols = [], col = new THREE.Color();
+      const back = new THREE.Color(0x5e5546), belly = new THREE.Color(0xe2ddd2), brown = new THREE.Color(0x7a4418), dark = new THREE.Color(0x1e1008), gold = new THREE.Color(0xc0802e);
+      for (let i=0;i<pos.count;i++){
+        const vx = pos.getX(i), vy = pos.getY(i), vz = pos.getZ(i);
+        const up = (vy/.1+1)/2;                                       // 0 belly .. 1 back
+        col.copy(belly).lerp(back, Math.pow(up,1.6));
+        const n = Math.sin(vx*90)*Math.sin(vz*70+vx*30)*.5+.5;        // browning blotches
+        if (up>.22) col.lerp(n>.5?brown:gold, Math.min(1,(up-.22)*1.5)*(.55+n*.45));
+        const spot = Math.sin(vx*210+vz*40)*Math.sin(vz*190-vx*60); if (up>.4 && spot>.8) col.lerp(dark,.6);
+        const stripe = Math.sin((vx*1.0 + vz*.55)*130);               // diagonal grill marks
+        if (up>.45 && stripe>.7 && Math.abs(vx)<.08) col.lerp(dark, .9);
+        if (vx>.06) col.lerp(new THREE.Color(0x6a5a48), Math.min(1,(vx-.06)*12)*.5*up);   // head toasted
+        cols.push(col.r,col.g,col.b);
+      }
+      bg.setAttribute('color', new THREE.Float32BufferAttribute(cols,3));
+      const fb = mesh(bg, new THREE.MeshStandardMaterial({vertexColors:true, roughness:.35, metalness:.05})); fb.scale.set(1,.27,.3); fish.add(fb);
+      // tail fin (forked), charred with salt
+      const ts = new THREE.Shape(); ts.moveTo(0,0); ts.lineTo(-.055,.035); ts.quadraticCurveTo(-.04,0,-.055,-.035); ts.lineTo(0,0);
+      const tail = mesh(new THREE.ShapeGeometry(ts), M(0x3a2c20,{roughness:.6, side:THREE.DoubleSide}), -.088,0,0); fish.add(tail);
+      for (let i=0;i<10;i++) fish.add(mesh(new THREE.SphereGeometry(.0028,4,3), M(0xffffff,{roughness:1}), -.1-rand(0,.035), .006+rand(-.004,.012), rand(-.003,.003), false));
+      // dorsal fin
+      const ds = new THREE.Shape(); ds.moveTo(.02,0); ds.lineTo(-.04,0); ds.lineTo(-.03,.022); ds.lineTo(.01,.012); ds.lineTo(.02,0);
+      const dorsal = mesh(new THREE.ShapeGeometry(ds), M(0x2e241a,{side:THREE.DoubleSide}), 0,.025,0); fish.add(dorsal);
+      // pectoral fin
+      [-1,1].forEach(s=>{ const pf = mesh(new THREE.ShapeGeometry(ds), M(0x5a4a3a,{side:THREE.DoubleSide,transparent:true,opacity:.85}), .045,-.005,s*.028); pf.scale.setScalar(.6); pf.rotation.set(0,0,-.5); fish.add(pf); });
+      // eyes, gills, mouth (both sides)
+      [-1,1].forEach(s=>{
+        const ew = mesh(new THREE.SphereGeometry(.009,10,8), M(0xf4f0e6,{roughness:.2}), .074,.006,s*.0215); ew.scale.z = .5; fish.add(ew);
+        fish.add(mesh(new THREE.SphereGeometry(.0045,8,6), M(0x111111,{roughness:.1}), .076,.006,s*.025));
+        const gill = mesh(new THREE.TorusGeometry(.02,.0018,4,12,Math.PI*.8), M(0x3a2618), .052,.0,s*.027); gill.rotation.set(0,0,Math.PI*.6); fish.add(gill);
+      });
+      const mouth = mesh(new THREE.ConeGeometry(.007,.012,8), M(0x5a4030), .102,-.002,0); mouth.rotation.z = -Math.PI/2; fish.add(mouth);
+      // grated daikon with a drop of soy (front right)
+      const dk = new THREE.Group(); dk.position.set(plateW*.37, PT, .035*sc); dk.scale.setScalar(sc); g.add(dk);
+      const dm = mesh(new THREE.SphereGeometry(.022,12,8,0,Math.PI*2,0,Math.PI/2), M(0xf4f4ec,{roughness:.95}), 0,0,0); dm.scale.y = .8; dk.add(dm);
+      dk.add(mesh(new THREE.SphereGeometry(.007,8,6), M(0x3a1608,{roughness:.1}), 0,.017,0));
       addDish('fish', g, [fish], x, z); return g; };
     const mkHashi = (x,z)=>{ const g = new THREE.Group(); g.userData.r = .14;
       g.add(mesh(new THREE.BoxGeometry(.03,.012,.02), M(0x9ac0d0,{roughness:.2}), .1,.006,0));
@@ -523,7 +561,7 @@ function buildTable(kind){
       addDish('gari', ga, gp, -.3, .18, 0, true);
       // shoyu dish
       const sh = new THREE.Group(); sh.add(mesh(plateGeo(.045,.012), C.white));
-      const so = mesh(new THREE.CylinderGeometry(.03,.03,.002,16), M(0x2a0d05,{roughness:.1}), 0,.008,0); sh.add(so);
+      const so = mesh(new THREE.CylinderGeometry(.03,.03,.002,16), M(0x2a0d05,{roughness:.1}), 0,.0135,0); sh.add(so);
       addDish('shoyu', sh, [], .15, .3);
       // yunomi
       const yn = new THREE.Group(); yn.add(mesh(new THREE.CylinderGeometry(.035,.03,.09,16), M(0x6b7f5a,{roughness:.5}), 0,.045,0));
@@ -531,7 +569,7 @@ function buildTable(kind){
       addDish('tea', yn, [te], .42, -.12);
       mkHashi(-.05, .42);
     } else if (layout==='fish'){
-      const tray = mesh(new THREE.BoxGeometry(1.0,.02,.62), C.lacquerB, 0,.01,.08); tableG.add(tray);
+      const tray = mesh(new THREE.BoxGeometry(1.0,.008,.62), C.lacquerB, 0,.004,.08); tableG.add(tray);
       const fg = mkFish(0, -.02, 1.55, .5);
       const su = new THREE.Group(); const sd = mesh(new THREE.SphereGeometry(.022,12,8,0,Math.PI*2,0,Math.PI/2), M(0x3f9a2a,{roughness:.4}), 0,0,0); sd.rotation.x = -Math.PI/2; su.add(sd);
       su.add(mesh(new THREE.CircleGeometry(.02,12), M(0xd8f070), 0,0,.001)).rotation.set(0,0,0);
@@ -541,7 +579,7 @@ function buildTable(kind){
       addDish('hajikami', hj, [stem], -.22, .06);
       mkRice(-.2, .3); mkSoup(.2, .3); mkHashi(0, .46);
     } else {
-      const tray = mesh(new THREE.BoxGeometry(.9,.02,.55), C.lacquerB, 0,.01,.12); tableG.add(tray);
+      const tray = mesh(new THREE.BoxGeometry(.9,.008,.55), C.lacquerB, 0,.004,.12); tableG.add(tray);
       mkRice(-.18, .26); mkSoup(.18, .26); mkFish(0, -.05, 1, .3);
       let g = new THREE.Group(); g.add(mesh(new THREE.CylinderGeometry(.04,.035,.012,16), M(0x355e8a,{roughness:.3}),0,.006,0));
       const tk = mesh(new THREE.BoxGeometry(.04,.012,.025), M(0xf0d040), 0,.018,0); g.add(tk);
@@ -707,7 +745,7 @@ function buildTable(kind){
       g.add(mesh(new THREE.TorusGeometry(.03,.007,6,12), M(0x8a3a1a), -.07,.065,0));
       addDish('teapot', g, [], .32, -.18);
       mkTea(.3, .26);
-      g = new THREE.Group(); g.add(mesh(plateGeo(.035,.012), C.white)); const ry = mesh(new THREE.CylinderGeometry(.022,.022,.004,12), M(0xd0200a,{roughness:.1}), 0,.008,0); g.add(ry);
+      g = new THREE.Group(); g.add(mesh(plateGeo(.035,.012), C.white)); const ry = mesh(new THREE.CylinderGeometry(.022,.022,.004,12), M(0xd0200a,{roughness:.1}), 0,.014,0); g.add(ry);
       addDish('rayu', g, [ry], .12, .32);
       mkPlate(-.06, .36); mkHashiV(.06, .38); mkRenge(-.26, .42);
     } else if (layout==='noodle'){
@@ -715,7 +753,7 @@ function buildTable(kind){
       let g = new THREE.Group(); g.userData.r = .13; g.add(mesh(plateGeo(.12,.015), C.white)); const gy = [];
       for (let i=0;i<5;i++){ const d = mesh(new THREE.SphereGeometry(.026,10,6,0,Math.PI), M(0xe8c070,{roughness:.6}), -.06+i*.03, .012, 0); d.rotation.set(0,Math.PI/2,0); d.scale.set(1,.5,.55); g.add(d); gy.push(d); }
       addDish('gyoza', g, gy, -.3, .16, .3, true);
-      g = new THREE.Group(); g.add(mesh(plateGeo(.035,.012), C.white)); const tr = mesh(new THREE.CylinderGeometry(.022,.022,.004,12), M(0x5a2a0a,{roughness:.1}), 0,.008,0); g.add(tr);
+      g = new THREE.Group(); g.add(mesh(plateGeo(.035,.012), C.white)); const tr = mesh(new THREE.CylinderGeometry(.022,.022,.004,12), M(0x5a2a0a,{roughness:.1}), 0,.014,0); g.add(tr);
       addDish('tare', g, [tr], -.16, .38);
       g = new THREE.Group(); g.userData.r = .09;
       [[0xeeeeee,.35],[0xc0200a,.9],[0x2a0d05,.95]].forEach(([c,o],i)=>{ g.add(mesh(new THREE.CylinderGeometry(.016,.018,.08,10), new THREE.MeshStandardMaterial({color:c,transparent:true,opacity:o,roughness:.1}), -.04+i*.04,.04,0));
@@ -736,7 +774,7 @@ function buildTable(kind){
       const bs = []; for (let i=0;i<4;i++){ const b = mesh(new THREE.CylinderGeometry(.065,.065,.004,20), M(0xfaf6ea,{roughness:.9}), 0,.008+i*.005,0); g.add(b); bs.push(b); }
       const lid = mesh(new THREE.CylinderGeometry(.082,.082,.008,20), M(0xc9a060), 0,.044,0); g.add(lid); g.userData.lid = lid;
       addDish('bing', g, bs, -.3, .2, 0, true);
-      g = new THREE.Group(); g.add(mesh(plateGeo(.04,.012), C.white)); const tm = mesh(new THREE.CylinderGeometry(.026,.026,.006,12), M(0x3a1608,{roughness:.2}), 0,.009,0); g.add(tm);
+      g = new THREE.Group(); g.add(mesh(plateGeo(.04,.012), C.white)); const tm = mesh(new THREE.CylinderGeometry(.026,.026,.006,12), M(0x3a1608,{roughness:.2}), 0,.0145,0); g.add(tm);
       addDish('sauce', g, [tm], -.12, .38);
       g = new THREE.Group(); g.add(mesh(plateGeo(.06,.012), C.white));
       for (let i=0;i<4;i++){ g.add(mesh(new THREE.BoxGeometry(.006,.006,.07), M(i%2?0xf0f6e0:0x3f9a2a), -.015+i*.01,.012,0)); }
