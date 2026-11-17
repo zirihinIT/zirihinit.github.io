@@ -65,7 +65,7 @@ h2{font-family:'Dela Gothic One',sans-serif;font-size:clamp(28px,6vw,44px);margi
 .pl{background:#fff;color:var(--ink);border:3px solid var(--ink);border-radius:12px;padding:4px 14px;min-width:96px;text-align:center;box-shadow:0 4px 0 var(--ink);font-weight:800}
 /* 消しゴム選択 */
 #pickMenu{justify-content:safe center;overflow-y:auto;touch-action:pan-y}
-#cards{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;width:min(560px,100%)}
+#cards{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;width:min(560px,100%)}
 .card{font-family:'M PLUS Rounded 1c',sans-serif;background:#fff;color:var(--ink);border:3px solid var(--ink);border-radius:14px;box-shadow:0 5px 0 var(--ink);padding:8px 2px 6px;cursor:pointer;
   display:flex;flex-direction:column;align-items:center;gap:6px;transition:transform .12s,background .12s;touch-action:manipulation;min-width:0}
 .card .ic{height:34px;display:flex;align-items:center;justify-content:center}
@@ -139,7 +139,7 @@ a.btn{display:inline-block;box-sizing:border-box;text-decoration:none;text-align
 .drList{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:8px}
 .drItem{display:inline-flex;flex:0 0 auto;align-items:center;gap:5px;border:3px solid var(--ink);border-radius:12px;padding:4px 8px;margin:0;font:800 13px 'M PLUS Rounded 1c',sans-serif;white-space:nowrap;background:#fff;color:var(--ink);cursor:pointer}
 .drItem.on{background:#ffd23f;box-shadow:0 4px 0 var(--ink);transform:translateY(-2px)}.drItem.lock{opacity:.4;border-style:dashed;cursor:default}
-.drItem em{font-style:normal;font-size:10px;font-weight:800;padding:1px 5px;border-radius:6px;background:#e9e6f2}.drItem em.r1{background:#cfe5ff}.drItem em.r2{background:#ffe9a8}.drItem em.r3{background:#e7d2ff}
+.drItem em{font-style:normal;font-size:10px;font-weight:800;padding:1px 5px;border-radius:6px;background:#e9e6f2}.drItem em.r1{background:#cfe5ff}.drItem em.r2{background:#ffe9a8}.drItem em.r4{background:#ffd0c8}.drItem em.r3{background:#e7d2ff}
 .pl .tl{font-size:10px;font-weight:800;color:#8a3fe0;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pl .tl:empty{display:none}
 .vsp .vtl{font-size:12px;font-weight:800;color:#8a3fe0;min-height:16px}.bnm small{font-size:10px;color:#8a3fe0;margin-left:5px;font-weight:800}
 #resRate .ks{margin-top:4px;font-size:15px}#resRate .ks b{font:18px 'Dela Gothic One',sans-serif;color:#a64bff}
@@ -232,3 +232,22 @@ a.btn{display:inline-block;box-sizing:border-box;text-decoration:none;text-align
 #toast{position:fixed;left:50%;top:18px;transform:translateX(-50%);background:#fff;color:var(--ink);border:3px solid var(--ink);border-radius:12px;padding:8px 16px;font-weight:800;z-index:20;box-shadow:0 4px 0 var(--ink)}
 #resT{font-family:'Dela Gothic One';font-size:clamp(52px,13vw,110px);-webkit-text-stroke:3px var(--ink);text-shadow:6px 6px 0 var(--red),12px 12px 0 var(--ink);transform:rotate(-4deg)}
 #resS{font-weight:800;font-size:22px;margin-bottom:10px;white-space:pre-line;text-align:center;line-height:1.5}
+
+.card.lock .eras{filter:brightness(0) opacity(.35)}.card.lock .tn{opacity:.5}
+.card.lock .tn::before{content:"🔒"}
+#pickInfo.lock .ic .eras{filter:brightness(0) opacity(.3)}
+#bPickOk:disabled{filter:grayscale(.8);opacity:.6}
+@media(max-width:640px){.card .tn{font-size:8.5px}.card .ic .eras{width:40px;height:20px}#cards{gap:4px}}
+
+/* 指のお手本 */
+#ghost{position:fixed;inset:0;pointer-events:none;z-index:8}
+#ghostF{position:absolute;left:-32px;top:-8px;font-size:64px;line-height:1;filter:drop-shadow(0 3px 0 #1b1430) drop-shadow(0 0 6px rgba(255,255,255,.9));transition:transform .06s linear}
+#ghostF::before{content:"";position:absolute;left:12px;top:-14px;width:28px;height:28px;border-radius:50%;border:4px solid #fff;box-shadow:0 0 0 3px rgba(27,20,48,.5);animation:gpress .9s ease-out infinite}
+#ghostF.up::before{display:none}
+@keyframes gpress{from{transform:scale(.4);opacity:1}to{transform:scale(1.6);opacity:0}}
+#ghostLine{position:absolute;width:10px;margin-left:-5px;background:linear-gradient(#fff,rgba(255,210,63,.95));border:3px solid #1b1430;border-radius:6px;transition:opacity .15s}
+#ghostCap{position:absolute;left:50%;transform:translateX(-50%);white-space:nowrap;font:900 clamp(17px,4.8vw,24px) 'M PLUS Rounded 1c',sans-serif;color:#fff;
+  background:rgba(27,20,48,.82);border:3px solid #fff;border-radius:999px;padding:6px 18px;box-shadow:0 4px 0 rgba(27,20,48,.6)}
+
+#toast.big{top:22%;font-size:clamp(16px,4.6vw,22px);padding:12px 22px;white-space:pre-line;text-align:center;background:#ffd23f;border-width:4px;box-shadow:0 6px 0 var(--ink);animation:capin .35s cubic-bezier(.2,1.6,.4,1)}
+@keyframes capin{from{transform:translateX(-50%) scale(1.8);opacity:0}}

@@ -15,22 +15,26 @@ const TYPE_NAMES=['ストレート','ループ','カーブ'];
 const PEER_PFX='gekiochi-keshigomu-v3-';
 // 消しゴムの種類
 const ETYPES=[
-  {name:'ふつうの消しゴム',short:'ふつう',label:'激落',desc:'普通のステータスだぞ。',stats:[3,3,3,3],
+  {name:'ふつうの消しゴム',rr:0.07,short:'ふつう',label:'激落',desc:'普通のステータスだぞ。',stats:[3,3,3,3],
    spd:1.0,mu:9,m:1.0,rest:0.85,oRest:0.45,land:0.22,squish:0.45,body:0xf7f6f0,rough:0.95,metal:0},
-  {name:'ツルツル消しゴム',short:'ツルツル',label:'ツルツル',desc:'めっちゃ滑る。当てた相手もツルッと滑らせる！ ぶつけられると止まらないのが弱点。',stats:[5,5,2,2],
+  {name:'ツルツル消しゴム',rr:0.11,clear:1,short:'ツルツル',label:'ツルツル',desc:'めっちゃ滑る。当てた相手もツルッと滑らせる！ ぶつけられると止まらないのが弱点。',stats:[5,5,2,2],
    spd:1.15,mu:6.2,m:0.9,rest:0.7,oRest:0.35,land:0.15,squish:0.25,body:0x7fd2ff,rough:0.12,metal:0.15},
-  {name:'もちもち消しゴム',short:'もちもち',label:'もちもち',desc:'弾力がすごい。当たった相手をボヨーンと弾き飛ばす。足はおそい。',stats:[2,1,5,4],
+  {name:'もちもち消しゴム',rr:0.26,jelly:1,short:'もちもち',label:'もちもち',desc:'弾力がすごい。当たった相手をボヨーンと弾き飛ばす。足はおそい。',stats:[2,1,5,4],
    spd:0.9,mu:11,m:1.15,rest:1.3,oRest:0.95,land:0.6,squish:1.0,body:0xff9cc0,rough:0.8,metal:0},
   // ボス専用（プレイヤーは選べない）。ふつうより少し重い
-  {name:'おうごん消しゴム',short:'おうごん',label:'王者',desc:'激落王だけが持つ伝説の消しゴム。',stats:[3,3,3,4],
+  {name:'おうごん消しゴム',rr:0.06,short:'おうごん',label:'王者',desc:'激落王だけが持つ伝説の消しゴム。',stats:[3,3,3,4],
    spd:1.0,mu:9,m:1.12,rest:0.85,oRest:0.45,land:0.22,squish:0.4,body:0xffc928,rough:0.35,metal:0,emis:0x8a5a00,sleeve:'#1b1430'},
-  {name:'ちびちび消しゴム',short:'ちびちび',label:'ちびちび',desc:'使い古しで小さい。当たりにくくて足が速い。でも軽いから当たると吹っ飛ぶ。',stats:[5,3,2,1],
+  {name:'ちびちび消しゴム',rr:0.16,worn:1,short:'ちびちび',label:'ちびちび',desc:'使い古しで小さい。当たりにくくて足が速い。でも軽いから当たると吹っ飛ぶ。',stats:[5,3,2,1],
    spd:1.25,mu:8.5,m:0.8,rest:1.0,oRest:0.5,land:0.3,squish:0.4,body:0xe8e2d2,rough:0.95,metal:0,sz:0.7},
-  {name:'ブッとび消しゴム',short:'ブッとび',label:'ブッとび',desc:'ぶつかった相手を空中にブッとばす！ 軽いので自分も飛ばされやすい。',stats:[4,3,4,2],
+  {name:'ブッとび消しゴム',rr:0.3,stripe:1,short:'ブッとび',label:'ブッとび',desc:'ぶつかった相手を空中にブッとばす！ 軽いので自分も飛ばされやすい。',stats:[4,3,4,2],
    spd:1.1,mu:9,m:0.85,rest:0.95,oRest:0.55,land:0.4,squish:0.5,body:0xff9a3c,rough:0.7,metal:0,pop:1},
 ];
 // プレイヤーが選べる消しゴム（3番はボス専用）
 const PLAYABLE=[0,1,2,4,5],randType=()=>PLAYABLE[(Math.random()*PLAYABLE.length)|0];
+// 勝ち抜き戦で解放したもの（端末に保存）
+const UNL=new Set();try{(JSON.parse(localStorage.getItem('gekiochiUnlock')||'[]')||[]).forEach(x=>UNL.add(String(x)))}catch(e){}
+function unlock(id){if(UNL.has(id))return false;UNL.add(id);try{localStorage.setItem('gekiochiUnlock',JSON.stringify([...UNL]))}catch(e){}return true}
+const goldOpen=()=>UNL.has('e3');
 const STAT_NAMES=['スピード','すべり','弾力','重さ'];
 
 function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
@@ -76,6 +80,7 @@ function newState(seed,types=[0,0]){return{e:[mkE(-START_X,0,0,types[0]),mkE(STA
 function cloneState(s){return{e:s.e.map(o=>Object.assign({},o)),obs:s.obs.map(o=>Object.assign({},o)),t:s.t}}
 function in0(x,z){for(const d of DESKS)if(x>=d.x0&&x<=d.x1&&z>=d.z0&&z<=d.z1)return true;return false}
 // m>0 のときは「縁から m 以上内側か」（つなぎ目は内側扱い）
+function edgeDist(e){const D=DESKS[e.x<0?0:1];return Math.min(20-Math.abs(e.x),e.z-D.z0,D.z1-e.z)}
 function inTable(x,z,m=0){return in0(x,z)&&(m===0||(in0(x+m,z+m)&&in0(x-m,z+m)&&in0(x+m,z-m)&&in0(x-m,z-m)))}
 const onTable=e=>inTable(e.x,e.z);
 // 一番近い机の上の点（落ちる方向を決めるため）
@@ -156,7 +161,7 @@ function step(s,dt,ev){
         let sl=false,bu=false;
         if(-rv>2){if(a.k===1){b.slick=1;sl=true}if(b.k===1){a.slick=1;sl=true}
           if(a.k===5){b.vy=Math.max(b.vy,Math.min(9,-rv*0.55));bu=true}if(b.k===5){a.vy=Math.max(a.vy,Math.min(9,-rv*0.55));bu=true}}
-        ev&&ev.push({k:'hit',p:-rv,x:(a.x+b.x)/2,y:(a.y+b.y)/2,z:(a.z+b.z)/2,mochi:(a.k===2||b.k===2),slick:sl,buttobi:bu});
+        ev&&ev.push({k:'hit',vic:Math.hypot(a.vx,a.vz)>=Math.hypot(b.vx,b.vz)?0:1,p:-rv,x:(a.x+b.x)/2,y:(a.y+b.y)/2,z:(a.z+b.z)/2,mochi:(a.k===2||b.k===2),slick:sl,buttobi:bu});
       }
     }
   }
@@ -578,6 +583,23 @@ buildStages();
     for(const sx of[-1,1])for(const sz of[-1,1]){const l=new THREE.Mesh(new THREE.CylinderGeometry(0.35,0.35,24,12),metal);l.position.set(cx+sx*(w/2-1.1),-13,cz+sz*(dp/2-1.1));l.castShadow=true;scene.add(l)}
   });
 }
+// 消しゴムの形：角の丸い箱（noiseで使い古しのいびつさ）
+function roundBox(w,h,d,r,noise=0,seed=1){
+  const seg=r>0.15?18:8,g=new THREE.BoxGeometry(w,h,d,seg,seg,seg),p=g.attributes.position,v=new THREE.Vector3(),c=new THREE.Vector3(),rnd=mulberry32(seed);
+  const hx=w/2-r,hy=h/2-r,hz=d/2-r;
+  for(let i=0;i<p.count;i++){v.fromBufferAttribute(p,i);c.set(clamp(v.x,-hx,hx),clamp(v.y,-hy,hy),clamp(v.z,-hz,hz));
+    const o=v.clone().sub(c);if(o.lengthSq()>0)v.copy(c).add(o.normalize().multiplyScalar(r));
+    if(noise){const n=(Math.sin(v.x*7.1+seed)+Math.sin(v.z*9.3+seed*2)+Math.sin(v.y*11.7))*noise;v.multiplyScalar(1+n)}
+    p.setXYZ(i,v.x,v.y,v.z)}
+  g.computeVertexNormals();return g}
+const BODY_GEO={};
+const bodyGeo=k=>BODY_GEO[k]||(BODY_GEO[k]=roundBox(EL,EH,EW,ETYPES[k].rr||0.05,ETYPES[k].worn?0.007:0,k+3));
+// 使い古しの黒ずみ・ブッとびのしま模様
+const grimeTex=canvasTex(256,128,(g,w,h)=>{g.fillStyle='#fff';g.fillRect(0,0,w,h);const r=mulberry32(17);
+  for(let i=0;i<120;i++){const x=r()*w,y=r()*h,rad=3+r()*16;const gr=g.createRadialGradient(x,y,0,x,y,rad);gr.addColorStop(0,`rgba(80,80,90,${0.04+r()*0.12})`);gr.addColorStop(1,'rgba(70,70,80,0)');g.fillStyle=gr;g.fillRect(x-rad,y-rad,rad*2,rad*2)}
+  g.strokeStyle='rgba(60,60,70,.35)';g.lineWidth=1.5;for(let i=0;i<14;i++){g.beginPath();const x=r()*w,y=r()*h;g.moveTo(x,y);g.lineTo(x+(r()-.5)*60,y+(r()-.5)*20);g.stroke()}});
+const stripeTex=canvasTex(128,128,(g,w,h)=>{g.fillStyle='#fff';g.fillRect(0,0,w,h);g.fillStyle='rgba(255,90,20,.85)';for(let y=-h;y<h*2;y+=32){g.beginPath();g.moveTo(0,y);g.lineTo(w,y+40);g.lineTo(w,y+54);g.lineTo(0,y+14);g.fill()}});
+stripeTex.wrapS=stripeTex.wrapT=THREE.RepeatWrapping;stripeTex.repeat.set(2,1);
 // 消しゴム
 function makeEraser(i){
   const g=new THREE.Group();g.rotation.order='YXZ';
@@ -586,15 +608,15 @@ function makeEraser(i){
   const sl=new THREE.Mesh(new THREE.BoxGeometry(EL*0.62,EH+0.04,EW+0.04),new THREE.MeshStandardMaterial({map:sleeveTex(PLCOL[i],'激落'),roughness:0.65}));
   sl.castShadow=true;g.add(sl);
   const smudge=new THREE.Mesh(new THREE.BoxGeometry(0.02,EH*0.7,EW*0.7),new THREE.MeshStandardMaterial({color:0x9b9ba8,roughness:1}));
-  smudge.position.x=EL/2;g.add(smudge);
+  smudge.position.x=EL/2;g.add(smudge);g.userData.smudge=smudge;
   scene.add(g);
   const ring=new THREE.Mesh(new THREE.RingGeometry(0.95,1.15,40),new THREE.MeshBasicMaterial({color:i?0x2f8cff:0xff4b3e,transparent:true,opacity:0.6,depthWrite:false}));
   ring.rotation.x=-Math.PI/2;scene.add(ring);
-  return{g,ring,body,sl};
+  return{g,ring,body,sl,smudge,vib:0,jelly:false};
 }
 const eMesh=[makeEraser(0),makeEraser(1)];
 // ===== ガチャ景品（見た目と称号だけ。性能は変わらない） =====
-const RAR=['ノーマル','レア','激レア','伝説'];
+const RAR=['ノーマル','レア','激レア','伝説','勝ち抜き'];
 const SKINS={
   s1:{name:'すいか',rar:0,body:0x57c26a,sleeve:'#e23b3b'},s2:{name:'チョコ',rar:0,body:0x7a4a2b,sleeve:'#c79a5b'},
   s3:{name:'ソーダ',rar:0,body:0x9be8ff,sleeve:'#1c7ed6'},s4:{name:'さくら',rar:0,body:0xffd6e6,sleeve:'#ff6fa5'},
@@ -604,13 +626,16 @@ const SKINS={
 const TITLES={
   t1:{name:'かけだし',rar:0},t2:{name:'文房具マニア',rar:0},t3:{name:'えんぴつ派',rar:0},t4:{name:'定規使い',rar:0},
   t5:{name:'ギリギリ職人',rar:1},t6:{name:'机の端の住人',rar:1},t7:{name:'消しカス長者',rar:2},t8:{name:'休み時間の覇者',rar:2},
-  t9:{name:'伝説の消しゴム',rar:3}};
+  t9:{name:'伝説の消しゴム',rar:3},
+  t10:{name:'激落王を倒した者',rar:4}};
 const PRIZES=Object.assign({},SKINS,TITLES),safeSkin=v=>SKINS[v]?v:'',safeTitle=v=>TITLES[v]?v:'';
 const MY={skin:'',title:''};try{MY.skin=safeSkin(localStorage.getItem('gekiochiSkin'));MY.title=safeTitle(localStorage.getItem('gekiochiTitle'))}catch(e){}
 const skinOf=i=>i===(game.mode==='cpu'?0:game.me)?MY.skin:safeSkin(game.oppSkin),titleOf=i=>i===(game.mode==='cpu'?0:game.me)?MY.title:safeTitle(game.oppTitle);
 function applyLooks(types){
-  types.forEach((k,i)=>{const T=Object.assign({},ETYPES[k],k!==3?SKINS[skinOf(i)]:null),m=eMesh[i];m.anim=T.anim|0;T.label=ETYPES[k].label;m.body.material.transparent=m.anim===2;m.body.material.opacity=1;m.body.material.depthWrite=m.anim!==2;
-    m.body.material.color.setHex(T.body);m.body.material.map=T.grain?grainTex:null;m.body.material.needsUpdate=true;m.body.material.roughness=T.rough;m.body.material.metalness=T.metal;m.body.material.emissive.setHex(T.emis||0);
+  types.forEach((k,i)=>{const T=Object.assign({},ETYPES[k],k!==3?SKINS[skinOf(i)]:null),m=eMesh[i],E=ETYPES[k];m.anim=T.anim|0;T.label=E.label;
+    m.body.geometry=bodyGeo(k);m.smudge.visible=(E.rr||0)<0.12;m.jelly=!!E.jelly;
+    const clear=!!E.clear&&!T.anim;m.body.material.transparent=m.anim===2||clear;m.body.material.opacity=clear?0.82:1;m.body.material.depthWrite=m.anim!==2;
+    m.body.material.color.setHex(T.body);m.body.material.map=E.worn?grimeTex:E.stripe?stripeTex:T.grain?grainTex:null;m.body.material.needsUpdate=true;m.body.material.roughness=E.clear?0.06:T.rough;m.body.material.metalness=E.clear?0.15:T.metal;m.body.material.emissive.setHex(T.emis||0);
     m.sl.material.map=sleeveTex(T.sleeve||PLCOL[i],T.label);m.sl.material.needsUpdate=true;});
 }
 // ぷにっと変形（もちもちは大きく揺れる）
@@ -718,9 +743,10 @@ const myIdx=()=>game.mode==='cpu'?0:game.me;
 const isMyTurn=()=>game.shooter===myIdx();
 const aiming=()=>['dir','power'].includes(game.phase);
 
-function toast(t){const el=$('toast');el.textContent=t;el.classList.remove('hidden');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.add('hidden'),2600)}
+function toast(t,ms=2600,prio=0){const el=$('toast'),now=performance.now();if(prio<(toast.p||0)&&now<(toast.until||0))return;toast.p=prio;toast.until=now+ms;
+  el.textContent=t;el.classList.toggle('big',prio>0);el.classList.remove('hidden');clearTimeout(toast.t);toast.t=setTimeout(()=>{el.classList.add('hidden');toast.p=0},ms)}
 function pop(text,cls){const el=$('pop');el.textContent=text;el.className='';void el.offsetWidth;el.className='show '+cls}
-function showScreen(id){['title','rankName','rankLobby','rankGacha','rankDress','rankQueue','rankVs','rankBoard','pickMenu','netMenu','howto','result'].forEach(s=>$(s).classList.toggle('hidden',s!==id))}
+function showScreen(id){if(id==='pickMenu'){pickSel=null;pickRender()}['title','rankName','rankLobby','rankGacha','rankDress','rankQueue','rankVs','rankBoard','pickMenu','netMenu','howto','result'].forEach(s=>$(s).classList.toggle('hidden',s!==id))}
 function showPanel(id){['pAim','pWait'].forEach(p=>$(p).classList.toggle('hidden',p!==id))}
 function updateHUD(){
   const names=game.mode==='cpu'?['あなた',GT()?GT().st.name:'CPU']:(game.me===0?['あなた','ライバル']:['ライバル','あなた']);
@@ -749,8 +775,13 @@ function stageOf(n){
 const GT=()=>game.mode==='cpu'&&!game.ranked?game.gt:null,cpuName=()=>GT()?GT().st.name:'CPU';
 let gtBest=0;try{gtBest=+localStorage.getItem('gekiochiBest')||0}catch(e){}
 function gtBestText(){$('bestTxt').textContent=gtBest?'自己ベスト：'+gtBest+'人激落':'どこまで勝ち抜ける？'}
+const allInv=()=>{const a=rkInv();UNL.forEach(x=>{if(PRIZES[x]&&!a.includes(x))a.push(x)});return a};
+// ボスを倒すと解放されるもの
+const GT_REWARDS={5:{id:'t10',name:'称号「激落王を倒した者」'},15:{id:'e3',name:'おうごん消しゴム'}};
+function gtReward(n){const R=GT_REWARDS[n];if(!R||!unlock(R.id))return;
+  later(()=>{toast('🎉 解放！ '+R.name+(R.id==='e3'?'\n消しゴム選択で使えるよ':'\nきせかえで使えるよ'),4200,1);SFX.max()},1500)}
 function gtRecord(wins){if(wins<=gtBest)return false;gtBest=wins;try{localStorage.setItem('gekiochiBest',wins)}catch(e){}gtBestText();return true}
-function gtGo(n,keep){if(n===1)stat('gt_start');game.oppSkin=game.oppTitle='';const st=stageOf(n);game.gt={n,st,won:false};game.me=0;game.ranked=null;startMatch('cpu',(Math.random()*1e9)|0,0,[game.myType,st.k],st.need,keep)}
+function gtGo(n,keep,cont){if(n===1)stat('gt_start');game.oppSkin=game.oppTitle='';const st=stageOf(n);game.gt={n,st,won:false,cont:!!cont};game.me=0;game.ranked=null;startMatch('cpu',(Math.random()*1e9)|0,0,[game.myType,st.k],st.need,keep)}
 function startMatch(mode,seed,first,types,need,keepBgm){
   {const g=mode==='cpu'&&!game.ranked?game.gt:null;setStage(g?(g.n-1)%3:((seed>>>0)%3));}
   if(mode==='net'&&!game.ranked)stat('net_start');
@@ -766,7 +797,7 @@ function startRound(first){
   S=newState(game.seed+game.round*7919,game.types);buildObs(S.obs);clearParts();fallCam=null;sq.forEach(q=>{q.v=0;q.vel=0});
   game.shooter=first;game.phase='between';updateHUD();$('turn').textContent='';showPanel(null);
   const g=GT();pop(g&&game.round===1?(g.st.boss?'強敵出現！！':g.n+'人目！'):'ROUND '+game.round,'mid');if(game.round===1)toast('ステージ：'+STAGE_NAMES[game.stage]);SFX.round();if(game.round>1)bgmHit('crash');
-  later(beginTurn,1100);
+  later(beginTurn,game.round===1?900:700);
 }
 const TURN_SEC=20;
 function beginTurn(){
@@ -801,6 +832,23 @@ function back(){}
 function curveLabel(){}
 // 引っぱって弾く：左右で向き、下に引っぱるとパワー、離すと発射
 const PULL_MAX=()=>Math.min(innerWidth,innerHeight)*0.36;
+// ===== 指のお手本（弾けた回数が2回になるまで、自分の番に出す） =====
+const TUT={n:0};try{TUT.n=+localStorage.getItem('gekiochiTut')||0}catch(e){}
+function tutCount(){TUT.n++;try{localStorage.setItem('gekiochiTut',TUT.n)}catch(e){}}
+const _tv=new THREE.Vector3();
+function tutUpdate(){const el=$('ghost');
+  const on=TUT.n<2&&game.phase==='dir'&&isMyTurn()&&!drag&&!game.kbCharge&&matchMedia('(pointer:coarse)').matches;
+  el.classList.toggle('hidden',!on);if(!on){TUT.t0=null;return}
+  if(TUT.t0==null)TUT.t0=game.realT;
+  // 画面のどこからでもなぞれるので、お手本は見やすい画面の真ん中で見せる
+  const ex=innerWidth/2,ey=innerHeight*0.36,P=PULL_MAX(),T=(game.realT-TUT.t0)%3.6,f=$('ghostF'),cap=$('ghostCap');
+  let x=ex,y=ey+46,press=false,txt;
+  if(T<1.5){x=ex+Math.sin(T/1.5*Math.PI*2)*Math.min(90,innerWidth*0.2);press=true;txt='① 左右になぞって 向きを決める'}
+  else if(T<3.0){const u=Math.min(1,(T-1.5)/1.1),k=1-(1-u)*(1-u);y=ey+46+P*0.75*k;press=true;txt='② 下に引っぱって…'}
+  else{y=ey+46+P*0.75;txt='③ 指をはなすと 弾く！'}
+  f.style.transform=`translate(${x}px,${y}px) scale(${press?0.92:1.08})`;f.classList.toggle('up',!press);
+  $('ghostLine').style.cssText=T>=1.5&&T<3.0?`left:${ex}px;top:${ey+46}px;height:${Math.max(0,y-ey-46)}px;opacity:1`:'opacity:0';
+  cap.textContent=txt;cap.style.top=Math.max(70,ey-110)+'px'}
 function aimStart(x,y){if(!isMyTurn()||!aiming()||game.kbCharge)return false;drag={x0:x,y0:y,x,y,lx:x,mode:null};return true}
 // 1回のなぞりは「向き」か「引っぱり」のどちらか一方だけ（最初の動きで決める）
 const AIM_GAIN=()=>Math.min(0.0032,1.3/innerWidth);
@@ -823,14 +871,14 @@ function aimEnd(){
 }
 function setAimHint(){const t=matchMedia('(pointer:coarse)').matches?'左右になぞって向き → 下に引っぱって離すと弾く！':'←→で向き ／ スペース長押し→離すと弾く！（ドラッグでもOK）';$('aimHint').textContent=t}
 function myFire(){
-  if(game.phase!=='power'||!isMyTurn())return;stat('shot1',true);drag=null;game.kbCharge=false;
+  if(game.phase!=='power'||!isMyTurn())return;stat('shot1',true);tutCount();drag=null;game.kbCharge=false;
   const sh={type:game.shot.type,angle:game.shot.angle,curve:game.shot.curve,power:game.shot.power};
   if(game.mode==='net')netSend(Object.assign({t:'shot'},sh));
   fireShot(sh);
 }
 function fireShot(sh){
   game.shot={type:sh.type,angle:sh.angle,curve:sh.curve,power:sh.power};
-  launch(S,game.shooter,game.shot);game.phase='flying';game.flyT=0;acc=0;camTarget=game.shooter;fallCam=null;
+  launch(S,game.shooter,game.shot);game.phase='flying';game.flyT=0;acc=0;game.ff=false;camTarget=game.shooter;fallCam=null;
   showPanel(null);$('gauge').classList.add('hidden');$('turn').textContent='';
   chargeStop();SFX.flick(sh.power);if(sh.power>0.6)bgmHit('crash');if(sh.type===1)SFX.jump();
   const e=S.e[game.shooter],bx=e.x-Math.cos(sh.angle)*0.9,bz=e.z-Math.sin(sh.angle)*0.9;
@@ -882,10 +930,10 @@ function resolveTurn(){
   else{game.score[w]++;updateHUD();pop(w===myIdx()?'ナイス激落！':'落とされた…','mid');next=1-w}
   if(w>=0&&game.score[w]>=game.need){const g=GT();
     // 勝ち抜き中に勝ったら、結果画面をはさまずに次の相手へ
-    if(g&&w===myIdx()){if(g.n<=5)stat('gt_win'+g.n);if(g.st.boss)later(()=>pop('強敵撃破！！','mid'),1000);
-      later(()=>{const r=gtRecord(g.n)||g.rec;gtGo(g.n+1,true);game.gt.rec=r},g.st.boss?2600:2000)}
-    else later(()=>endMatch(w),2200)}
-  else later(()=>{game.round++;startRound(next)},2400);
+    if(g&&w===myIdx()){if(g.n<=5)stat('gt_win'+g.n);if(g.st.boss){later(()=>pop('強敵撃破！！','mid'),1000);gtReward(g.n)}
+      later(()=>{const r=(!g.cont&&gtRecord(g.n))||g.rec;gtGo(g.n+1,true,g.cont);game.gt.rec=r},g.st.boss?2300:1500)}
+    else later(()=>endMatch(w),1700)}
+  else later(()=>{game.round++;startRound(next)},1500);
 }
 function endMatch(w){
   game.token++;chargeStop();if(game.ranked)stat('rank_end');
@@ -894,10 +942,12 @@ function endMatch(w){
   const mine=w===myIdx();$('resT').textContent=mine?'YOU WIN!!':'YOU LOSE…';
   $('resS').textContent=`${game.score[myIdx()]} － ${game.score[1-myIdx()]}`;
   $('bAgain').textContent=game.ranked?'もう一回ランクマッチ':'もう一回！';$('bAgain').disabled=false;
-  const g=GT();if(g){g.won=mine;if(!mine)stat('gt_lose'+Math.min(g.n,6));const wins=mine?g.n:g.n-1,rec=gtRecord(wins)||(!mine&&g.rec);
+  $('bRetry').classList.add('hidden');
+  const g=GT();if(g){g.won=mine;if(!mine)stat('gt_lose'+Math.min(g.n,6));const wins=mine?g.n:g.n-1,rec=(!g.cont&&gtRecord(wins))||(!mine&&g.rec);
+    if(!mine&&g.st.boss)$('bRetry').classList.remove('hidden');
     $('resT').textContent=wins+'人激落！';
     $('resS').textContent=g.n+'人目で敗退\n相手：'+g.st.name;$('bAgain').textContent='1人目からもう一回'
-    if(rec)$('resS').textContent+='\n自己ベスト更新！'}
+    if(rec)$('resS').textContent+='\n自己ベスト更新！';if(g.cont)$('resS').textContent+='\n（再挑戦中は記録に入りません）'}
   $('resRate').classList.add('hidden');if(game.ranked)rkReportEnd(mine);
   setShare(mine);
   bgmPlay(null);const gw=GT();(gw?gw.n>1:mine)?SFX.win():SFX.lose();
@@ -912,7 +962,7 @@ function setShare(mine){
     const r=Math.round(pre+(mine?K*(1-E):-K*E)),t=tierOf(r).name;
     text=mine?`ランクマッチで${sc}で激落勝ち！ レート${r}（${t}）`:`ランクマッチで${sc}で激落させられた… レート${r}（${t}）`}
   else if(game.mode==='cpu'){const g=game.gt||{n:1},wins=mine?g.n:g.n-1;
-    text=wins?`勝ち抜き戦で${wins}人激落させた！（${et}）`:`勝ち抜き戦、1人目で激落させられた…`}
+    text=wins?`勝ち抜き戦で${wins}人激落させた！（${et}${g.cont?'・再挑戦あり':''}）`:`勝ち抜き戦、1人目で激落させられた…`}
   else text=mine?`ネット対戦でライバルを${sc}で激落させた！`:`ネット対戦でライバルに${sc}で激落させられた…`;
   text='「激落！！消しゴムバトル！！」'+text;
   shareData={text,url:GAME_URL};
@@ -928,7 +978,7 @@ function toTitle(){
 function handleEvents(ev){
   for(const e of ev){
     if(e.k==='hit'){if(e.p<1)continue;SFX.hit(e.p);if(e.mochi)SFX.boing(e.p);if(e.slick)SFX.flick(0.25);if(e.buttobi)SFX.boing(e.p*0.6);spawn(e.x,e.y+0.5,e.z,Math.min(24,(e.p*2)|0),pMatE,2+e.p*0.3);
-      const am=Math.min(3.2,e.p*0.2);squash(0,am);squash(1,am);
+      const am=Math.min(3.2,e.p*0.2),vi=e.vic|0;squash(vi,am*1.5);squash(1-vi,am*0.4);eMesh[vi].vib=Math.min(0.22,0.05+e.p*0.012);
       if(e.p>5){hitstop=0.04+Math.min(0.09,e.p*0.006);shake=Math.min(1.2,e.p*0.09);pop(e.buttobi?'ブッとび！！':e.slick?'ツルッ！！':e.mochi?'ボヨーン！！':e.p>11?'ドカーン！！':e.p>8?'バシッ！！':'パシッ！','small')}}
     else if(e.k==='obs'){if(e.p<0.8)continue;e.kind===0?SFX.pencil(e.p):SFX.ruler(e.p);squash(e.i,Math.min(2.5,e.p*0.14));
       spawn(e.x,0.35,e.z,Math.min(8,(e.p)|0),e.kind===0?pMatW:pMatE,2);shake=Math.max(shake,Math.min(0.5,e.p*0.05));
@@ -1041,7 +1091,7 @@ const rkKasu=()=>RK.prof&&Number.isInteger(RK.prof.kasu)?RK.prof.kasu:100,rkInv=
 const rkBase=()=>Object.assign({name:RK.name,rating:1500,wins:0,losses:0,games:0},RK.prof||{},{name:RK.name,updated:Date.now()});
 function mySave(){try{localStorage.setItem('gekiochiSkin',MY.skin);localStorage.setItem('gekiochiTitle',MY.title)}catch(e){}}
 async function rkSaveProf(patch){const d=Object.assign(rkBase(),patch);RK.prof=d;try{await pRef().set(d);return true}catch(e){console.warn(e);return false}}
-const safeType=k=>PLAYABLE.includes(k|0)?k|0:0;
+const safeType=k=>[0,1,2,3,4,5].includes(k|0)?k|0:0;
 function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=()=>rej(new Error('load '+src));document.head.appendChild(s)})}
 async function rkInit(){
   if(RK.db)return true;
@@ -1057,7 +1107,7 @@ async function rkInit(){
     RK.uid=u.uid;RK.db=firebase.firestore();
     const d=await RK.db.collection(COL.p).doc(RK.uid).get();RK.prof=d.exists?d.data():null;
     if(RK.prof&&RK.prof.name&&!RK.name)RK.name=RK.prof.name;
-    if(RK.prof){const inv=rkInv();MY.skin=inv.includes(RK.prof.skin)?RK.prof.skin:'';MY.title=inv.includes(RK.prof.title)?RK.prof.title:'';mySave()}
+    if(RK.prof){const inv=allInv();MY.skin=inv.includes(RK.prof.skin)?RK.prof.skin:'';MY.title=inv.includes(RK.prof.title)?RK.prof.title:'';mySave()}
     $('toast').classList.add('hidden');return true;
   }catch(e){console.error(e);RK.db=null;toast('サーバーにつながりませんでした');return false}
 }
@@ -1253,7 +1303,7 @@ async function gachaPull(){
 }
 function gachaOpen(){$('gaCard').classList.add('hidden');$('gaCap').style.visibility='';gachaRender.busy=false;gachaRender();showScreen('rankGacha')}
 // ===== きせかえ =====
-function dressRender(){const inv=rkInv();
+function dressRender(){const inv=allInv();
   for(const[box,all,key,cnt]of[['drSkins',SKINS,'skin','drSkinN'],['drTitles',TITLES,'title','drTitleN']]){
     const el=$(box);el.innerHTML='';const ids=Object.keys(all);$(cnt).textContent=`${ids.filter(i=>inv.includes(i)).length} / ${ids.length}`;
     const mk=(id,label,own)=>{const b=document.createElement('button');b.className='drItem'+(MY[key]===id?' on':'')+(own?'':' lock');
@@ -1330,17 +1380,22 @@ $('bRankBack').onclick=()=>{SFX.click();showScreen('title')};
 $('bQCancel').onclick=()=>{SFX.click();rkCleanupQueue();netClose();rkRenderLobby();showScreen('rankLobby')};
 $('bCpu').onclick=()=>{ac();SFX.click();game.pickFor='cpu';showScreen('pickMenu')};
 $('bNet').onclick=()=>{ac();SFX.click();game.pickFor='net';showScreen('pickMenu')};
-const CARDC={0:'#ffd23f',1:'#5cc8ff',2:'#ff8fb8',4:'#d8cfb8',5:'#ffb066'};
-try{const t=+localStorage.getItem('gekiochiType');if(PLAYABLE.includes(t))game.myType=t}catch(e){}
+const CARDC={0:'#ffd23f',1:'#5cc8ff',2:'#ff8fb8',3:'#ffe27a',4:'#d8cfb8',5:'#ffb066'};
+const PICK_LIST=[0,1,2,4,5,3];
+const canPick=k=>PLAYABLE.includes(k)||(k===3&&goldOpen());
+try{const t=+localStorage.getItem('gekiochiType');if(canPick(t))game.myType=t}catch(e){}
 const hexC=k=>'#'+ETYPES[k].body.toString(16).padStart(6,'0');
-$('cards').innerHTML=PLAYABLE.map(k=>`<button class="card" role="radio" data-k="${k}" style="--c:${CARDC[k]};--b:${hexC(k)}"><div class="ic"><div class="eras k${k}" data-l=""></div></div><div class="tn">${ETYPES[k].short}</div></button>`).join('');
-function pickRender(){const k=PLAYABLE.includes(game.myType)?game.myType:0,T=ETYPES[k];
-  document.querySelectorAll('#cards .card').forEach(b=>{const on=+b.dataset.k===k;b.classList.toggle('on',on);b.setAttribute('aria-checked',on)});
-  const p=$('pickInfo');p.style.setProperty('--c',CARDC[k]);p.style.setProperty('--b',hexC(k));
-  p.innerHTML=`<div class="ic"><div class="eras k${k}" data-l="${T.label}"></div></div><div class="nm">${T.name}</div><div class="ds">${T.desc}</div>
-  <div class="sts">${T.stats.map((v,j)=>`<div class="stat"><span>${STAT_NAMES[j]}</span><span class="bar">${[0,1,2,3,4].map(n=>`<i class="${n<v?'on':''}"></i>`).join('')}</span></div>`).join('')}</div>`}
+$('cards').innerHTML=PICK_LIST.map(k=>`<button class="card" role="radio" data-k="${k}" style="--c:${CARDC[k]};--b:${hexC(k)}"><div class="ic"><div class="eras k${k}" data-l=""></div></div><div class="tn">${ETYPES[k].short}</div></button>`).join('');
+let pickSel=null;
+function pickRender(){if(pickSel===null||!PICK_LIST.includes(pickSel))pickSel=canPick(game.myType)?game.myType:0;const k=pickSel,T=ETYPES[k],lock=!canPick(k);
+  document.querySelectorAll('#cards .card').forEach(b=>{const kk=+b.dataset.k,on=kk===k;b.classList.toggle('on',on);b.classList.toggle('lock',!canPick(kk));b.querySelector('.tn').textContent=canPick(kk)?ETYPES[kk].short:'？？？';b.setAttribute('aria-checked',on)});
+  const p=$('pickInfo');p.style.setProperty('--c',CARDC[k]);p.style.setProperty('--b',hexC(k));p.classList.toggle('lock',lock);
+  p.innerHTML=`<div class="ic"><div class="eras k${k}" data-l="${T.label}"></div></div><div class="nm">${lock?'？？？':T.name}</div><div class="ds">${lock?'勝ち抜き戦で15人目の強敵を倒すと使えるようになる。':T.desc}</div>
+  <div class="sts">${T.stats.map((v,j)=>`<div class="stat"><span>${STAT_NAMES[j]}</span><span class="bar">${[0,1,2,3,4].map(n=>`<i class="${!lock&&n<v?'on':''}"></i>`).join('')}</span></div>`).join('')}</div>`;
+  $('bPickOk').disabled=lock;$('bPickOk').textContent=lock?'まだ使えない':'これで勝負！'}
 pickRender();
-document.querySelectorAll('#cards .card').forEach(b=>b.onclick=()=>{ac();game.myType=+b.dataset.k;pickRender();
+document.querySelectorAll('#cards .card').forEach(b=>b.onclick=()=>{ac();pickSel=+b.dataset.k;if(canPick(pickSel))game.myType=pickSel;pickRender();
+  if(!canPick(pickSel)){SFX.buzz();return}
   ({1:()=>SFX.flick(0.3),2:()=>SFX.boing(6),4:()=>SFX.flick(0.15),5:()=>SFX.boing(3)}[game.myType]||(()=>SFX.click()))()});
 $('bPickOk').onclick=()=>{ac();SFX.click();try{localStorage.setItem('gekiochiType',game.myType)}catch(e){}
   if(game.pickFor==='rank')rkStartQueue();else if(game.pickFor==='cpu')gtGo(1);else{showScreen('netMenu');netStatus('部屋を作るか、相手から聞いた<br>4ケタのコードで入ってね')}};
@@ -1377,8 +1432,8 @@ const RANKED_OPEN=true;
 function rankedOpen(){if(RANKED_OPEN===true)return true;if(typeof RANKED_OPEN==='string')return Date.now()>=Date.parse(RANKED_OPEN);return false}
 function rankedLabel(){if(typeof RANKED_OPEN==='string'){const d=new Date(RANKED_OPEN);return `${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')} 解禁！`}return '近日解禁！'}
 // 初めて遊ぶときだけ、先にあそびかたを見せる
-const howGate=fn=>function(...a){if(!howSeen){ac();SFX.click();openHowto(()=>fn.apply(this,a));return}return fn.apply(this,a)};
-['bCpu','bNet','bRank'].forEach(id=>{$(id).onclick=howGate($(id).onclick)});
+// はじめての人は説明を見せずに、ふつう消しゴムでそのまま1人目と勝負（指のお手本つき）
+{const orig=$('bCpu').onclick;$('bCpu').onclick=function(...a){if(TUT.n===0&&!howSeen){ac();SFX.click();game.myType=0;game.pickFor='cpu';gtGo(1);return}return orig.apply(this,a)}}
 if(!rankedOpen()){const b=$('bRank'),open=b.onclick;b.classList.add('locked');b.innerHTML='ランクマッチ<small>'+rankedLabel()+'</small>';
   b.onclick=function(...a){
     if(rankedOpen()){b.classList.remove('locked');b.textContent='ランクマッチ';b.onclick=open;return open.apply(this,a)}
@@ -1394,6 +1449,7 @@ $('bAgain').onclick=()=>{ac();SFX.click();
   else{game.againMe=true;netSend({t:'again'});$('bAgain').textContent='相手を待っています…';$('bAgain').disabled=true;checkAgain()}};
 // スマホもPCも、文章入りのXの投稿画面を開く（共有シートだとXアプリがURLしか拾わないことがあるため）
 {let nw=false;try{nw=!localStorage.getItem('gekiochiSeen');localStorage.setItem('gekiochiSeen','1')}catch(e){}stat('open');if(nw)stat('open_new')}
+$('bRetry').onclick=()=>{ac();SFX.click();const g=game.gt;if(g)gtGo(g.n,false,true)};
 $('bShare').addEventListener('click',()=>{SFX.click();stat('share')});
 $('bToTitle').onclick=()=>{SFX.click();toTitle()};
 addEventListener('keydown',e=>{
@@ -1409,7 +1465,7 @@ addEventListener('keyup',e=>{keys[e.key]=false;
 // 引っぱったときにページがスクロールしたり、アプリ内ブラウザが閉じたりしないようにする
 for(const t of['touchstart','touchmove'])cv.addEventListener(t,e=>{if(e.cancelable)e.preventDefault()},{passive:false});
 document.addEventListener('touchmove',e=>{if(e.cancelable&&!e.target.closest('.screen'))e.preventDefault()},{passive:false});
-cv.addEventListener('pointerdown',e=>{ac();if(aimStart(e.clientX,e.clientY)){try{cv.setPointerCapture(e.pointerId)}catch(_){}}});
+cv.addEventListener('pointerdown',e=>{ac();if(game.phase==='flying'&&game.flyT>0.6&&slowT<=0)game.ff=true;if(aimStart(e.clientX,e.clientY)){try{cv.setPointerCapture(e.pointerId)}catch(_){}}});
 cv.addEventListener('pointermove',e=>aimMove(e.clientX,e.clientY));
 cv.addEventListener('pointerup',()=>aimEnd());cv.addEventListener('pointercancel',()=>{drag=null;if(game.phase==='power'&&isMyTurn()){chargeStop();game.phase='dir';game.shot.power=0}});
 
@@ -1524,8 +1580,9 @@ addEventListener('resize',resize);resize();
 function syncMeshes(dt){
   for(let i=0;i<2;i++){const e=S.e[i],m=eMesh[i],q=sq[i],mo=e.k===2;
     const K=mo?95:280,C=mo?4.5:17;q.vel+=(-K*q.v-C*q.vel)*dt;q.v=clamp(q.v+q.vel*dt,-0.4,0.45);
-    const v=e.falling?0:q.v,z=e.sz||1;m.g.scale.set((1+v*0.6)*z,(1-v)*z,(1+v*0.6)*z);if(m.anim===1)m.body.material.color.setHSL((game.realT*0.3+i*0.5)%1,0.9,0.62);else if(m.anim===2)m.body.material.opacity=0.45+0.3*Math.sin(game.realT*3+i);
-    m.g.position.set(e.x,e.y+EH/2*(1-v)*z,e.z);m.g.rotation.set(e.rx,-e.yaw,e.rz);
+    const sp=Math.hypot(e.vx,e.vz),jig=m.jelly&&!e.falling?Math.min(0.09,sp*0.012)*Math.sin(game.realT*24+i):0;
+    const v=(e.falling?0:q.v)+jig,z=e.sz||1;m.g.scale.set((1+v*0.6)*z,(1-v)*z,(1+v*0.6)*z);if(m.anim===1)m.body.material.color.setHSL((game.realT*0.3+i*0.5)%1,0.9,0.62);else if(m.anim===2)m.body.material.opacity=0.45+0.3*Math.sin(game.realT*3+i);
+    m.g.position.set(e.x,e.y+EH/2*(1-v)*z,e.z);if(m.vib>0.003){m.g.position.x+=(Math.random()-0.5)*m.vib;m.g.position.z+=(Math.random()-0.5)*m.vib;m.vib*=hitstop>0?0.97:0.82}m.g.rotation.set(e.rx,-e.yaw,e.rz);
     const wb=game.phase==='title'?null:edgeWobble(e);
     if(wb){_wq.setFromAxisAngle(_wa.set(wb[1],0,-wb[0]),wb[2]*(0.55+0.45*Math.sin(game.realT*11+i*2)));m.g.quaternion.premultiply(_wq)}
     m.ring.visible=!e.falling&&game.phase!=='title';m.ring.position.set(e.x,0.015,e.z);
@@ -1541,6 +1598,9 @@ function frame(now){
   bgmUpdate();
   const ph=game.phase;
   if(ph==='flying'){
+    // 決着に関係なさそうな「止まるまで」は早送り。タップでさらに速く
+    if(ts===1&&game.flyT>0.5){const calm=S.e.every(e=>e.falling?e.y<=FLOOR:(Math.hypot(e.vx,e.vz)<3&&e.y<=0.01&&edgeDist(e)>2.5));
+      if(game.ff)ts=6;else if(calm)ts=3}
     let sdt=rdt*ts;if(hitstop>0){hitstop-=rdt;sdt=0}
     acc+=sdt;let n=0;
     while(acc>=DT&&n<30){const ev=[];step(S,DT,ev);handleEvents(ev);acc-=DT;n++;game.flyT+=DT}
@@ -1566,7 +1626,8 @@ function frame(now){
     }
   }
   $('gauge').classList.toggle('hidden',!((ph==='power'&&isMyTurn())||(ph==='wait'&&game.remoteSub==='power')));
-  $('aimHint').style.opacity=(ph==='power'&&isMyTurn())?0.25:1;
+  tutUpdate();
+  $('aimHint').style.opacity=!$('ghost').classList.contains('hidden')?0:(ph==='power'&&isMyTurn())?0.25:1;
   $('gfill').style.height=(game.shot.power*100).toFixed(1)+'%';$('gauge').classList.toggle('hot',game.shot.power>0.85);
   updateParts(rdt*ts);updateCamera(rdt);syncMeshes(rdt*ts);updateAimViz();updateFinger(rdt);drawFX(rdt);updateTimer();
   renderer.render(scene,camera);
