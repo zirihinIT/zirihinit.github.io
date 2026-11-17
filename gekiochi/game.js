@@ -415,7 +415,7 @@ Object.assign(sun.shadow.camera,{left:-24,right:24,top:12,bottom:-12,near:1,far:
 scene.add(sun);scene.add(sun.target);
 
 const redraws=[];
-function canvasTex(w,h,draw){const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');draw(g,w,h);const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.anisotropy=renderer.capabilities.getMaxAnisotropy();t._redraw=()=>{g.clearRect(0,0,w,h);draw(g,w,h);t.needsUpdate=true};return t}
+function canvasTex(w,h,draw){const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');draw(g,w,h);const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.anisotropy=renderer.capabilities.getMaxAnisotropy();t._redraw=()=>{g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,w,h);draw(g,w,h);t.needsUpdate=true};return t}
 function makeWood(seed,txt,tx,ty){return canvasTex(1024,666,(g,w,h)=>{
   g.fillStyle='#cf9a5f';g.fillRect(0,0,w,h);const r=mulberry32(seed);
   for(let i=0;i<240;i++){const y=r()*h,amp=3+r()*9,ph=r()*6,f=0.003+r()*0.008;
@@ -624,9 +624,12 @@ const SKINS={
   s7:{name:'ぎんいろ',rar:2,body:0xc9d1da,sleeve:'#2c333d',tex:'silver',rough:0.25,metal:0.3,emis:0x30343a},s8:{name:'にじいろ',rar:2,body:0xff6ad5,sleeve:'#7b2ff7',tex:'rainbow',rough:0.3,anim:3},
   s9:{name:'まぼろし',rar:3,body:0xbfe6ff,sleeve:'#2a1d6e',emis:0x2a4fb0,anim:2,tex:'ghost'},
   // 特殊スキン（おもちゃっぽい形。見た目だけで性能は元の消しゴムのまま）
-  x1:{name:'カブトムシ',rar:4,body:0x5a2e12,sleeve:'#3a1d0a',model:'beetle'},x2:{name:'豆腐',rar:5,body:0xfbf7ea,sleeve:'#7fb8e8',model:'tofu',jelly:1},
+  x1:{name:'カブトムシ',rar:4,body:0x5a2e12,sleeve:'#3a1d0a',model:'beetle'},x7:{name:'王冠',rar:4,body:0xffc928,sleeve:'#c21f3a',model:'crown'},
   x3:{name:'レンガ',rar:5,body:0xc0532f,sleeve:'#7a2f18',model:'brick'},x4:{name:'たまご寿司',rar:5,body:0xffd23f,sleeve:'#1b1430',model:'sushi'},
-  x5:{name:'将棋の駒',rar:5,body:0xe8c27a,sleeve:'#3a2410',model:'shogi'},x6:{name:'牛乳パック',rar:5,body:0xffffff,sleeve:'#2f8cff',model:'milk'}};
+  x5:{name:'将棋の駒',rar:5,body:0xe8c27a,sleeve:'#3a2410',model:'shogi'},x6:{name:'牛乳パック',rar:5,body:0xffffff,sleeve:'#2f8cff',model:'milk'},
+  x8:{name:'ハンバーガー',rar:5,body:0xd99a4e,sleeve:'#7a3d12',model:'burger'},x9:{name:'招き猫',rar:5,body:0xffffff,sleeve:'#e23b3b',model:'maneki'},
+  x10:{name:'こんにゃく',rar:5,body:0x8d8a86,sleeve:'#4a4744',model:'konnyaku',jelly:1},x11:{name:'土下座サラリーマン',rar:5,body:0x26324f,sleeve:'#26324f',model:'dogeza'},
+  x12:{name:'プリン',rar:5,body:0xffd977,sleeve:'#7a3d12',model:'pudding',jelly:1}};
 const TITLES={
   t1:{name:'かけだし',rar:0},t2:{name:'文房具マニア',rar:0},t3:{name:'えんぴつ派',rar:0},t4:{name:'定規使い',rar:0},
   t5:{name:'ギリギリ職人',rar:1},t6:{name:'机の端の住人',rar:1},t7:{name:'消しカス長者',rar:2},t8:{name:'休み時間の覇者',rar:2},
@@ -690,12 +693,6 @@ const MODELS={
       const e=new THREE.Mesh(new THREE.SphereGeometry(0.05,12,8),toyMat(0xffffff));e.position.set(0.76,-0.03,sz*0.13);G.add(e)}
     const hi=new THREE.Mesh(new THREE.SphereGeometry(0.14,16,10),toyMat(0xffffff,{transparent:true,opacity:0.45}));hi.scale.set(2,0.25,0.6);hi.position.set(-0.38,0.29,0.18);G.add(hi);
     return G},
-  tofu(){const G=new THREE.Group(),m=toyMat(0xfbf7ea,{roughness:0.55}),geo=roundBox(1.7,0.66,0.98,0.09);
-    const mats=[m,m,m,m,new THREE.MeshStandardMaterial({map:faceTex('#fbf7ea'),roughness:0.55}),m];const b=new THREE.Mesh(geo,m);G.add(b);
-    const face=new THREE.Mesh(new THREE.PlaneGeometry(0.75,0.6),new THREE.MeshStandardMaterial({map:faceTex('#fbf7ea'),roughness:0.55}));face.position.set(0,0,0.5);G.add(face);
-    const face2=face.clone();face2.position.z=-0.5;face2.rotation.y=Math.PI;G.add(face2);
-    const plate=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,0.02,8),m);G.add(plate);plate.visible=false;
-    return G},
   brick(){const G=new THREE.Group(),t=canvasTex(256,128,(g,w,h)=>{g.fillStyle='#c4572f';g.fillRect(0,0,w,h);const r=mulberry32(4);
       for(let i=0;i<500;i++){g.fillStyle=`rgba(${r()<.5?90:230},${r()<.5?30:120},20,${0.08+r()*0.12})`;g.fillRect(r()*w,r()*h,2+r()*3,2+r()*3)}});
     const b=new THREE.Mesh(roundBox(1.8,0.68,0.98,0.05),toyMat(0xffffff,{map:t,roughness:0.85}));G.add(b);
@@ -714,19 +711,100 @@ const MODELS={
     const wood=canvasTex(256,128,(g,w,h)=>{g.fillStyle='#e8c27a';g.fillRect(0,0,w,h);g.strokeStyle='rgba(150,95,40,.35)';g.lineWidth=2;for(let y=4;y<h;y+=9){g.beginPath();g.moveTo(0,y);g.bezierCurveTo(w*0.3,y+5,w*0.6,y-5,w,y+2);g.stroke()}});
     wood.wrapS=wood.wrapT=THREE.RepeatWrapping;wood.repeat.set(0.6,0.6);
     const p=new THREE.Mesh(geo,toyMat(0xffffff,{map:wood,roughness:0.5}));p.position.y=-0.04;G.add(p);
-    const lg=new THREE.PlaneGeometry(0.62,0.62);lg.rotateX(-Math.PI/2);lg.rotateY(-Math.PI/2);
-    const label=new THREE.Mesh(lg,new THREE.MeshStandardMaterial({map:canvasTex(160,160,(g,w,h)=>{g.clearRect(0,0,w,h);g.fillStyle='#1b1430';g.font="900 132px sans-serif";g.textAlign='center';g.textBaseline='middle';g.fillText('王',w/2,h/2+6)}),transparent:true,roughness:0.5}));
-    label.position.set(-0.08,0.33,0);G.add(label);
+    const lg=new THREE.PlaneGeometry(0.5,0.92);lg.rotateX(-Math.PI/2);lg.rotateY(Math.PI/2);
+    const lt=canvasTex(160,300,(g,w,h)=>{g.clearRect(0,0,w,h);g.fillStyle='#1b1430';g.font="128px 'Yuji Syuku','Yu Mincho','Hiragino Mincho ProN',serif";g.textAlign='center';g.textBaseline='middle';g.translate(w,0);g.scale(-1,1);
+      g.fillText('王',w/2,h*0.27);g.fillText('将',w/2,h*0.74)});lt.center.set(0.5,0.5);lt.rotation=Math.PI;redraws.push(lt);
+    const label=new THREE.Mesh(lg,new THREE.MeshStandardMaterial({map:lt,transparent:true,roughness:0.5}));
+    label.position.set(-0.12,0.33,0);G.add(label);
     return G},
   milk(){const G=new THREE.Group();
-    const side=canvasTex(256,128,(g,w,h)=>{g.fillStyle='#fff';g.fillRect(0,0,w,h);g.fillStyle='#2f8cff';g.fillRect(0,0,w,26);g.fillRect(0,h-16,w,16);
-      g.fillStyle='#1b1430';g.font="900 40px 'M PLUS Rounded 1c',sans-serif";g.textAlign='center';g.fillText('ぎゅうにゅう',w/2,h/2+18);
-      g.fillStyle='#1b1430';for(const[x,y,r]of[[34,62,9],[220,58,7],[60,96,6]]){g.beginPath();g.ellipse(x,y,r*1.4,r,0.4,0,7);g.fill()}});
-    const box=new THREE.Mesh(roundBox(1.35,0.68,0.98,0.04),toyMat(0xffffff,{map:side,roughness:0.6}));box.position.x=-0.22;G.add(box);
+    const side=canvasTex(320,160,(g,w,h)=>{g.fillStyle='#fff';g.fillRect(0,0,w,h);g.fillStyle='#2f8cff';g.fillRect(0,0,w,18);g.fillRect(0,h-12,w,12);
+      g.fillStyle='#1b1430';g.font="800 56px 'M PLUS Rounded 1c',sans-serif";g.textAlign='center';g.textBaseline='middle';g.fillText('牛乳',w*0.36,52);
+      // 牛の顔
+      const cx=w*0.36,cy=112;g.fillStyle='#fff';g.strokeStyle='#1b1430';g.lineWidth=4;
+      g.beginPath();g.ellipse(cx-34,cy-16,10,6,-0.5,0,7);g.ellipse(cx+34,cy-16,10,6,0.5,0,7);g.fill();g.stroke();
+      g.beginPath();g.ellipse(cx,cy,30,24,0,0,7);g.fill();g.stroke();g.fillStyle='#1b1430';g.beginPath();g.ellipse(cx-14,cy-10,9,7,0.4,0,7);g.fill();
+      g.beginPath();g.arc(cx-9,cy-2,3,0,7);g.arc(cx+9,cy-2,3,0,7);g.fill();
+      g.fillStyle='#ffb3c4';g.beginPath();g.ellipse(cx,cy+12,17,10,0,0,7);g.fill();g.stroke();g.fillStyle='#1b1430';g.beginPath();g.arc(cx-6,cy+12,2.4,0,7);g.arc(cx+6,cy+12,2.4,0,7);g.fill();
+      g.fillStyle='#ffd23f';g.beginPath();g.moveTo(cx-24,cy-24);g.lineTo(cx-18,cy-36);g.lineTo(cx-14,cy-22);g.moveTo(cx+24,cy-24);g.lineTo(cx+18,cy-36);g.lineTo(cx+14,cy-22);g.fill();
+      g.fillStyle='#1b1430';g.font="800 20px 'M PLUS Rounded 1c',sans-serif";g.fillText('200ml',w*0.82,h-34)});redraws.push(side);
+    const plain=toyMat(0xffffff,{roughness:0.6}),lab=toyMat(0xffffff,{map:side,roughness:0.6});
+    const box=new THREE.Mesh(roundBox(1.35,0.68,0.98,0.04),[plain,plain,plain,plain,lab,lab]);box.position.x=-0.22;G.add(box);
     const tri=new THREE.Shape();tri.moveTo(0,-0.34);tri.lineTo(0.42,0);tri.lineTo(0,0.34);tri.lineTo(0,-0.34);
     const roof=new THREE.Mesh(new THREE.ExtrudeGeometry(tri,{depth:0.96,bevelEnabled:false}),toyMat(0x2f8cff,{roughness:0.5}));roof.position.set(0.45,0,-0.48);G.add(roof);
     const fin=new THREE.Mesh(new THREE.BoxGeometry(0.1,0.72,0.96),toyMat(0x2f8cff,{roughness:0.5}));fin.position.set(0.9,0,0);G.add(fin);
     const straw=new THREE.Mesh(new THREE.CylinderGeometry(0.035,0.035,0.7,10),toyMat(0xff6fa5));straw.position.set(-0.6,0.5,0.2);straw.rotation.z=0.5;G.add(straw);
+    return G},
+  crown(){const G=new THREE.Group(),gold=toyMat(0xffc928,{roughness:0.22,metalness:0.55,emissive:0x5a3a00}),red=toyMat(0xc21f3a,{roughness:0.7});
+    const band=new THREE.Mesh(new THREE.CylinderGeometry(0.46,0.46,0.3,40,1,true),gold);band.material.side=THREE.DoubleSide;band.position.y=-0.18;G.add(band);
+    const cap=new THREE.Mesh(new THREE.SphereGeometry(0.44,28,16,0,Math.PI*2,0,Math.PI/2),red);cap.scale.y=0.7;cap.position.y=-0.06;G.add(cap);
+    for(let i=0;i<8;i++){const a=i/8*Math.PI*2,sp=new THREE.Mesh(new THREE.ConeGeometry(0.1,0.32,4),gold);sp.position.set(Math.cos(a)*0.43,0.1,Math.sin(a)*0.43);G.add(sp);
+      const ball=new THREE.Mesh(new THREE.SphereGeometry(0.05,10,8),gold);ball.position.set(Math.cos(a)*0.43,0.28,Math.sin(a)*0.43);G.add(ball);
+      const gem=new THREE.Mesh(new THREE.SphereGeometry(0.055,12,8),toyMat([0xff3355,0x2f8cff,0x3ccf6b,0xa64bff][i%4],{roughness:0.15}));gem.position.set(Math.cos(a)*0.47,-0.18,Math.sin(a)*0.47);G.add(gem)}
+    const top=new THREE.Mesh(new THREE.SphereGeometry(0.08,12,10),gold);top.position.y=0.26;G.add(top);
+    const crossA=new THREE.Mesh(new THREE.BoxGeometry(0.05,0.2,0.05),gold);crossA.position.y=0.38;G.add(crossA);const crossB=new THREE.Mesh(new THREE.BoxGeometry(0.14,0.05,0.05),gold);crossB.position.y=0.4;G.add(crossB);
+    const rim=new THREE.Mesh(new THREE.TorusGeometry(0.47,0.04,8,40),toyMat(0xffffff,{roughness:0.9}));rim.rotation.x=Math.PI/2;rim.position.y=-0.33;G.add(rim);
+    G.scale.set(1.5,1,1.05);return G},
+  burger(){const G=new THREE.Group();const add=(geo,m,y,sx=1)=>{const o=new THREE.Mesh(geo,m);o.position.y=y;o.scale.x=sx;G.add(o);return o};
+    const bun=toyMat(0xe0a050,{roughness:0.45}),sx=1.6;
+    add(roundBox(0.95,0.16,0.95,0.07),bun,-0.27,sx);
+    add(new THREE.CylinderGeometry(0.5,0.5,0.12,32),toyMat(0x5a2e16,{roughness:0.7}),-0.13,sx);
+    const ch=add(new THREE.BoxGeometry(0.86,0.03,0.86),toyMat(0xffc31a,{roughness:0.35}),-0.06,sx);ch.rotation.y=Math.PI/4;
+    add(new THREE.CylinderGeometry(0.52,0.5,0.06,14),toyMat(0x6fcf4a,{roughness:0.5}),-0.02,sx);
+    add(new THREE.CylinderGeometry(0.44,0.44,0.05,24),toyMat(0xe2453a,{roughness:0.4}),0.03,sx);
+    const top=add(new THREE.SphereGeometry(0.5,32,16,0,Math.PI*2,0,Math.PI/2),bun,0.05,sx);top.scale.y=0.62;
+    const seed=toyMat(0xfff4d6);const r=mulberry32(7);for(let i=0;i<16;i++){const a=r()*Math.PI*2,rr=0.12+r()*0.3,y=0.05+Math.sqrt(Math.max(0,0.25-rr*rr))*0.62;
+      const sd=new THREE.Mesh(new THREE.SphereGeometry(0.03,8,6),seed);sd.scale.set(1.4,0.6,0.8);sd.position.set(Math.cos(a)*rr*sx,y,Math.sin(a)*rr);sd.rotation.y=a;G.add(sd)}
+    return G},
+  maneki(){const G=new THREE.Group(),wh=toyMat(0xffffff,{roughness:0.35}),red=toyMat(0xe23b3b,{roughness:0.4}),gold=toyMat(0xffc928,{roughness:0.25,metalness:0.5});
+    const face=canvasTex(128,128,(g,w,h)=>{g.fillStyle='#fff';g.fillRect(0,0,w,h);g.strokeStyle='#1b1430';g.lineWidth=6;g.lineCap='round';
+      g.beginPath();g.arc(40,58,11,Math.PI*1.1,Math.PI*1.9);g.stroke();g.beginPath();g.arc(88,58,11,Math.PI*1.1,Math.PI*1.9);g.stroke();
+      g.fillStyle='#ff8fa0';g.beginPath();g.moveTo(58,70);g.lineTo(70,70);g.lineTo(64,77);g.fill();g.lineWidth=3;g.beginPath();g.moveTo(64,77);g.quadraticCurveTo(56,88,48,82);g.moveTo(64,77);g.quadraticCurveTo(72,88,80,82);g.stroke();
+      g.lineWidth=2;for(const d of[-1,1])for(const k of[0,1]){g.beginPath();g.moveTo(64+d*24,74+k*7);g.lineTo(64+d*52,70+k*12);g.stroke()}});
+    const body=new THREE.Mesh(new THREE.SphereGeometry(0.36,28,20),wh);body.scale.set(1,0.95,1.05);body.position.set(-0.05,-0.05,0);G.add(body);
+    const head=new THREE.Mesh(new THREE.SphereGeometry(0.3,28,20),wh);head.position.set(0.05,0.36,0);head.scale.set(0.95,0.88,1.05);G.add(head);
+    const fp=new THREE.Mesh(new THREE.SphereGeometry(0.303,24,16,Math.PI-0.95,1.9,Math.PI/2-0.85,1.7),new THREE.MeshStandardMaterial({map:face,roughness:0.35}));fp.position.copy(head.position);fp.scale.copy(head.scale);G.add(fp);
+    for(const sz of[-1,1]){const e=new THREE.Mesh(new THREE.ConeGeometry(0.1,0.16,4),wh);e.position.set(0.05,0.6,sz*0.17);e.rotation.x=-sz*0.3;G.add(e);
+      const ein=new THREE.Mesh(new THREE.ConeGeometry(0.06,0.1,4),toyMat(0xff9fb0));ein.position.set(0.09,0.59,sz*0.17);ein.rotation.x=-sz*0.3;G.add(ein)}
+    const col=new THREE.Mesh(new THREE.TorusGeometry(0.24,0.04,8,30),red);col.rotation.z=Math.PI/2;col.rotation.y=Math.PI/2;col.position.set(0.05,0.12,0);col.rotation.set(Math.PI/2,0,0);G.add(col);
+    const bell=new THREE.Mesh(new THREE.SphereGeometry(0.07,14,10),gold);bell.position.set(0.28,0.07,0);G.add(bell);
+    const arm=new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.08,0.34,12),wh);arm.position.set(0.12,0.4,-0.24);arm.rotation.x=0.15;G.add(arm);
+    const paw=new THREE.Mesh(new THREE.SphereGeometry(0.09,14,10),wh);paw.position.set(0.13,0.58,-0.27);G.add(paw);
+    const coin=new THREE.Mesh(new THREE.CylinderGeometry(0.17,0.17,0.04,24),gold);coin.rotation.z=Math.PI/2;coin.position.set(0.3,-0.06,0.18);coin.scale.set(1,1,0.6);G.add(coin);
+    for(const[x,z,c]of[[-0.2,0.2,0x1b1430],[-0.25,-0.12,0xff8a1a]]){const p=new THREE.Mesh(new THREE.SphereGeometry(0.1,12,8),toyMat(c));p.scale.y=0.4;p.position.set(x,0.25,z);G.add(p)}
+    G.scale.setScalar(1.25);G.position.y=0.02;return G},
+  konnyaku(){const G=new THREE.Group(),t=canvasTex(256,128,(g,w,h)=>{g.fillStyle='#8f8b86';g.fillRect(0,0,w,h);const r=mulberry32(21);
+      for(let i=0;i<420;i++){g.fillStyle=`rgba(30,28,26,${0.35+r()*0.5})`;g.beginPath();g.arc(r()*w,r()*h,0.8+r()*1.6,0,7);g.fill()}});
+    const b=new THREE.Mesh(roundBox(1.72,0.56,0.96,0.16),toyMat(0xffffff,{map:t,roughness:0.12}));b.position.y=-0.06;G.add(b);
+    const cut=toyMat(0x77736e,{roughness:0.2});for(const x of[-0.4,0,0.4]){const c=new THREE.Mesh(new THREE.BoxGeometry(0.03,0.02,0.7),cut);c.position.set(x,0.225,0);c.rotation.y=0.6;G.add(c)}
+    return G},
+  dogeza(){const G=new THREE.Group(),suit=toyMat(0x26324f,{roughness:0.6}),skin=toyMat(0xf3c9a0,{roughness:0.5}),blk=toyMat(0x1b1430,{roughness:0.4}),wht=toyMat(0xffffff);
+    const torso=new THREE.Mesh(roundBox(0.78,0.42,0.66,0.16),suit);torso.position.set(-0.02,-0.04,0);torso.rotation.z=-0.28;G.add(torso);
+    const hips=new THREE.Mesh(roundBox(0.5,0.46,0.62,0.18),suit);hips.position.set(-0.42,0.0,0);G.add(hips);
+    for(const sz of[-1,1]){const leg=new THREE.Mesh(roundBox(0.62,0.2,0.24,0.08),suit);leg.position.set(-0.52,-0.24,sz*0.17);G.add(leg);
+      const shoe=new THREE.Mesh(roundBox(0.12,0.16,0.22,0.05),blk);shoe.position.set(-0.86,-0.22,sz*0.17);G.add(shoe);
+      const arm=new THREE.Mesh(new THREE.CylinderGeometry(0.075,0.085,0.46,10),suit);arm.position.set(0.42,-0.14,sz*0.27);arm.rotation.z=1.0;G.add(arm);
+      const hand=new THREE.Mesh(new THREE.SphereGeometry(0.08,12,8),skin);hand.scale.set(1.3,0.5,1);hand.position.set(0.68,-0.31,sz*0.16);G.add(hand)}
+    const collar=new THREE.Mesh(new THREE.TorusGeometry(0.13,0.035,8,20),wht);collar.position.set(0.33,-0.06,0);collar.rotation.y=Math.PI/2;collar.rotation.x=0.4;G.add(collar);
+    const head=new THREE.Mesh(new THREE.SphereGeometry(0.19,24,16),skin);head.position.set(0.5,-0.15,0);G.add(head);
+    const shine=new THREE.Mesh(new THREE.SphereGeometry(0.06,10,8),toyMat(0xffffff,{transparent:true,opacity:0.6}));shine.scale.set(1,0.4,1.6);shine.position.set(0.47,0.03,0.06);G.add(shine);
+    // バーコード（横に流した数本の毛）
+    for(let k=0;k<4;k++){const hr=new THREE.Mesh(new THREE.TorusGeometry(0.192,0.008,4,24,Math.PI*0.9),blk);hr.position.set(0.5-0.02*k+0.03,-0.15,0);hr.rotation.set(0,Math.PI/2,0.3);hr.rotation.x=-0.25+k*0.17;G.add(hr)}
+    for(const sz of[-1,1]){const side=new THREE.Mesh(new THREE.SphereGeometry(0.07,10,8),blk);side.scale.set(1.3,1,0.5);side.position.set(0.44,-0.16,sz*0.17);G.add(side);
+      const lens=new THREE.Mesh(new THREE.TorusGeometry(0.05,0.012,6,16),blk);lens.position.set(0.63,-0.24,sz*0.07);lens.rotation.y=Math.PI/2;G.add(lens);
+      const temple=new THREE.Mesh(new THREE.BoxGeometry(0.2,0.012,0.012),blk);temple.position.set(0.55,-0.2,sz*0.185);G.add(temple)}
+    const sweat=new THREE.Mesh(new THREE.SphereGeometry(0.045,10,8),toyMat(0x7fd2ff,{roughness:0.1}));sweat.scale.y=1.4;sweat.position.set(0.4,0.1,0.18);G.add(sweat);
+    return G},
+  pudding(){const G=new THREE.Group();
+    const plate=new THREE.Mesh(new THREE.CylinderGeometry(0.62,0.66,0.06,36),toyMat(0xffffff,{roughness:0.25}));plate.scale.x=1.35;plate.position.y=-0.32;G.add(plate);
+    const pud=new THREE.Mesh(new THREE.CylinderGeometry(0.3,0.44,0.48,32),toyMat(0xffd977,{roughness:0.3}));pud.scale.x=1.35;pud.position.y=-0.05;G.add(pud);
+    const car=new THREE.Mesh(new THREE.CylinderGeometry(0.31,0.32,0.09,32),toyMat(0x7a3d12,{roughness:0.15}));car.scale.x=1.35;car.position.y=0.2;G.add(car);
+    for(let i=0;i<7;i++){const a=i/7*Math.PI*2+0.3,d=new THREE.Mesh(new THREE.SphereGeometry(0.05,8,6),toyMat(0x7a3d12,{roughness:0.15}));
+      d.scale.set(0.8,1.8,0.8);d.position.set(Math.cos(a)*0.33*1.35,0.13,Math.sin(a)*0.33);G.add(d)}
+    const cream=new THREE.Mesh(new THREE.ConeGeometry(0.13,0.18,10),toyMat(0xffffff,{roughness:0.5}));cream.position.y=0.33;G.add(cream);
+    const cb=new THREE.Mesh(new THREE.SphereGeometry(0.12,14,10),toyMat(0xffffff,{roughness:0.5}));cb.scale.y=0.6;cb.position.y=0.27;G.add(cb);
+    const cherry=new THREE.Mesh(new THREE.SphereGeometry(0.075,14,10),toyMat(0xe2163a,{roughness:0.15}));cherry.position.y=0.45;G.add(cherry);
+    const stem=new THREE.Mesh(new THREE.CylinderGeometry(0.01,0.01,0.14,6),toyMat(0x3a8a2a));stem.position.set(0.03,0.54,0);stem.rotation.z=-0.4;G.add(stem);
     return G},
 };
 function skinModel(m,id){m.models=m.models||{};if(!m.models[id]){const G=MODELS[SKINS[id].model]();G.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true}});m.g.add(G);m.models[id]=G}return m.models[id]}
@@ -869,7 +947,7 @@ let gtBest=0;try{gtBest=+localStorage.getItem('gekiochiBest')||0}catch(e){}
 function gtBestText(){$('bestTxt').textContent=gtBest?'自己ベスト：'+gtBest+'人激落':'どこまで勝ち抜ける？'}
 const allInv=()=>{const a=rkInv();UNL.forEach(x=>{if(PRIZES[x]&&!a.includes(x))a.push(x)});return a};
 // ボスを倒すと解放されるもの
-const GT_REWARDS={5:{id:'t10',name:'称号「激落王を倒した者」'},10:{id:'x1',name:'スキン「カブトムシ」'},15:{id:'e3',name:'おうごん消しゴム'}};
+const GT_REWARDS={5:{id:'t10',name:'称号「激落王を倒した者」'},10:{id:'x1',name:'スキン「カブトムシ」'},20:{id:'x7',name:'スキン「王冠」'},15:{id:'e3',name:'おうごん消しゴム'}};
 function gtReward(n){const R=GT_REWARDS[n];if(!R||!unlock(R.id))return;
   later(()=>{toast('🎉 解放！ '+R.name+(R.id==='e3'?'\n消しゴム選択で使えるよ':'\nきせかえで使えるよ'),4200,1);SFX.max()},1500)}
 function gtRecord(wins){if(wins<=gtBest)return false;gtBest=wins;try{localStorage.setItem('gekiochiBest',wins)}catch(e){}gtBestText();return true}
