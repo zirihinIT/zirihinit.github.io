@@ -817,7 +817,7 @@ function edgeWobble(e){
   return best<=0.95?[bd[0],bd[1],0.05+0.14*(1-best/0.95)]:null;
 }
 const _wq=new THREE.Quaternion(),_wa=new THREE.Vector3();
-function squash(i,amt){if(!S.e[i])return;sq[i].vel+=amt*(0.3+ETYPES[S.e[i].k].squish)}
+function squash(i,amt){if(!S.e[i])return;sq[i].vel+=amt*(0.3+ETYPES[S.e[i].k].squish);const m=eMesh[i];if(m&&m.jelly&&amt>0.15){m.pw=Math.min(0.3,(m.pw||0)+amt*0.09);m.pt=0}}
 // 弾く指
 const finger=new THREE.Group();finger.visible=false;scene.add(finger);
 {
@@ -1751,10 +1751,13 @@ function syncMeshes(dt){
   for(let i=0;i<2;i++){const e=S.e[i],m=eMesh[i],q=sq[i],mo=e.k===2;
     const K=mo?95:280,C=mo?4.5:17;q.vel+=(-K*q.v-C*q.vel)*dt;q.v=clamp(q.v+q.vel*dt,-0.4,0.45);
     const sp=Math.hypot(e.vx,e.vz),jig=m.jelly&&!e.falling?Math.min(0.09,sp*0.012)*Math.sin(game.realT*24+i):0;
-    const v=(e.falling?0:q.v)+jig,z=e.sz||1;m.g.scale.set((1+v*0.6)*z,(1-v)*z,(1+v*0.6)*z);if(m.anim===3&&m.skinTex)m.skinTex.offset.x=(game.realT*0.25)%1;else if(m.anim===1)m.body.material.color.setHSL((game.realT*0.3+i*0.5)%1,0.9,0.62);else if(m.anim===2)m.body.material.opacity=0.45+0.3*Math.sin(game.realT*3+i);
+    // プルン：ぶつかった後しばらく揺れが残る
+    let pw=0,pr=0;if(m.pw>0.004&&!e.falling){m.pt=(m.pt||0)+dt;const ph=Math.sin(m.pt*26);pw=m.pw*ph;pr=m.pw*Math.cos(m.pt*26)*0.5;m.pw*=Math.exp(-dt*2.6)}else m.pw=0;
+    const v=(e.falling?0:q.v)+jig,z=e.sz||1;m.g.scale.set((1+v*0.6+pw*0.55)*z,(1-v-pw*0.7)*z,(1+v*0.6-pw*0.25+pr*0.4)*z);if(m.anim===3&&m.skinTex)m.skinTex.offset.x=(game.realT*0.25)%1;else if(m.anim===1)m.body.material.color.setHSL((game.realT*0.3+i*0.5)%1,0.9,0.62);else if(m.anim===2)m.body.material.opacity=0.45+0.3*Math.sin(game.realT*3+i);
     m.g.position.set(e.x,e.y+EH/2*(1-v)*z,e.z);if(m.vib>0.003){m.g.position.x+=(Math.random()-0.5)*m.vib;m.g.position.z+=(Math.random()-0.5)*m.vib;m.vib*=hitstop>0?0.97:0.82}m.g.rotation.set(e.rx,-e.yaw,e.rz);
     const wb=game.phase==='title'?null:edgeWobble(e);
     if(wb){_wq.setFromAxisAngle(_wa.set(wb[1],0,-wb[0]),wb[2]*(0.55+0.45*Math.sin(game.realT*11+i*2)));m.g.quaternion.premultiply(_wq)}
+    if(pr){_wq.setFromAxisAngle(_wa.set(0,0,1),pr*0.5);m.g.quaternion.multiply(_wq)}
     m.ring.visible=!e.falling&&game.phase!=='title';m.ring.position.set(e.x,0.015,e.z);
     const pulse=(game.phase!=='flying'&&i===game.shooter&&game.phase!=='title')?1+0.08*Math.sin(game.realT*6):1;m.ring.scale.setScalar(pulse);
   }
