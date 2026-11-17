@@ -616,13 +616,17 @@ function makeEraser(i){
 }
 const eMesh=[makeEraser(0),makeEraser(1)];
 // ===== ガチャ景品（見た目と称号だけ。性能は変わらない） =====
-const RAR=['ノーマル','レア','激レア','伝説','勝ち抜き'];
+const RAR=['ノーマル','レア','激レア','伝説','勝ち抜き','特殊'];
 const SKINS={
-  s1:{name:'すいか',rar:0,body:0x57c26a,sleeve:'#e23b3b'},s2:{name:'チョコ',rar:0,body:0x7a4a2b,sleeve:'#c79a5b'},
-  s3:{name:'ソーダ',rar:0,body:0x9be8ff,sleeve:'#1c7ed6'},s4:{name:'さくら',rar:0,body:0xffd6e6,sleeve:'#ff6fa5'},
-  s5:{name:'まっくろ',rar:1,body:0x2a2a33,sleeve:'#55556a'},s6:{name:'ほのお',rar:1,body:0xff7a1a,sleeve:'#b01212',emis:0x551500},
-  s7:{name:'ぎんいろ',rar:2,body:0x7d8794,sleeve:'#2c333d',emis:0x10141a,rough:0.2},s8:{name:'にじいろ',rar:2,body:0xff6ad5,sleeve:'#7b2ff7',anim:1},
-  s9:{name:'まぼろし',rar:3,body:0xbfe6ff,sleeve:'#2a1d6e',emis:0x2a4fb0,anim:2}};
+  s1:{name:'すいか',rar:0,body:0x57c26a,sleeve:'#e23b3b',tex:'melon',rough:0.5},s2:{name:'チョコ',rar:0,body:0x7a4a2b,sleeve:'#c79a5b',tex:'choco',rough:0.35},
+  s3:{name:'ソーダ',rar:0,body:0x9be8ff,sleeve:'#1c7ed6',tex:'soda',rough:0.15,clear:0.85},s4:{name:'さくら',rar:0,body:0xffd6e6,sleeve:'#ff6fa5',tex:'sakura',rough:0.6},
+  s5:{name:'まっくろ',rar:1,body:0x2a2a33,sleeve:'#55556a',tex:'night',rough:0.45},s6:{name:'ほのお',rar:1,body:0xff7a1a,sleeve:'#b01212',emis:0x7a2000,tex:'fire',rough:0.5,emisTex:1},
+  s7:{name:'ぎんいろ',rar:2,body:0xc9d1da,sleeve:'#2c333d',tex:'silver',rough:0.25,metal:0.3,emis:0x30343a},s8:{name:'にじいろ',rar:2,body:0xff6ad5,sleeve:'#7b2ff7',tex:'rainbow',rough:0.3,anim:3},
+  s9:{name:'まぼろし',rar:3,body:0xbfe6ff,sleeve:'#2a1d6e',emis:0x2a4fb0,anim:2,tex:'ghost'},
+  // 特殊スキン（おもちゃっぽい形。見た目だけで性能は元の消しゴムのまま）
+  x1:{name:'カブトムシ',rar:4,body:0x5a2e12,sleeve:'#3a1d0a',model:'beetle'},x2:{name:'豆腐',rar:5,body:0xfbf7ea,sleeve:'#7fb8e8',model:'tofu',jelly:1},
+  x3:{name:'レンガ',rar:5,body:0xc0532f,sleeve:'#7a2f18',model:'brick'},x4:{name:'たまご寿司',rar:5,body:0xffd23f,sleeve:'#1b1430',model:'sushi'},
+  x5:{name:'将棋の駒',rar:5,body:0xe8c27a,sleeve:'#3a2410',model:'shogi'},x6:{name:'牛乳パック',rar:5,body:0xffffff,sleeve:'#2f8cff',model:'milk'}};
 const TITLES={
   t1:{name:'かけだし',rar:0},t2:{name:'文房具マニア',rar:0},t3:{name:'えんぴつ派',rar:0},t4:{name:'定規使い',rar:0},
   t5:{name:'ギリギリ職人',rar:1},t6:{name:'机の端の住人',rar:1},t7:{name:'消しカス長者',rar:2},t8:{name:'休み時間の覇者',rar:2},
@@ -633,11 +637,99 @@ const MY={skin:'',title:''};try{MY.skin=safeSkin(localStorage.getItem('gekiochiS
 const skinOf=i=>i===(game.mode==='cpu'?0:game.me)?MY.skin:safeSkin(game.oppSkin),titleOf=i=>i===(game.mode==='cpu'?0:game.me)?MY.title:safeTitle(game.oppTitle);
 function applyLooks(types){
   types.forEach((k,i)=>{const T=Object.assign({},ETYPES[k],k!==3?SKINS[skinOf(i)]:null),m=eMesh[i],E=ETYPES[k];m.anim=T.anim|0;T.label=E.label;
-    m.body.geometry=bodyGeo(k);m.smudge.visible=(E.rr||0)<0.12;m.jelly=!!E.jelly;
-    const clear=!!E.clear&&!T.anim;m.body.material.transparent=m.anim===2||clear;m.body.material.opacity=clear?0.82:1;m.body.material.depthWrite=m.anim!==2;
-    m.body.material.color.setHex(T.body);m.body.material.map=E.worn?grimeTex:E.stripe?stripeTex:T.grain?grainTex:null;m.body.material.needsUpdate=true;m.body.material.roughness=E.clear?0.06:T.rough;m.body.material.metalness=E.clear?0.15:T.metal;m.body.material.emissive.setHex(T.emis||0);
+    const sid=k!==3?skinOf(i):'',SK=SKINS[sid]||null,mdl=SK&&SK.model?skinModel(m,sid):null;
+    if(m.models)for(const id in m.models)m.models[id].visible=m.models[id]===mdl;
+    m.body.visible=m.sl.visible=!mdl;
+    m.body.geometry=bodyGeo(k);m.smudge.visible=!mdl&&(E.rr||0)<0.12;m.jelly=!!E.jelly||!!(SK&&SK.jelly);m.skinTex=SK&&SK.tex?skinTex(SK.tex):null;
+    const clear=SK&&SK.clear?SK.clear:(!!E.clear&&!SK)?0.82:0;m.body.material.transparent=m.anim===2||!!clear;m.body.material.opacity=clear||1;m.body.material.depthWrite=m.anim!==2;
+    m.body.material.color.setHex(m.skinTex?0xffffff:T.body);m.body.material.map=m.skinTex||(E.worn?grimeTex:E.stripe?stripeTex:T.grain?grainTex:null);m.body.material.needsUpdate=true;
+    m.body.material.roughness=SK&&SK.rough!=null?SK.rough:E.clear?0.06:T.rough;m.body.material.metalness=SK&&SK.metal!=null?SK.metal:E.clear?0.15:(T.metal||0);m.body.material.emissive.setHex(T.emis||0);
+    m.body.material.emissiveMap=SK&&SK.emisTex?m.skinTex:null;
     m.sl.material.map=sleeveTex(T.sleeve||PLCOL[i],T.label);m.sl.material.needsUpdate=true;});
 }
+// ===== スキンの模様 =====
+const SKIN_TEX={};
+const skinTex=n=>SKIN_TEX[n]||(SKIN_TEX[n]=({
+  melon:()=>canvasTex(256,128,(g,w,h)=>{g.fillStyle='#4fb860';g.fillRect(0,0,w,h);g.fillStyle='#1f6e33';
+    for(let x=-20;x<w+20;x+=36){g.beginPath();for(let y=0;y<=h;y+=8)g.lineTo(x+Math.sin(y*0.18+x)*7,y);for(let y=h;y>=0;y-=8)g.lineTo(x+14+Math.sin(y*0.18+x+1)*7,y);g.fill()}}),
+  choco:()=>canvasTex(256,128,(g,w,h)=>{g.fillStyle='#6b3d22';g.fillRect(0,0,w,h);for(let x=0;x<w;x+=64)for(let y=0;y<h;y+=64){
+    g.fillStyle='#7d4a2b';g.fillRect(x+6,y+6,52,52);g.fillStyle='rgba(255,255,255,.12)';g.fillRect(x+6,y+6,52,6);g.fillStyle='rgba(0,0,0,.25)';g.fillRect(x+6,y+52,52,6)}}),
+  soda:()=>canvasTex(256,128,(g,w,h)=>{const gr=g.createLinearGradient(0,0,0,h);gr.addColorStop(0,'#c9f3ff');gr.addColorStop(1,'#7fd6f5');g.fillStyle=gr;g.fillRect(0,0,w,h);
+    const r=mulberry32(3);g.strokeStyle='rgba(255,255,255,.9)';g.lineWidth=2.5;for(let i=0;i<40;i++){g.beginPath();g.arc(r()*w,r()*h,2+r()*7,0,7);g.stroke()}}),
+  sakura:()=>canvasTex(256,128,(g,w,h)=>{g.fillStyle='#ffe3ee';g.fillRect(0,0,w,h);const r=mulberry32(8);
+    for(let i=0;i<14;i++){const x=r()*w,y=r()*h,s=6+r()*6;g.fillStyle=r()<.5?'#ff9ec4':'#ffbcd6';for(let k=0;k<5;k++){const a=k*Math.PI*2/5+r();g.beginPath();g.ellipse(x+Math.cos(a)*s,y+Math.sin(a)*s,s*0.7,s*0.45,a,0,7);g.fill()}
+      g.fillStyle='#fff3a0';g.beginPath();g.arc(x,y,s*0.35,0,7);g.fill()}}),
+  night:()=>canvasTex(256,128,(g,w,h)=>{g.fillStyle='#22222c';g.fillRect(0,0,w,h);const r=mulberry32(12);for(let i=0;i<70;i++){g.fillStyle=`rgba(255,255,255,${0.3+r()*0.6})`;const x=r()*w,y=r()*h,s=r()<.12?2.4:1;g.fillRect(x,y,s,s)}}),
+  fire:()=>canvasTex(256,128,(g,w,h)=>{const gr=g.createLinearGradient(0,h,0,0);gr.addColorStop(0,'#ffe066');gr.addColorStop(0.45,'#ff8a1a');gr.addColorStop(1,'#c4160e');g.fillStyle=gr;g.fillRect(0,0,w,h);
+    g.fillStyle='rgba(255,240,150,.85)';for(let x=0;x<w;x+=40){g.beginPath();g.moveTo(x,h);g.quadraticCurveTo(x+6,h*0.45,x+20,h*0.25);g.quadraticCurveTo(x+18,h*0.6,x+40,h);g.fill()}}),
+  silver:()=>canvasTex(256,128,(g,w,h)=>{const gr=g.createLinearGradient(0,0,0,h);gr.addColorStop(0,'#f4f7fa');gr.addColorStop(0.5,'#c3ccd6');gr.addColorStop(1,'#e8edf2');g.fillStyle=gr;g.fillRect(0,0,w,h);const r=mulberry32(6);for(let i=0;i<120;i++){g.fillStyle=`rgba(255,255,255,${0.15+r()*0.25})`;g.fillRect(0,r()*h,w,1)}}),
+  rainbow:()=>{const t=canvasTex(256,64,(g,w,h)=>{const c=['#ff4b3e','#ff9f1a','#ffd23f','#3ccf6b','#2f8cff','#8a4bff','#ff4b3e'];const gr=g.createLinearGradient(0,0,w,0);c.forEach((x,i)=>gr.addColorStop(i/6,x));g.fillStyle=gr;g.fillRect(0,0,w,h);
+    g.fillStyle='rgba(255,255,255,.35)';g.fillRect(0,0,w,h*0.3)});t.wrapS=THREE.RepeatWrapping;return t},
+  ghost:()=>canvasTex(128,128,(g,w,h)=>{const gr=g.createRadialGradient(w/2,h/2,4,w/2,h/2,w*0.7);gr.addColorStop(0,'#ffffff');gr.addColorStop(1,'#9fd2ff');g.fillStyle=gr;g.fillRect(0,0,w,h)}),
+})[n]());
+// ===== 特殊スキン：おもちゃっぽい形（大きさは消しゴムと同じ箱 1.8×0.7×1.0 の中） =====
+const SKIN_MODEL={};
+function toyMat(c,o={}){return new THREE.MeshStandardMaterial(Object.assign({color:c,roughness:0.38,metalness:0},o))}
+function faceTex(bg){return canvasTex(128,128,(g,w,h)=>{g.fillStyle=bg;g.fillRect(0,0,w,h);g.fillStyle='#1b1430';
+  g.beginPath();g.arc(42,56,9,0,7);g.arc(86,56,9,0,7);g.fill();g.fillStyle='#fff';g.beginPath();g.arc(45,53,3,0,7);g.arc(89,53,3,0,7);g.fill();
+  g.strokeStyle='#1b1430';g.lineWidth=5;g.lineCap='round';g.beginPath();g.arc(64,70,12,0.2,Math.PI-0.2);g.stroke();
+  g.fillStyle='rgba(255,120,140,.55)';g.beginPath();g.ellipse(28,76,9,5,0,0,7);g.ellipse(100,76,9,5,0,0,7);g.fill()})}
+function textTex(txt,bg,fg,font){return canvasTex(256,128,(g,w,h)=>{g.fillStyle=bg;g.fillRect(0,0,w,h);g.fillStyle=fg;g.font=font;g.textAlign='center';g.textBaseline='middle';g.fillText(txt,w/2,h/2+4)})}
+const MODELS={
+  beetle(){const G=new THREE.Group(),sh=toyMat(0x6b3414,{roughness:0.15}),dk=toyMat(0x2b170b,{roughness:0.22});
+    const limb=(a,b,r)=>{const A=new THREE.Vector3(...a),B=new THREE.Vector3(...b),L=A.distanceTo(B),m=new THREE.Mesh(new THREE.CylinderGeometry(r,r*0.8,L,8),dk);
+      m.position.copy(A).add(B).multiplyScalar(0.5);m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),B.clone().sub(A).normalize());G.add(m)};
+    const shell=new THREE.Mesh(new THREE.SphereGeometry(0.5,36,24),sh);shell.scale.set(1.2,0.62,0.92);shell.position.set(-0.28,0.0,0);G.add(shell);
+    const seam=new THREE.Mesh(new THREE.TorusGeometry(0.5,0.012,6,48,Math.PI),dk);seam.scale.set(1.2,0.62,1);seam.position.set(-0.28,0.0,0);G.add(seam);
+    const thorax=new THREE.Mesh(new THREE.SphereGeometry(0.34,28,18),dk);thorax.scale.set(0.85,0.72,1.05);thorax.position.set(0.36,0.0,0);G.add(thorax);
+    const head=new THREE.Mesh(new THREE.SphereGeometry(0.2,20,14),dk);head.position.set(0.66,-0.07,0);G.add(head);
+    const horn=new THREE.Mesh(new THREE.TubeGeometry(new THREE.QuadraticBezierCurve3(new THREE.Vector3(0.68,-0.02,0),new THREE.Vector3(0.98,0.0,0),new THREE.Vector3(1.0,0.36,0)),16,0.055,8),dk);G.add(horn);
+    for(const sz of[-1,1]){const t=new THREE.Mesh(new THREE.ConeGeometry(0.045,0.16,8),dk);t.position.set(1.0,0.4,sz*0.05);t.rotation.x=sz*0.5;G.add(t)}
+    const horn2=new THREE.Mesh(new THREE.ConeGeometry(0.06,0.3,10),dk);horn2.position.set(0.5,0.25,0);horn2.rotation.z=-0.9;G.add(horn2);
+    for(const sz of[-1,1]){for(const[x,dx]of[[-0.45,-0.25],[-0.1,0.0],[0.3,0.25]]){limb([x,-0.08,sz*0.36],[x+dx,-0.16,sz*0.62],0.035);limb([x+dx,-0.16,sz*0.62],[x+dx*1.4,-0.34,sz*0.7],0.03)}
+      const e=new THREE.Mesh(new THREE.SphereGeometry(0.05,12,8),toyMat(0xffffff));e.position.set(0.76,-0.03,sz*0.13);G.add(e)}
+    const hi=new THREE.Mesh(new THREE.SphereGeometry(0.14,16,10),toyMat(0xffffff,{transparent:true,opacity:0.45}));hi.scale.set(2,0.25,0.6);hi.position.set(-0.38,0.29,0.18);G.add(hi);
+    return G},
+  tofu(){const G=new THREE.Group(),m=toyMat(0xfbf7ea,{roughness:0.55}),geo=roundBox(1.7,0.66,0.98,0.09);
+    const mats=[m,m,m,m,new THREE.MeshStandardMaterial({map:faceTex('#fbf7ea'),roughness:0.55}),m];const b=new THREE.Mesh(geo,m);G.add(b);
+    const face=new THREE.Mesh(new THREE.PlaneGeometry(0.75,0.6),new THREE.MeshStandardMaterial({map:faceTex('#fbf7ea'),roughness:0.55}));face.position.set(0,0,0.5);G.add(face);
+    const face2=face.clone();face2.position.z=-0.5;face2.rotation.y=Math.PI;G.add(face2);
+    const plate=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,0.02,8),m);G.add(plate);plate.visible=false;
+    return G},
+  brick(){const G=new THREE.Group(),t=canvasTex(256,128,(g,w,h)=>{g.fillStyle='#c4572f';g.fillRect(0,0,w,h);const r=mulberry32(4);
+      for(let i=0;i<500;i++){g.fillStyle=`rgba(${r()<.5?90:230},${r()<.5?30:120},20,${0.08+r()*0.12})`;g.fillRect(r()*w,r()*h,2+r()*3,2+r()*3)}});
+    const b=new THREE.Mesh(roundBox(1.8,0.68,0.98,0.05),toyMat(0xffffff,{map:t,roughness:0.85}));G.add(b);
+    const hole=new THREE.MeshBasicMaterial({color:0x3a1206});for(const x of[-0.55,0,0.55]){const hh=new THREE.Mesh(new THREE.CylinderGeometry(0.17,0.17,0.02,20),hole);hh.position.set(x,0.345,0);G.add(hh)}
+    return G},
+  sushi(){const G=new THREE.Group();
+    const rice=canvasTex(128,64,(g,w,h)=>{g.fillStyle='#fffdf4';g.fillRect(0,0,w,h);const r=mulberry32(2);for(let i=0;i<90;i++){g.fillStyle=`rgba(200,195,180,${0.3+r()*0.4})`;g.beginPath();g.ellipse(r()*w,r()*h,4,2,r()*3,0,7);g.fill()}});
+    const base=new THREE.Mesh(roundBox(1.55,0.42,0.82,0.18),toyMat(0xffffff,{map:rice,roughness:0.8}));base.position.y=-0.13;G.add(base);
+    const egg=canvasTex(256,64,(g,w,h)=>{g.fillStyle='#ffd23f';g.fillRect(0,0,w,h);g.fillStyle='rgba(200,120,20,.35)';for(let x=10;x<w;x+=34)g.fillRect(x,0,8,h)});
+    const tam=new THREE.Mesh(roundBox(1.8,0.28,0.98,0.1),toyMat(0xffffff,{map:egg,roughness:0.45}));tam.position.y=0.2;G.add(tam);
+    const nori=new THREE.Mesh(new THREE.BoxGeometry(0.28,0.74,1.02),toyMat(0x13241a,{roughness:0.6}));nori.position.y=0.0;G.add(nori);
+    return G},
+  shogi(){const G=new THREE.Group(),sh=new THREE.Shape();
+    sh.moveTo(-0.9,-0.46);sh.lineTo(0.42,-0.5);sh.lineTo(0.9,0);sh.lineTo(0.42,0.5);sh.lineTo(-0.9,0.46);sh.lineTo(-0.9,-0.46);
+    const geo=new THREE.ExtrudeGeometry(sh,{depth:0.5,bevelEnabled:true,bevelThickness:0.06,bevelSize:0.05,bevelSegments:3});geo.translate(0,0,-0.25);geo.rotateX(-Math.PI/2);
+    const wood=canvasTex(256,128,(g,w,h)=>{g.fillStyle='#e8c27a';g.fillRect(0,0,w,h);g.strokeStyle='rgba(150,95,40,.35)';g.lineWidth=2;for(let y=4;y<h;y+=9){g.beginPath();g.moveTo(0,y);g.bezierCurveTo(w*0.3,y+5,w*0.6,y-5,w,y+2);g.stroke()}});
+    wood.wrapS=wood.wrapT=THREE.RepeatWrapping;wood.repeat.set(0.6,0.6);
+    const p=new THREE.Mesh(geo,toyMat(0xffffff,{map:wood,roughness:0.5}));p.position.y=-0.04;G.add(p);
+    const lg=new THREE.PlaneGeometry(0.62,0.62);lg.rotateX(-Math.PI/2);lg.rotateY(-Math.PI/2);
+    const label=new THREE.Mesh(lg,new THREE.MeshStandardMaterial({map:canvasTex(160,160,(g,w,h)=>{g.clearRect(0,0,w,h);g.fillStyle='#1b1430';g.font="900 132px sans-serif";g.textAlign='center';g.textBaseline='middle';g.fillText('王',w/2,h/2+6)}),transparent:true,roughness:0.5}));
+    label.position.set(-0.08,0.33,0);G.add(label);
+    return G},
+  milk(){const G=new THREE.Group();
+    const side=canvasTex(256,128,(g,w,h)=>{g.fillStyle='#fff';g.fillRect(0,0,w,h);g.fillStyle='#2f8cff';g.fillRect(0,0,w,26);g.fillRect(0,h-16,w,16);
+      g.fillStyle='#1b1430';g.font="900 40px 'M PLUS Rounded 1c',sans-serif";g.textAlign='center';g.fillText('ぎゅうにゅう',w/2,h/2+18);
+      g.fillStyle='#1b1430';for(const[x,y,r]of[[34,62,9],[220,58,7],[60,96,6]]){g.beginPath();g.ellipse(x,y,r*1.4,r,0.4,0,7);g.fill()}});
+    const box=new THREE.Mesh(roundBox(1.35,0.68,0.98,0.04),toyMat(0xffffff,{map:side,roughness:0.6}));box.position.x=-0.22;G.add(box);
+    const tri=new THREE.Shape();tri.moveTo(0,-0.34);tri.lineTo(0.42,0);tri.lineTo(0,0.34);tri.lineTo(0,-0.34);
+    const roof=new THREE.Mesh(new THREE.ExtrudeGeometry(tri,{depth:0.96,bevelEnabled:false}),toyMat(0x2f8cff,{roughness:0.5}));roof.position.set(0.45,0,-0.48);G.add(roof);
+    const fin=new THREE.Mesh(new THREE.BoxGeometry(0.1,0.72,0.96),toyMat(0x2f8cff,{roughness:0.5}));fin.position.set(0.9,0,0);G.add(fin);
+    const straw=new THREE.Mesh(new THREE.CylinderGeometry(0.035,0.035,0.7,10),toyMat(0xff6fa5));straw.position.set(-0.6,0.5,0.2);straw.rotation.z=0.5;G.add(straw);
+    return G},
+};
+function skinModel(m,id){m.models=m.models||{};if(!m.models[id]){const G=MODELS[SKINS[id].model]();G.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true}});m.g.add(G);m.models[id]=G}return m.models[id]}
 // ぷにっと変形（もちもちは大きく揺れる）
 const sq=[{v:0,vel:0},{v:0,vel:0}];
 // 机の端に止まっている消しゴムは、落ちそうな方向にグラグラ（見た目だけ）
@@ -777,7 +869,7 @@ let gtBest=0;try{gtBest=+localStorage.getItem('gekiochiBest')||0}catch(e){}
 function gtBestText(){$('bestTxt').textContent=gtBest?'自己ベスト：'+gtBest+'人激落':'どこまで勝ち抜ける？'}
 const allInv=()=>{const a=rkInv();UNL.forEach(x=>{if(PRIZES[x]&&!a.includes(x))a.push(x)});return a};
 // ボスを倒すと解放されるもの
-const GT_REWARDS={5:{id:'t10',name:'称号「激落王を倒した者」'},15:{id:'e3',name:'おうごん消しゴム'}};
+const GT_REWARDS={5:{id:'t10',name:'称号「激落王を倒した者」'},10:{id:'x1',name:'スキン「カブトムシ」'},15:{id:'e3',name:'おうごん消しゴム'}};
 function gtReward(n){const R=GT_REWARDS[n];if(!R||!unlock(R.id))return;
   later(()=>{toast('🎉 解放！ '+R.name+(R.id==='e3'?'\n消しゴム選択で使えるよ':'\nきせかえで使えるよ'),4200,1);SFX.max()},1500)}
 function gtRecord(wins){if(wins<=gtBest)return false;gtBest=wins;try{localStorage.setItem('gekiochiBest',wins)}catch(e){}gtBestText();return true}
@@ -1289,7 +1381,7 @@ function prizeIcon(id){const p=PRIZES[id],d=document.createElement('span');
   if(SKINS[id]){d.className='sw';d.style.background='#'+p.body.toString(16).padStart(6,'0');d.style.setProperty('--s',p.sleeve)}else d.textContent='「'+p.name+'」';return d}
 async function gachaPull(){
   if(gachaRender.busy||rkKasu()<GACHA_COST)return;gachaRender.busy=true;gachaRender();
-  const r=Math.random(),rar=r<0.03?3:r<0.12?2:r<0.42?1:0,pool=Object.keys(PRIZES).filter(k=>PRIZES[k].rar===rar),id=pool[(Math.random()*pool.length)|0];
+  const r=Math.random(),rar=r<0.05?5:r<0.08?3:r<0.17?2:r<0.47?1:0,pool=Object.keys(PRIZES).filter(k=>PRIZES[k].rar===rar),id=pool[(Math.random()*pool.length)|0];
   const inv=rkInv(),dup=inv.includes(id),kasu=rkKasu()-GACHA_COST+(dup?KASU_DUP:0);
   const ok=await rkSaveProf({kasu,inv:dup?inv:inv.concat(id)});
   if(ok)stat('gacha');
@@ -1581,7 +1673,7 @@ function syncMeshes(dt){
   for(let i=0;i<2;i++){const e=S.e[i],m=eMesh[i],q=sq[i],mo=e.k===2;
     const K=mo?95:280,C=mo?4.5:17;q.vel+=(-K*q.v-C*q.vel)*dt;q.v=clamp(q.v+q.vel*dt,-0.4,0.45);
     const sp=Math.hypot(e.vx,e.vz),jig=m.jelly&&!e.falling?Math.min(0.09,sp*0.012)*Math.sin(game.realT*24+i):0;
-    const v=(e.falling?0:q.v)+jig,z=e.sz||1;m.g.scale.set((1+v*0.6)*z,(1-v)*z,(1+v*0.6)*z);if(m.anim===1)m.body.material.color.setHSL((game.realT*0.3+i*0.5)%1,0.9,0.62);else if(m.anim===2)m.body.material.opacity=0.45+0.3*Math.sin(game.realT*3+i);
+    const v=(e.falling?0:q.v)+jig,z=e.sz||1;m.g.scale.set((1+v*0.6)*z,(1-v)*z,(1+v*0.6)*z);if(m.anim===3&&m.skinTex)m.skinTex.offset.x=(game.realT*0.25)%1;else if(m.anim===1)m.body.material.color.setHSL((game.realT*0.3+i*0.5)%1,0.9,0.62);else if(m.anim===2)m.body.material.opacity=0.45+0.3*Math.sin(game.realT*3+i);
     m.g.position.set(e.x,e.y+EH/2*(1-v)*z,e.z);if(m.vib>0.003){m.g.position.x+=(Math.random()-0.5)*m.vib;m.g.position.z+=(Math.random()-0.5)*m.vib;m.vib*=hitstop>0?0.97:0.82}m.g.rotation.set(e.rx,-e.yaw,e.rz);
     const wb=game.phase==='title'?null:edgeWobble(e);
     if(wb){_wq.setFromAxisAngle(_wa.set(wb[1],0,-wb[0]),wb[2]*(0.55+0.45*Math.sin(game.realT*11+i*2)));m.g.quaternion.premultiply(_wq)}
