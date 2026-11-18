@@ -721,7 +721,7 @@ const MODELS={
     wood.wrapS=wood.wrapT=THREE.RepeatWrapping;wood.repeat.set(0.6,0.6);
     const p=new THREE.Mesh(geo,toyMat(0xffffff,{map:wood,roughness:0.5}));p.position.y=-0.04;G.add(p);
     const lg=new THREE.PlaneGeometry(0.5,0.92);lg.rotateX(-Math.PI/2);lg.rotateY(Math.PI/2);
-    const lt=canvasTex(160,300,(g,w,h)=>{g.clearRect(0,0,w,h);g.fillStyle='#1b1430';g.font="128px 'Yuji Syuku','Yu Mincho','Hiragino Mincho ProN',serif";g.textAlign='center';g.textBaseline='middle';g.translate(w,0);g.scale(-1,1);
+    const lt=canvasTex(160,300,(g,w,h)=>{g.clearRect(0,0,w,h);g.fillStyle='#1b1430';g.font="128px 'Yuji Syuku','Yu Mincho','Hiragino Mincho ProN',serif";g.textAlign='center';g.textBaseline='middle';
       g.fillText('王',w/2,h*0.27);g.fillText('将',w/2,h*0.74)});lt.center.set(0.5,0.5);lt.rotation=Math.PI;redraws.push(lt);
     const label=new THREE.Mesh(lg,new THREE.MeshStandardMaterial({map:lt,transparent:true,roughness:0.5}));
     label.position.set(-0.12,0.33,0);G.add(label);
