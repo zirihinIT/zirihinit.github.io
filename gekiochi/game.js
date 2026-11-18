@@ -883,9 +883,15 @@ function syncObs(){
     m.g.position.set(o.cx,(o.kind===0?PR:RUL_H/2)+o.y,o.cz);m.g.rotation.y=-o.a;m.tg.rotation.z=o.tilt;m.sp.rotation.x=o.roll;});
 }
 // 予測ドット
-const dotMat=[new THREE.MeshBasicMaterial({color:0xffe14d}),new THREE.MeshBasicMaterial({color:0x9fd8ff})];
-const dotGeo=new THREE.SphereGeometry(0.08,8,6);
-const dots=[];for(let k=0;k<34;k++){const m=new THREE.Mesh(dotGeo,dotMat[0]);m.visible=false;scene.add(m);dots.push(m)}
+// 点は動かさず、道のりに沿って等間隔に置く。濃い色＋白フチで木目に溶けないように
+const dotMat=[new THREE.MeshBasicMaterial({color:0xff9a00}),new THREE.MeshBasicMaterial({color:0x2f8cff})];
+const dotGeo=new THREE.SphereGeometry(0.1,10,8),dotRim=new THREE.MeshBasicMaterial({color:0xffffff,side:THREE.BackSide});
+const DOT_GAP=0.75;
+const dots=[];for(let k=0;k<64;k++){const m=new THREE.Mesh(dotGeo,dotMat[0]),r=new THREE.Mesh(dotGeo,dotRim);r.scale.setScalar(1.45);m.add(r);m.visible=false;scene.add(m);dots.push(m)}
+// 先端（止まる所）の印：白フチの円
+const tipMark=new THREE.Group();{const rim=new THREE.Mesh(new THREE.CircleGeometry(0.42,32),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.95,depthWrite:false}));
+  const ctr=new THREE.Mesh(new THREE.CircleGeometry(0.3,32),dotMat[0]);ctr.position.z=0.002;rim.add(ctr);rim.rotation.x=-Math.PI/2;tipMark.add(rim);tipMark.userData.ctr=ctr}
+tipMark.visible=false;scene.add(tipMark);
 const arrowHead=new THREE.Mesh(new THREE.ConeGeometry(0.22,0.5,12),dotMat[0]);arrowHead.visible=false;scene.add(arrowHead);
 // 消しカス
 const parts=[];const pGeo=new THREE.BoxGeometry(0.12,0.06,0.09);
@@ -1053,7 +1059,8 @@ function aimEnd(){
 function setAimHint(){const t=matchMedia('(pointer:coarse)').matches?'左右になぞって向き → 下に引っぱって離すと弾く！':'←→で向き ／ スペース長押し→離すと弾く！（ドラッグでもOK）';$('aimHint').textContent=t}
 function myFire(){
   if(game.phase!=='power'||!isMyTurn())return;stat('shot1',true);tutCount();drag=null;game.kbCharge=false;
-  const sh={type:game.shot.type,angle:game.shot.angle,curve:game.shot.curve,power:game.shot.power};
+  // 予測線と同じ丸め方で打つ（見えている線どおりに飛ぶ）
+  const sh={type:game.shot.type,angle:+(+game.shot.angle).toFixed(3),curve:game.shot.curve,power:+(+game.shot.power).toFixed(2)};
   if(game.mode==='net')netSend(Object.assign({t:'shot'},sh));
   fireShot(sh);
 }
@@ -1660,21 +1667,33 @@ cv.addEventListener('pointerup',()=>aimEnd());cv.addEventListener('pointercancel
 // 当たる場合は「相手がはじかれる向き」と「自分がはね返る向き」を矢印で見せる（長さ＝勢い）
 function previewShot(sh,i,maxLen){
   const t=cloneState(S),ev=[];t.noLuck=true;launch(t,i,Object.assign({},sh));const e=t.e[i],o=t.e[1-i];
-  const all=[];let len=0,px=e.x,pz=e.z,hit=null,fall=false;
+  const raw=[[e.x,Math.max(e.y,0),e.z]];let len=0,px=e.x,pz=e.z,hit=null,fall=false;
   for(let k=0;k<2400;k++){
     ev.length=0;step(t,DT,ev);len+=Math.hypot(e.x-px,e.z-pz);px=e.x;pz=e.z;
     if(ev.some(v=>v.k==='hit')){
-      // 数ステップ進めて、ぶつかった直後の向きと速さを読む
+      raw.push([e.x,Math.max(e.y,0),e.z]);const hx=e.x,hz=e.z;
+      // 数ステップ進めて、ぶつかった直後の向きと速さを読む（線の先端は当たった瞬間の位置）
       for(let j=0;j<3;j++)step(t,DT,null);
-      hit={ox:o.x,oz:o.z,ovx:o.vx,ovz:o.vz,ex:e.x,ez:e.z,evx:e.vx,evz:e.vz};all.push([e.x,Math.max(e.y,0)+0.12,e.z]);break}
-    if(k%4===3)all.push([e.x,Math.max(e.y,0)+0.12,e.z]);
+      hit={ox:o.x,oz:o.z,ovx:o.vx,ovz:o.vz,ex:hx,ez:hz,evx:e.vx,evz:e.vz};break}
+    if(k%2===1)raw.push([e.x,Math.max(e.y,0),e.z]);
     if(e.falling){fall=true;break}
-    if(len>maxLen||isStill(e)){all.push([e.x,Math.max(e.y,0)+0.12,e.z]);break}
+    if(len>maxLen||isStill(e)){raw.push([e.x,Math.max(e.y,0),e.z]);break}
   }
-  // 点の数に収まるよう間引く（最後の点は必ず残す）
-  const n=dots.length,pts=all.length<=n?all:Array.from({length:n},(_,k)=>all[Math.round(k*(all.length-1)/(n-1))]);
-  return{pts,hit,fall};
+  // 細かいガタつきをならす（横方向だけ移動平均、両端はそのまま）
+  const W=6,sm=raw.map((p,k)=>{if(k<W||k>=raw.length-W)return p;let x=0,z=0;for(let j=-W;j<=W;j++){x+=raw[k+j][0];z+=raw[k+j][2]}return[x/(2*W+1),p[1],z/(2*W+1)]});
+  // 道のりに沿って DOT_GAP ごとに点を置く（始点から数えるので、威力を変えても手前の点は動かない）
+  const pts=[];let acc=DOT_GAP*0.8;
+  for(let k=1;k<sm.length&&pts.length<dots.length;k++){const a=sm[k-1],b=sm[k],d=Math.hypot(b[0]-a[0],b[2]-a[2]);let u=0;
+    while(acc<=d-u&&pts.length<dots.length){u+=acc;const f=u/d;pts.push([a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f+0.12,a[2]+(b[2]-a[2])*f]);acc=DOT_GAP}
+    acc-=d-u}
+  const end=sm[sm.length-1];
+  return{pts,end:[end[0],end[1],end[2]],hit,fall};
 }
+let pvKey='',pvRes=null;
+function previewCached(sh,i,maxLen){
+  const k=[i,sh.type,sh.curve,sh.angle.toFixed(3),(+sh.power).toFixed(2),maxLen,S.e[0].x.toFixed(3),S.e[0].z.toFixed(3),S.e[1].x.toFixed(3),S.e[1].z.toFixed(3)].join();
+  if(k!==pvKey||!pvRes){pvKey=k;pvRes=previewShot(Object.assign({},sh,{angle:+(+sh.angle).toFixed(3),power:+(+sh.power).toFixed(2)}),i,maxLen)}
+  return pvRes}
 const arrowMk=c=>{const g=new THREE.Group(),m=new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:0.9,depthTest:false});
   const sh=new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.07,1,10),m);sh.position.y=0.5;g.add(sh);
   const hd=new THREE.Mesh(new THREE.ConeGeometry(0.2,0.42,12),m);g.add(hd);g.userData={sh,hd};g.visible=false;g.renderOrder=5;scene.add(g);return g};
@@ -1689,14 +1708,13 @@ function updateAimViz(){
   let show=false,sh=game.shot,sub=game.phase;
   if(aiming()&&isMyTurn())show=true;
   else if(game.phase==='wait'&&(game.cpuAnim||game.remoteSub!=='select')){show=true;sub=game.remoteSub}
-  if(!show){dots.forEach(d=>d.visible=false);arrowHead.visible=false;pushArrow.visible=hitRing.visible=false;ht.className='hidden';return}
+  if(!show){dots.forEach(d=>d.visible=false);arrowHead.visible=false;tipMark.visible=false;pushArrow.visible=hitRing.visible=false;ht.className='hidden';return}
   const pw=sub==='power',p=pw?Math.max(0.05,sh.power):0.55;
-  const{pts,hit,fall}=previewShot(Object.assign({},sh,{power:p}),game.shooter,pw?1e9:5);
-  const mat=dotMat[game.shooter];
-  dots.forEach((d,k)=>{if(k<pts.length){d.visible=true;d.material=fall&&k>=pts.length-3?fallMat:mat;d.position.set(...pts[k]);const s=1+0.3*Math.sin(game.realT*8-k*0.6);d.scale.setScalar(s)}else d.visible=false});
-  if(pts.length>=2&&!hit){const a=pts[pts.length-2],b=pts[pts.length-1];arrowHead.visible=true;arrowHead.material=fall?fallMat:mat;arrowHead.position.set(...b);
-    const dir=new THREE.Vector3(b[0]-a[0],b[1]-a[1],b[2]-a[2]).normalize();arrowHead.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir)}
-  else arrowHead.visible=false;
+  const{pts,end,hit,fall}=previewCached(Object.assign({},sh,{power:p}),game.shooter,pw?1e9:5);
+  const mat=dotMat[game.shooter];arrowHead.visible=false;
+  dots.forEach((d,k)=>{if(k<pts.length){d.visible=true;d.material=fall&&k>=pts.length-3?fallMat:mat;d.position.set(...pts[k]);d.scale.setScalar(1)}else d.visible=false});
+  // 先端：引っぱっている間だけ、止まる所／落ちる所に白フチの円（当たる時は相手の赤い輪で示す）
+  tipMark.visible=pw&&!hit;if(tipMark.visible){tipMark.position.set(end[0],0.03,end[2]);tipMark.userData.ctr.material=fall?fallMat:mat}
   hitRing.visible=!!hit;
   if(hit){const o=S.e[1-game.shooter];hitRing.position.set(o.x,0.03,o.z);hitRing.scale.setScalar((o.sz||1)*(1+0.08*Math.sin(game.realT*9)))}
   // 矢印は引っぱっている間だけ（威力で長さが変わる）
