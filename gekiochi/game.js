@@ -26,7 +26,7 @@ const ETYPES=[
    spd:1.0,mu:9,m:1.12,rest:0.85,oRest:0.45,land:0.22,squish:0.4,body:0xffc928,rough:0.35,metal:0,emis:0x8a5a00,sleeve:'#1b1430'},
   {name:'ちびちび消しゴム',rr:0.16,worn:1,short:'ちびちび',label:'ちびちび',desc:'使い古しで小さい。当たりにくくて足が速い。でも軽いから当たると吹っ飛ぶ。',stats:[5,3,2,1],
    spd:1.25,mu:8.5,m:0.8,rest:1.0,oRest:0.5,land:0.3,squish:0.4,body:0xe8e2d2,rough:0.95,metal:0,sz:0.7},
-  {name:'ブッとび消しゴム',rr:0.3,stripe:1,short:'ブッとび',label:'ブッとび',desc:'ぶつかった相手を空中にブッとばす！ 軽いので自分も飛ばされやすい。',stats:[4,3,4,2],
+  {name:'ブッとび消しゴム',rr:0.3,stripe:1,short:'ブッとび',label:'ブッとび',desc:'ぶつかると3回に1回、相手を空中にブッとばす！ 軽いので自分も飛ばされやすい。',stats:[4,3,4,2],
    spd:1.1,mu:9,m:0.85,rest:0.95,oRest:0.55,land:0.4,squish:0.5,body:0xff9a3c,rough:0.7,metal:0,pop:1},
 ];
 // プレイヤーが選べる消しゴム（3番はボス専用）
@@ -99,6 +99,8 @@ function startFall(e,ev,i){
   e.wr=4+Math.hypot(e.vx,e.vz)*0.5;
   ev&&ev.push({k:'fall',i,x:e.x,z:e.z});
 }
+const BUTTOBI_P=1/3;
+function luck(a,b,t){const v=Math.sin(a.x*12.9898+a.z*4.1414+b.x*78.233+b.z*39.425+t*137.31)*43758.5453;return v-Math.floor(v)}
 function step(s,dt,ev){
   s.t+=dt;
   for(let i=0;i<2;i++){const e=s.e[i];
@@ -160,7 +162,8 @@ function step(s,dt,ev){
         a.w-=rt*1.2+(-rv)*0.4;b.w+=rt*1.2+(-rv)*0.5;a.curve=b.curve=0;
         let sl=false,bu=false;
         if(-rv>2){if(a.k===1){b.slick=1;sl=true}if(b.k===1){a.slick=1;sl=true}
-          if(a.k===5){b.vy=Math.max(b.vy,Math.min(9,-rv*0.55));bu=true}if(b.k===5){a.vy=Math.max(a.vy,Math.min(9,-rv*0.55));bu=true}}
+          // ブッとびは確率技（3回に1回）。通信対戦でも両方で同じ結果になるよう、盤面から決まる乱数を使う。予測線とCPUの読みには入れない
+          if((a.k===5||b.k===5)&&!s.noLuck&&luck(a,b,s.t)<BUTTOBI_P){if(a.k===5){b.vy=Math.max(b.vy,Math.min(9,-rv*0.55));bu=true}if(b.k===5){a.vy=Math.max(a.vy,Math.min(9,-rv*0.55));bu=true}}}
         ev&&ev.push({k:'hit',vic:Math.hypot(a.vx,a.vz)>=Math.hypot(b.vx,b.vz)?0:1,p:-rv,x:(a.x+b.x)/2,y:(a.y+b.y)/2,z:(a.z+b.z)/2,mochi:(a.k===2||b.k===2),slick:sl,buttobi:bu});
       }
     }
@@ -219,7 +222,7 @@ function applyState(s,st){
 const DIR8=[...Array(12)].map((_,k)=>[Math.cos(k*Math.PI/6),Math.sin(k*Math.PI/6)]);
 function edgeDist(e){let m=6;for(const[dx,dz]of DIR8)for(let r=0.3;r<m;r+=0.3)if(!inTable(e.x+dx*r,e.z+dz*r)){m=r;break}return m}
 function evalShot(s0,i,sh){
-  const s=cloneState(s0);launch(s,i,sh);
+  const s=cloneState(s0);s.noLuck=true;launch(s,i,sh);
   for(let k=0;k<800;k++){step(s,DT*2,null);if(k%8===7&&quiet(s))break}
   const me=s.e[i],op=s.e[1-i];let sc=0;
   if(me.fell)sc-=1000;
@@ -1656,7 +1659,7 @@ cv.addEventListener('pointerup',()=>aimEnd());cv.addEventListener('pointercancel
 // 本物の盤面（相手・文房具込み）で先読みして、相手に当たる所まで線を引く。
 // 当たる場合は「相手がはじかれる向き」と「自分がはね返る向き」を矢印で見せる（長さ＝勢い）
 function previewShot(sh,i,maxLen){
-  const t=cloneState(S),ev=[];launch(t,i,Object.assign({},sh));const e=t.e[i],o=t.e[1-i];
+  const t=cloneState(S),ev=[];t.noLuck=true;launch(t,i,Object.assign({},sh));const e=t.e[i],o=t.e[1-i];
   const all=[];let len=0,px=e.x,pz=e.z,hit=null,fall=false;
   for(let k=0;k<2400;k++){
     ev.length=0;step(t,DT,ev);len+=Math.hypot(e.x-px,e.z-pz);px=e.x;pz=e.z;
