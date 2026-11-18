@@ -15,8 +15,9 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://zirihinit.github.io/gekiochi/ogp.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&text=%E7%8E%8B%E5%B0%86&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=M+PLUS+Rounded+1c:wght@500;800&family=Murecho:wght@900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=20261117">
+<link rel="stylesheet" href="style.css?v=20261118">
 </head>
 <body>
 <canvas id="c"></canvas>
@@ -132,7 +133,7 @@
   <div class="howbox">
     自分のターンに <b>左右になぞって向き → 下に引っぱって離す</b> で消しゴムを弾こう（引っぱるほど強い）。打ち方は画面下のボタンで選ぶ。<br>
     <b>相手を机から落としたら1本！</b> 自分が落ちたら相手の1本。両方落ちたら相打ちでやり直し。<br>
-    <b>勝ち抜き戦</b>：全員<b>1本勝負</b>で、だんだん強くなる相手を何人激落させられるか挑戦！ 5人ごとに強敵が出る。負けたら1人目から。<br>
+    <b>勝ち抜き戦</b>：全員<b>1本勝負</b>で、だんだん強くなる相手を何人激落させられるか挑戦！ 5人ごとに強敵が出て、倒すと称号や新しい消しゴムが手に入る。負けたら1人目から（強敵に負けたときは、その強敵から再挑戦もできる）。<br>
     <b>ネット対戦・ランクマッチ</b>：先に<b>2本</b>取ったほうの勝ち。<br><br>
     <b>ストレート</b>：まっすぐ一直線。いちばん威力が出る。<br>
     <b>ループ</b>：ジャンプして鉛筆を飛び越える。着地で少し減速。<br>
@@ -159,6 +160,7 @@
   <div id="resS"></div>
   <div id="resRate" class="hidden"></div>
   <button class="btn red" id="bAgain">もう一回！</button>
+  <button class="btn" id="bRetry">強敵から再挑戦<small>記録には入りません</small></button>
   <a class="btn blue share" id="bShare" href="https://x.com/intent/post" target="_blank" rel="noopener">結果をポストする</a>
   <button class="btn ghost" id="bToTitle">タイトルへ</button>
 </div>
@@ -185,9 +187,11 @@
   <label>効果音<input type="range" id="volSe" min="0" max="100" step="5"><b id="volSeN"></b></label></div></div>
 <div id="pop"></div>
 <div id="toast" class="hidden"></div>
+<div id="hitTag" class="hidden"></div>
+<div id="ghost" class="hidden" aria-hidden="true"><div id="ghostLine"></div><div id="ghostF">👆</div><div id="ghostCap"></div></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
-<script src="game.js?v=20261117"></script>
+<script src="game.js?v=20261118"></script>
 </body>
 </html>
