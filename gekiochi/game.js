@@ -230,6 +230,12 @@ function evalShot(s0,i,sh){
 function cpuChoose(s,i,diff){
   const cfg=typeof diff==='object'?diff:[{n:40,na:0.2,np:0.16},{n:140,na:0.06,np:0.06},{n:360,na:0.012,np:0.015}][diff];
   const me=s.e[i],op=s.e[1-i],base=Math.atan2(op.z-me.z,op.x-me.x),r=Math.random;
+  if(cfg.easy){let best=null,bs=-1e9;
+    for(let k=0;k<cfg.n;k++){const sh={type:0,curve:1,angle:r()*Math.PI*2,power:0.12+r()*0.3},t=cloneState(s);launch(t,i,sh);
+      for(let j=0;j<500;j++){step(t,DT*2,null);if(j%8===7&&quiet(t))break}
+      const a=t.e[i],b=t.e[1-i];let sc=-Math.abs(edgeDist(a)-1.1)*10+r()*3;
+      if(a.fell)sc-=1000;if(Math.hypot(b.x-op.x,b.z-op.z)>0.05||b.fell)sc-=800;if(sc>bs){bs=sc;best=sh}}
+    return best}
   let best=null,bs=-1e9;
   for(let k=0;k<cfg.n;k++){
     const sh={type:(r()*3)|0,curve:r()<0.5?-1:1,angle:r()<0.8?base+(r()*2-1)*0.75:r()*Math.PI*2,power:0.15+r()*0.85};
@@ -939,6 +945,7 @@ const lerp=(a,b,t)=>a+(b-a)*t;
 function stageOf(n){
   if(n%5===0){const i=n/5-1,B=GT_BOSSES[i%GT_BOSSES.length];
     return{name:(i>=GT_BOSSES.length?'真・':'')+B.name,k:B.k,need:1,boss:true,cfg:{n:360,na:0.012,np:0.015,refine:true}}}
+  if(n===1)return{name:GT_NAMES[0],k:0,need:1,easy:true,cfg:{n:60,easy:true}};   // 1人目は必ず落とせる練習相手
   const t=Math.min(1,(n-1)/13),fixed=[0,1,2,4];   // 最初の4人は消しゴムの種類を順番に見せる
   return{name:GT_NAMES[(n-1-Math.floor(n/5))%GT_NAMES.length],k:n<=4?fixed[n-1]:randType(),need:1,
     cfg:{n:Math.round(lerp(40,300,t)),na:lerp(0.2,0.02,t),np:lerp(0.16,0.022,t)}}}
@@ -964,7 +971,8 @@ function startMatch(mode,seed,first,types,need,keepBgm){
   startRound(first);
 }
 function startRound(first){
-  S=newState(game.seed+game.round*7919,game.types);buildObs(S.obs);clearParts();fallCam=null;sq.forEach(q=>{q.v=0;q.vel=0});
+  S=newState(game.seed+game.round*7919,game.types);buildObs(S.obs);
+  {const g=GT();if(g&&g.st.easy){const o=S.e[1];o.m*=0.5;o.mu*=0.75}}   // 練習相手は軽くてよく滑るclearParts();fallCam=null;sq.forEach(q=>{q.v=0;q.vel=0});
   game.shooter=first;game.phase='between';updateHUD();$('turn').textContent='';showPanel(null);
   const g=GT();pop(g&&game.round===1?(g.st.boss?'強敵出現！！':g.n+'人目！'):'ROUND '+game.round,'mid');if(game.round===1)toast('ステージ：'+STAGE_NAMES[game.stage]);SFX.round();if(game.round>1)bgmHit('crash');
   later(beginTurn,game.round===1?900:700);
@@ -1094,7 +1102,12 @@ function resolveTurn(){
     const msg=nm&&no?(game.shooter===me?'おしい！！':'ギリギリ！！'):no?'おしい！！':nm?'ギリギリ！！':null;
     if(msg){pop(msg,'mid');SFX.creak()}
     game.shooter=1-game.shooter;game.phase='between';later(beginTurn,msg?1100:250);return}
-  let w=-1;if(f0&&!f1)w=1;else if(f1&&!f0)w=0;
+  const gE=GT();
+  // 1人目（練習相手）は自分が落ちてもセーフ。机に戻してもう一回
+  if(gE&&gE.st.easy&&f0&&!f1){const o=S.e[1],e=mkE(-START_X,0,0,S.e[0].k);if(Math.hypot(o.x-e.x,o.z-e.z)<1.6)e.z=o.z>0?-1.8:1.8;
+    e.yaw=Math.atan2(o.z-e.z,o.x-e.x);S.e[0]=e;fallCam=null;camTarget=0;pop('セーフ！もう一回！','mid');SFX.max();
+    game.shooter=0;game.phase='between';later(beginTurn,1300);return}
+  let w=-1;if(f0&&!f1)w=1;else if(f1&&!f0)w=0;else if(gE&&gE.st.easy)w=0;
   game.phase='between';let next;
   if(w<0){pop('相打ち！！','mid');next=1-game.shooter}
   else{game.score[w]++;updateHUD();pop(w===myIdx()?'ナイス激落！':'落とされた…','mid');next=1-w}
@@ -1157,7 +1170,7 @@ function handleEvents(ev){
     else if(e.k==='ofall'){SFX.drop();if(e.kind===1)pop('定規が落ちた！','small')}
     else if(e.k==='ofloor'){SFX.clack()}
     else if(e.k==='land'){squash(e.i,Math.min(2.5,e.p*0.12));if(e.p>3){SFX.land(e.p);spawn(e.x,0.1,e.z,4,pMatE,2);shake=Math.max(shake,0.2)}}
-    else if(e.k==='fall'){SFX.fall();bgmHit('boom');slowT=1.5;pop('激落！！','big');shake=0.6;camTarget=e.i;
+    else if(e.k==='fall'){const eFz=GT()&&GT().st.easy&&e.i===0;SFX.fall();bgmHit('boom');slowT=eFz?0.6:1.5;pop(eFz?'あっ！':'激落！！','big');shake=0.6;camTarget=e.i;
       const c=nearestOnTable(e.x,e.z),ex=c[0],ez=c[1];let ix=e.x-ex,iz=e.z-ez,l=Math.hypot(ix,iz);if(l<1e-6){ix=ex;iz=ez;l=Math.hypot(ix,iz)||1}
       fallCam={pos:new THREE.Vector3(ex-ix/l*3.4,3.6,ez-iz/l*3.4)}}
     else if(e.k==='floor'){SFX.floor()}
@@ -1640,29 +1653,59 @@ cv.addEventListener('pointermove',e=>aimMove(e.clientX,e.clientY));
 cv.addEventListener('pointerup',()=>aimEnd());cv.addEventListener('pointercancel',()=>{drag=null;if(game.phase==='power'&&isMyTurn()){chargeStop();game.phase='dir';game.shot.power=0}});
 
 // ================= 予測線 =================
-function previewPoints(sh,i,maxLen){
-  const t={e:[Object.assign({},S.e[i]),mkE(999,999,0)],obs:[],t:0};
-  const sh2=Object.assign({},sh);launch(t,0,sh2);const e=t.e[0];
-  const pts=[];let len=0,px=e.x,pz=e.z;
-  for(let k=0;k<500&&pts.length<dots.length;k++){
-    step(t,DT,null);len+=Math.hypot(e.x-px,e.z-pz);px=e.x;pz=e.z;
-    if(k%5===4)pts.push([e.x,Math.max(e.y,0)+0.12,e.z]);
-    if(len>maxLen||e.falling||isStill(e))break;
+// 本物の盤面（相手・文房具込み）で先読みして、相手に当たる所まで線を引く。
+// 当たる場合は「相手がはじかれる向き」と「自分がはね返る向き」を矢印で見せる（長さ＝勢い）
+function previewShot(sh,i,maxLen){
+  const t=cloneState(S),ev=[];launch(t,i,Object.assign({},sh));const e=t.e[i],o=t.e[1-i];
+  const all=[];let len=0,px=e.x,pz=e.z,hit=null,fall=false;
+  for(let k=0;k<2400;k++){
+    ev.length=0;step(t,DT,ev);len+=Math.hypot(e.x-px,e.z-pz);px=e.x;pz=e.z;
+    if(ev.some(v=>v.k==='hit')){
+      // 数ステップ進めて、ぶつかった直後の向きと速さを読む
+      for(let j=0;j<3;j++)step(t,DT,null);
+      hit={ox:o.x,oz:o.z,ovx:o.vx,ovz:o.vz,ex:e.x,ez:e.z,evx:e.vx,evz:e.vz};all.push([e.x,Math.max(e.y,0)+0.12,e.z]);break}
+    if(k%4===3)all.push([e.x,Math.max(e.y,0)+0.12,e.z]);
+    if(e.falling){fall=true;break}
+    if(len>maxLen||isStill(e)){all.push([e.x,Math.max(e.y,0)+0.12,e.z]);break}
   }
-  return pts;
+  // 点の数に収まるよう間引く（最後の点は必ず残す）
+  const n=dots.length,pts=all.length<=n?all:Array.from({length:n},(_,k)=>all[Math.round(k*(all.length-1)/(n-1))]);
+  return{pts,hit,fall};
 }
+const arrowMk=c=>{const g=new THREE.Group(),m=new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:0.9,depthTest:false});
+  const sh=new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.07,1,10),m);sh.position.y=0.5;g.add(sh);
+  const hd=new THREE.Mesh(new THREE.ConeGeometry(0.2,0.42,12),m);g.add(hd);g.userData={sh,hd};g.visible=false;g.renderOrder=5;scene.add(g);return g};
+const pushArrow=arrowMk(0xff3b5c),backArrow={visible:false},fallMat=new THREE.MeshBasicMaterial({color:0xff3b5c});
+const hitRing=new THREE.Mesh(new THREE.RingGeometry(0.42,0.56,32),new THREE.MeshBasicMaterial({color:0xff3b5c,transparent:true,opacity:0.9,side:THREE.DoubleSide,depthTest:false}));hitRing.rotation.x=-Math.PI/2;hitRing.visible=false;hitRing.renderOrder=5;scene.add(hitRing);
+function setArrow(a,x,z,vx,vz,k){const sp=Math.hypot(vx,vz);if(sp<0.3){a.visible=false;return}
+  const L=clamp(sp*k,0.35,3.2),dx=vx/sp,dz=vz/sp;a.visible=true;a.position.set(x,0.35,z);
+  a.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),new THREE.Vector3(dx,0,dz));
+  a.userData.sh.scale.y=L;a.userData.sh.position.y=L/2;a.userData.hd.position.y=L+0.18}
+const ht=document.getElementById('hitTag');
 function updateAimViz(){
   let show=false,sh=game.shot,sub=game.phase;
   if(aiming()&&isMyTurn())show=true;
   else if(game.phase==='wait'&&(game.cpuAnim||game.remoteSub!=='select')){show=true;sub=game.remoteSub}
-  if(!show){dots.forEach(d=>d.visible=false);arrowHead.visible=false;return}
-  const p=sub==='power'?Math.max(0.05,sh.power):0.55;
-  const pts=previewPoints(Object.assign({},sh,{power:p}),game.shooter,sub==='power'?7:5);
+  if(!show){dots.forEach(d=>d.visible=false);arrowHead.visible=false;pushArrow.visible=hitRing.visible=false;ht.className='hidden';return}
+  const pw=sub==='power',p=pw?Math.max(0.05,sh.power):0.55;
+  const{pts,hit,fall}=previewShot(Object.assign({},sh,{power:p}),game.shooter,pw?1e9:5);
   const mat=dotMat[game.shooter];
-  dots.forEach((d,k)=>{if(k<pts.length){d.visible=true;d.material=mat;d.position.set(...pts[k]);const s=1+0.3*Math.sin(game.realT*8-k*0.6);d.scale.setScalar(s)}else d.visible=false});
-  if(pts.length>=2){const a=pts[pts.length-2],b=pts[pts.length-1];arrowHead.visible=true;arrowHead.material=mat;arrowHead.position.set(...b);
+  dots.forEach((d,k)=>{if(k<pts.length){d.visible=true;d.material=fall&&k>=pts.length-3?fallMat:mat;d.position.set(...pts[k]);const s=1+0.3*Math.sin(game.realT*8-k*0.6);d.scale.setScalar(s)}else d.visible=false});
+  if(pts.length>=2&&!hit){const a=pts[pts.length-2],b=pts[pts.length-1];arrowHead.visible=true;arrowHead.material=fall?fallMat:mat;arrowHead.position.set(...b);
     const dir=new THREE.Vector3(b[0]-a[0],b[1]-a[1],b[2]-a[2]).normalize();arrowHead.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir)}
   else arrowHead.visible=false;
+  hitRing.visible=!!hit;
+  if(hit){const o=S.e[1-game.shooter];hitRing.position.set(o.x,0.03,o.z);hitRing.scale.setScalar((o.sz||1)*(1+0.08*Math.sin(game.realT*9)))}
+  // 矢印は引っぱっている間だけ（威力で長さが変わる）
+  if(hit&&pw)setArrow(pushArrow,hit.ox,hit.oz,hit.ovx,hit.ovz,0.16);else pushArrow.visible=false;
+  // 相手の頭上に「命中！ 強／中／弱」、自分が落ちる線なら「落ちる！」
+  let tag='';if(pw&&hit){const os=Math.hypot(hit.ovx,hit.ovz),es=Math.hypot(hit.evx,hit.evz);
+    tag='命中！ <b>'+(os>=11?'強':os>=6?'中':'弱')+'</b>'+(es>=6?'<small>自分も飛ぶ！</small>':'')}
+  else if(pw&&fall)tag='落ちる！';
+  if(tag){const o=fall&&!hit?pts[pts.length-1]:[S.e[1-game.shooter].x,0,S.e[1-game.shooter].z];
+    tmpP.set(o[0],1.1,o[2]).project(camera);ht.innerHTML=tag;ht.className=fall&&!hit?'miss':'';
+    ht.style.left=clamp((tmpP.x+1)/2*innerWidth,70,innerWidth-70)+'px';ht.style.top=clamp((1-tmpP.y)/2*innerHeight,150,innerHeight*0.6)+'px'}
+  else ht.className='hidden';
 }
 
 // ================= カメラ =================

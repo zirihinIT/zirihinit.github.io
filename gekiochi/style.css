@@ -254,3 +254,7 @@ a.btn{display:inline-block;box-sizing:border-box;text-decoration:none;text-align
 .drItem em.r5{background:#c8f5d8}
 .gaCard.r5{border-color:#1fb86a;background:linear-gradient(160deg,#fff,#dcffe9);box-shadow:0 8px 0 #1fb86a,0 0 50px rgba(31,184,106,.8)}
 .gaCard.r5 .gaRar{color:#1fb86a;font-size:26px}
+
+#hitTag{position:fixed;left:0;top:0;transform:translate(-50%,-100%);pointer-events:none;z-index:6;background:#fff;color:var(--ink);border:3px solid var(--ink);border-radius:10px;padding:2px 9px;font-weight:800;font-size:15px;white-space:nowrap;box-shadow:0 3px 0 var(--ink)}
+#hitTag b{color:#ff3b5c}#hitTag small{display:block;font-size:11px;color:#c0392b;text-align:center}
+#hitTag.miss{background:#ffe3e8}
