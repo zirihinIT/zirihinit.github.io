@@ -60,7 +60,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#3a2433;font-family:'M
 .btn:disabled{opacity:.45}
 .row{display:flex;gap:7px}.row>*{flex:1}
 .gauge{position:relative;height:40px;border-radius:12px;border:3px solid var(--ink);overflow:hidden;
-  background:linear-gradient(90deg,#ff7a8a 0 28%,#ffd84d 28% 45%,#5fd17a 45% 55%,#ffd84d 55% 72%,#ff7a8a 72%)}
+  background:linear-gradient(90deg,#ff7a8a 0 18%,#ffd84d 18% 41%,#5fd17a 41% 59%,#ffd84d 59% 82%,#ff7a8a 82%)}
 .gauge .cur{position:absolute;top:-4px;bottom:-4px;width:6px;margin-left:-3px;background:var(--ink);border-radius:3px;box-shadow:0 0 0 2px #fff}
 .spad{position:relative;height:150px;border:3px solid var(--ink);border-radius:16px;overflow:hidden;background:#fff;touch-action:none;cursor:pointer}
 .spad .half{position:absolute;left:0;right:0;height:50%;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:800;font-size:17px}
@@ -95,7 +95,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#3a2433;font-family:'M
 
 /* ---------- overlays ---------- */
 .screen{position:fixed;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px;
-  background:radial-gradient(circle at 50% 30%,rgba(255,240,250,.92),rgba(240,210,230,.96));overflow:auto}
+  background:radial-gradient(circle at 50% 30%,rgba(255,240,250,.92),rgba(240,210,230,.96));overflow:auto;touch-action:pan-y}
 .logo{font-family:'Dela Gothic One';text-align:center;color:var(--purple);line-height:1.05;
   text-shadow:3px 3px 0 #fff,-3px 3px 0 #fff,3px -3px 0 #fff,-3px -3px 0 #fff,0 7px 0 var(--pink)}
 .logo .s{font-size:22px;display:block;color:var(--ink)}
@@ -160,8 +160,8 @@ a.btn{text-decoration:none;text-align:center;display:block}
   <label class="opts"><input type="checkbox" id="voiceOn" checked>先生がしゃべる（音声読み上げ）</label>
   <label class="opts" style="margin-top:4px"><input type="checkbox" id="sfxOn" checked>効果音</label>
   <div class="howto">
-    ・お題に合わせて <b>選ぶ／スワイプ／タイミング／連打</b> でお作法をこなす<br>
-    ・ミスで<b>先生のお怒り</b>が溜まり、満タンで<b>落第</b><br>
+    ・お作法クイズに <b>選んで</b> 答える（順番を当てるお題もあり）<br>
+    ・まちがえると<b>先生のお怒り</b>が溜まり、満タンで<b>落第</b>。答えのあとに解説つき<br>
     ・小言を言われると<b>あなたのイライラ</b>が溜まる<br>
     ・右上の<b>ちゃぶ台返し</b>を長押しで、いつでも講座をぶち壊せる<br>
     ・イライラが満タンになると……勝手に返す
@@ -856,14 +856,14 @@ const COURSES = {
       exp:'「三手（みて）で取る」のが美しい所作ザマス。'},
     {type:'choice', target:'soup', q:'さて、最初に口をつけるのはどれザマス？', opts:[{t:'お味噌汁をひと口',ok:1},{t:'ご飯を一気にかき込む'},{t:'焼き魚の皮から'}],
       exp:'まず汁物で口と箸先をしめらせるのが和食の基本ザマス。'},
-    {type:'swipe', target:'soup', q:'お味噌汁をいただくザマス。お椀はどうするザマス？', dirs:{up:'持ち上げる',down:'置いたまま顔を近づける'}, ans:'up',
-      exp:'和食ではお椀は<b>持ち上げて</b>いただくザマス。犬食いは厳禁！'},
-    {type:'timing', target:'soup', q:'静かにすするザマス！緑のところでタップ', btn:'ずずっ', speed:1, eat:.5,
-      exp:'すする音は控えめに、が上品ザマス。'},
+    {type:'choice', target:'soup', q:'お味噌汁をいただくザマス。お椀はどうするザマス？', opts:[{t:'両手で持ち上げ、胸の高さで持つ',ok:1},{t:'置いたまま顔を近づける'},{t:'片手でつまんで高く掲げる'}],
+      exp:'和食ではお椀は<b>持ち上げて</b>いただくザマス。置いたまま顔を近づける「犬食い」は厳禁！'},
+    {type:'choice', target:'soup', q:'お味噌汁の具、どういただくザマス？', opts:[{t:'汁をひと口飲み、具はお箸で押さえていただく',ok:1},{t:'お箸で汁をぐるぐるかき混ぜる'},{t:'お椀に口をつけて具をかき込む'}], eat:0.5,
+      exp:'具はお箸で軽く押さえ、<b>汁と交互に</b>いただくザマス。かき混ぜたりかき込んだりは品がないザマス。'},
     {type:'choice', target:null, q:'ご飯とおかず、どう食べ進めるザマス？', opts:[{t:'ご飯・汁・おかずを交互に',ok:1},{t:'おかずだけ先に全部'},{t:'ご飯におかずを乗せて丼に'}],
       exp:'ご飯・汁物・おかずを<b>交互に</b>いただく「三角食べ」がきれいザマス。'},
-    {type:'mash', target:'rice', q:'ご飯はよく噛むザマス。きっちり<b>30回</b>！', btn:'もぐもぐ', done:'ごっくん', goal:30, time:14, eat:.5,
-      exp:'ひと口30回が目安ザマス。'},
+    {type:'choice', target:'rice', q:'ご飯をいただくザマス。お茶碗の持ち方は？', opts:[{t:'親指を縁にかけ、4本の指で底を支える',ok:1},{t:'手のひら全体でわしづかみ'},{t:'テーブルに置いたまま食べる'}], eat:0.5,
+      exp:'お茶碗は<b>親指を縁に、残りの指で底（糸底）を支える</b>ザマス。'},
     {type:'choice', target:'rice', q:'ご飯のおかわりをお願いするザマス。お茶碗は？', opts:[{t:'ひと口分残して両手で渡す',ok:1},{t:'空にして片手で差し出す'},{t:'お茶碗をお箸でチンチン鳴らす'}], eat:.5,
       exp:'おかわりは<b>ひと口残して両手で</b>、が昔ながらの作法とされるザマス。食器を鳴らすのは論外！'},
     {type:'seq', target:'hashi', q:'ごちそうさまの流れザマス。正しい順番で！', items:['お箸を箸置きに戻す','お椀のふたを元に戻す','手を合わせて「ごちそうさま」'],
@@ -878,12 +878,12 @@ const COURSES = {
       exp:'お箸をうろうろさせる「<b>迷い箸</b>」はタブーザマス。'},
     {type:'choice', target:'nimono', q:'煮物の里いもがつるつる滑って、つかめないザマス', opts:[{t:'お箸でブスッと突き刺す'},{t:'小鉢を手に持ち、落ち着いてつまむ',ok:1},{t:'指でつまむ'}], eat:.4,
       exp:'突き刺す「<b>刺し箸</b>」はNG。小鉢を持てば口まで安全ザマス。'},
-    {type:'swipe', target:'nimono', q:'煮物のおつゆが垂れそう！どうするザマス？', dirs:{up:'小鉢を持ち上げて口元で受ける',down:'空いた手を下に添えて受ける'}, ans:'up', eat:.3,
+    {type:'choice', target:'nimono', q:'煮物のおつゆが垂れそう！どうするザマス？', opts:[{t:'小鉢を持ち上げて口元で受ける',ok:1},{t:'空いた手を下に添えて受ける'},{t:'気にせずそのまま運ぶ'}], eat:0.3,
       exp:'手で受ける「<b>手皿</b>」も実はマナー違反。器を持ち上げて受けるザマス。'},
     {type:'choice', target:'pickle', q:'遠くのお漬物が食べたいザマス', opts:[{t:'お箸で器を引き寄せる'},{t:'器を手で持って手前に置く',ok:1},{t:'身を乗り出して取る'}], eat:.5,
       exp:'お箸で器を動かす「<b>寄せ箸</b>」はNGザマス。'},
-    {type:'timing', target:'hashi', q:'ちょっとひと休み。お箸を箸置きに<b>そっと</b>置くザマス', btn:'そっ…', speed:1.3,
-      exp:'カチャンと音を立てずに置くザマス。'},
+    {type:'choice', target:'hashi', q:'箸置きがないお店ザマス。食事中のお箸は？', opts:[{t:'箸袋を折って箸置きにする',ok:1},{t:'器の上に渡して置く'},{t:'テーブルに直接転がす'}],
+      exp:'<b>箸袋を折って</b>箸置きがわりにすると上品ザマス。'},
     {type:'choice', target:'hashi', q:'食事の途中でお箸を休めるときは？', opts:[{t:'器の上に橋のように渡す'},{t:'箸置きに置く',ok:1},{t:'ご飯に突き立てる'}],
       exp:'器に渡す「<b>渡し箸</b>」も、ご飯に立てる「<b>立て箸</b>」もNGザマス。'},
     {type:'choice', target:'fish', q:'お隣の人に焼き魚を取り分けてあげたいザマス', opts:[{t:'お箸からお箸へ直接渡す'},{t:'取り皿に乗せて渡す',ok:1},{t:'相手の口へ運ぶ'}], eat:.4,
@@ -898,11 +898,11 @@ const COURSES = {
       exp:'果汁が飛ばないよう<b>手で覆って</b>搾るザマス。'},
     {type:'choice', target:'fish', q:'どこから食べ始めるザマス？', opts:[{t:'頭の近くの背から、尾に向かって',ok:1},{t:'尾から頭に向かって'},{t:'お腹の真ん中から'}],
       exp:'上の身を<b>頭側から尾へ</b>向かって食べ進めるザマス。'},
-    {type:'timing', target:'fish', q:'上の身をひと口大にほぐすザマス。ぐちゃぐちゃにしないで！', btn:'ほぐす', speed:1.2, eat:.3,
-      exp:'中骨に沿って、ひと口ずつほぐすと美しいザマス。'},
+    {type:'choice', target:'fish', q:'焼き魚の身、どうやってほぐすザマス？', opts:[{t:'中骨に沿って、ひと口ずつほぐす',ok:1},{t:'最初に全部ぐちゃぐちゃにほぐす'},{t:'大きな塊のままかぶりつく'}], eat:0.3,
+      exp:'<b>ひと口分ずつ</b>ほぐすと、最後まで見た目がきれいザマス。'},
     {type:'choice', target:'fish', q:'上の身を食べ終えたザマス。下の身は？', opts:[{t:'中骨を外して奥に置き、下の身を食べる',ok:1},{t:'魚をひっくり返す'},{t:'骨のすき間からほじくる'}], eat:.3,
       exp:'魚を<b>裏返すのはNG</b>。中骨を頭ごと外すザマス。'},
-    {type:'swipe', target:'fish', q:'外した中骨、どこに置くザマス？', dirs:{up:'お皿の奥',down:'お皿の手前'}, ans:'up',
+    {type:'choice', target:'fish', q:'外した中骨、どこに置くザマス？', opts:[{t:'お皿の奥（向こう側）',ok:1},{t:'お皿の手前'},{t:'ご飯茶碗の中'}],
       exp:'骨や皮は<b>お皿の奥（向こう側）</b>にまとめるザマス。'},
     {type:'choice', target:null, q:'あら、口の中に小骨が…', opts:[{t:'口元を手で隠して取り出す',ok:1},{t:'ペッと吐き出す'},{t:'無理やり飲み込む'}],
       exp:'<b>口元を手で隠して</b>そっと取り出し、お皿の隅に置くザマス。'},
@@ -916,9 +916,9 @@ const COURSES = {
       exp:'にぎりは<b>手でもお箸でも</b>OKザマス。'},
     {type:'choice', target:'shoyu', q:'お醤油はどこにつけるザマス？', opts:[{t:'ネタの先に少しだけ',ok:1},{t:'シャリにたっぷり'},{t:'全体をドボン'}],
       exp:'シャリにつけると崩れるザマス。<b>ネタの先に少し</b>！'},
-    {type:'timing', target:'shoyu', q:'ネタの先にお醤油を<b>ちょん</b>とつけるザマス。つけすぎ注意！', btn:'ちょん', speed:1.4,
-      exp:'お醤油はほんの少しで十分ザマス。'},
-    {type:'swipe', target:'sushi', q:'口に運ぶときの向きは？', dirs:{up:'ネタが下（舌に当たる）',down:'シャリが下'}, ans:'up', eat:.25,
+    {type:'choice', target:'shoyu', q:'お醤油を小皿に注ぐザマス。どのくらい？', opts:[{t:'少しずつ、使う分だけ',ok:1},{t:'小皿のふちまでなみなみ'},{t:'あふれるくらいたっぷり'}],
+      exp:'お醤油は<b>少なめに注いで足す</b>のがスマートザマス。残すのはもったいないザマス。'},
+    {type:'choice', target:'sushi', q:'にぎりを口に運ぶときの向きは？', opts:[{t:'ネタを下にして、舌に当たるように',ok:1},{t:'シャリを下にして'},{t:'縦にして横からかじる'}], eat:0.25,
       exp:'<b>ネタを下</b>にすると、ネタの味が舌に直接届くザマス。'},
     {type:'choice', target:'sushi', q:'大きなにぎり。どう食べるザマス？', opts:[{t:'ひと口でいただく',ok:1},{t:'半分かじって置く'},{t:'お箸で切り分ける'}], eat:.25,
       exp:'にぎりは<b>ひと口</b>が基本。かじりかけを戻すのはNGザマス。'},
@@ -938,16 +938,16 @@ const COURSES = {
       exp:'ナプキンは<b>二つ折りにしてひざの上</b>ザマス。'},
     {type:'choice', target:'cutlery', q:'ナイフとフォークがたくさん。どれから使うザマス？', opts:[{t:'外側から順に',ok:1},{t:'内側から順に'},{t:'持ちやすいもの'}],
       exp:'カトラリーは料理ごとに<b>外側から</b>使うザマス。'},
-    {type:'swipe', target:'soup', q:'スープをすくうザマス。スプーンを動かす方向は？', dirs:{up:'奥へ',down:'手前へ'}, ans:'up',
-      exp:'イギリス式は<b>手前から奥へ</b>すくうザマス（フランス式は逆の場合もあるザマス）。'},
-    {type:'timing', target:'soup', q:'音を立てずに飲むザマス！緑でタップ', btn:'いただく', speed:1.15, eat:.6,
-      exp:'スープはすすらず、口に流し込むように、ザマス。'},
+    {type:'choice', target:'soup', q:'スープが少なくなったザマス。スープ皿は？', opts:[{t:'手前を少し持ち上げ、奥に傾けてすくう',ok:1},{t:'奥を持ち上げて手前に傾ける'},{t:'お皿を持って直接飲む'}],
+      exp:'お皿は<b>手前を持ち上げて奥へ傾ける</b>ザマス。直接口をつけるのはNGザマス。'},
+    {type:'choice', target:'soup', q:'スープの飲み方は？', opts:[{t:'スプーンで流し込むように、音を立てずに',ok:1},{t:'ズズッとすする'},{t:'お皿に口をつけて飲む'}], eat:0.6,
+      exp:'スープはすすらず、<b>音を立てずに</b>口に流し込むザマス。'},
     {type:'choice', target:'bread', q:'パンはどう食べるザマス？', opts:[{t:'丸ごとかぶりつく'},{t:'一口大にちぎって食べる',ok:1},{t:'ナイフで切る'}], eat:.5,
       exp:'パンは<b>手でひと口大にちぎって</b>いただくザマス。'},
-    {type:'timing', target:'steak', q:'お肉を切るザマス。ギコギコ音を立てずに、一瞬で！', btn:'切る', speed:1.6, eat:.4,
-      exp:'ナイフは引くときに切ると静かザマス。'},
-    {type:'mash', target:'wine', q:'ワインを回す（スワリング）のは<b>ちょうど3回</b>ザマス', btn:'くるっ', done:'いただく', goal:3, time:6, eat:.5,
-      exp:'回しすぎは品がないザマス。'},
+    {type:'choice', target:'steak', q:'ナイフでお肉を切るときのコツは？', opts:[{t:'ナイフを引くときに切る',ok:1},{t:'押しつけてギコギコ往復'},{t:'フォークで引きちぎる'}], eat:0.4,
+      exp:'ナイフは<b>引くときに</b>切ると、音も出ずきれいに切れるザマス。'},
+    {type:'choice', target:'wine', q:'ワイングラスはどこを持つザマス？', opts:[{t:'脚（ステム）を持つ',ok:1},{t:'丸い部分をわしづかみ'},{t:'縁をつまむ'}], eat:0.5,
+      exp:'日本では<b>脚（ステム）を持つ</b>のが一般的ザマス（海外では丸い部分を持つ流儀もあるザマス）。'},
     {type:'choice', target:'rice', q:'ライスはどうやって食べるザマス？', opts:[{t:'フォークの腹ですくう',ok:1},{t:'お皿を持ち上げてかき込む'},{t:'手でつまむ'}], eat:.6,
       exp:'<b>フォークの腹</b>ですくってOKザマス。背に乗せる必要はないザマス。'},
     {type:'choice', target:'steak', q:'ちょっとひと休み。ナイフとフォークは？', opts:[{t:'お皿の上にハの字に置く',ok:1},{t:'お皿の上に揃えて置く'},{t:'テーブルに直置き'}], eat:.3,
@@ -960,31 +960,31 @@ const COURSES = {
       exp:'<b>右手にナイフ、左手にフォーク</b>。人差し指を背に添えると安定するザマス。'},
     {type:'choice', target:'steak', q:'お肉はどう切り進めるザマス？', opts:[{t:'左端からひと口ずつ切って食べる',ok:1},{t:'最初に全部切り分ける'},{t:'真ん中から大胆に'}],
       exp:'最初に全部切ると肉汁が流れて冷めるザマス。<b>左からひと口ずつ</b>！'},
-    {type:'timing', target:'steak', q:'ひと口大に切るザマス。ギコギコせず、引くときにスッと！', btn:'切る', speed:1.5, eat:.25,
-      exp:'ナイフは<b>引くときに切る</b>と音も出ず、きれいに切れるザマス。'},
+    {type:'choice', target:'steak', q:'ナイフで切るとき、腕はどうするザマス？', opts:[{t:'脇を軽く締めて、ひじを張らない',ok:1},{t:'ひじを横に大きく張る'},{t:'立ち上がって体重をかける'}], eat:0.25,
+      exp:'ひじを張ると隣の人に当たるザマス。<b>脇を締めて</b>静かに切るザマス。'},
     {type:'choice', target:'steak', q:'付け合わせの野菜は？', opts:[{t:'お肉と一緒にいただく',ok:1},{t:'飾りなので残す'},{t:'お隣の人のお皿へ'}], eat:.25,
       exp:'付け合わせも料理の一部。<b>一緒にいただく</b>ザマス。'},
-    {type:'mash', target:'steak', q:'お肉はじっくり味わうザマス。<b>ちょうど15回</b>噛むザマス', btn:'もぐもぐ', done:'ごっくん', goal:15, time:9, eat:.2,
-      exp:'急いで飲み込むのは品がないザマス。'},
+    {type:'choice', target:'steak', q:'お肉を口に入れたところで話しかけられたザマス', opts:[{t:'飲み込んでから答える',ok:1},{t:'噛みながら答える'},{t:'口を手で押さえて叫ぶ'}], eat:0.2,
+      exp:'<b>飲み込んでから</b>話すのが基本ザマス。ひと口を小さめにしておくと慌てないザマス。'},
     {type:'choice', target:'wine', q:'ワインを注いでもらうザマス。グラスは？', opts:[{t:'テーブルに置いたまま',ok:1},{t:'持ち上げて受ける'},{t:'手で押さえてガード'}],
       exp:'洋食ではグラスは<b>置いたまま</b>注いでもらうザマス。'},
     {type:'choice', target:'cutlery', q:'あら、フォークを床に落としたザマス！', opts:[{t:'自分で拾う'},{t:'お店の人を呼んで替えてもらう',ok:1},{t:'足で隅に寄せる'}],
       exp:'自分で拾わず、<b>お店の人にお願いする</b>ザマス。'},
     {type:'choice', target:'napkin', q:'口元が汚れたザマス。どう拭く？', opts:[{t:'ナプキンの内側で軽く押さえる',ok:1},{t:'テーブルクロスで拭く'},{t:'手の甲でぬぐう'}],
       exp:'<b>ナプキンの内側</b>を使えば、汚れが見えないザマス。'},
-    {type:'swipe', target:'cutlery', q:'食べ終わり。ナイフの刃の向きは？', dirs:{up:'外側（向こう向き）',down:'内側（自分向き）'}, ans:'down', eat:1,
+    {type:'choice', target:'cutlery', q:'食べ終わり。ナイフの刃の向きは？', opts:[{t:'内側（自分向き）',ok:1},{t:'外側（向こう向き）'},{t:'上向き'}], eat:1,
       exp:'ナイフの刃は<b>自分側（内側）</b>に向けて置くザマス。'}
    ]},
    { id:'pasta', name:'パスタ編', layout:'pasta', steps:[
     {type:'choice', target:'cutlery', q:'スパゲッティ、何で食べるザマス？', opts:[{t:'フォークだけで巻く',ok:1},{t:'スプーンが絶対に必須'},{t:'お箸をもらう'}],
       exp:'本場イタリアでは<b>フォークだけ</b>が一般的ザマス（スプーンを添えても日本では問題なしザマス）。'},
-    {type:'swipe', target:'pasta', q:'フォークを回すのはお皿のどこで？', dirs:{up:'お皿の端（ふち近く）',down:'お皿の真ん中'}, ans:'up',
+    {type:'choice', target:'pasta', q:'フォークを回すのはお皿のどこで？', opts:[{t:'お皿の端（ふち近く）',ok:1},{t:'お皿の真ん中'},{t:'お皿から持ち上げて空中で'}],
       exp:'少量を<b>お皿の端</b>に寄せて巻くと、きれいにまとまるザマス。'},
     {type:'seq', target:'pasta', q:'パスタの巻き方ザマス。正しい順番で！', items:['少量をお皿の端に寄せる','フォークを立ててくるくる回す','ひと口サイズで口へ運ぶ'],
       exp:'欲張らず、<b>ひと口分だけ</b>巻くのがコツザマス。'},
-    {type:'mash', target:'pasta', q:'くるくる巻くのは<b>ちょうど4回</b>ザマス。巻きすぎは団子になるザマス', btn:'くるっ', done:'パクッ', goal:4, time:6, eat:.3,
-      exp:'巻きすぎると大きくなって口に入らないザマス。'},
-    {type:'timing', target:'pasta', q:'すすらずに、静かにいただくザマス！', btn:'パクッ', speed:1.3, eat:.3,
+    {type:'choice', target:'pasta', q:'フォークに巻く量は？', opts:[{t:'ひと口で食べられる量',ok:1},{t:'できるだけたくさん'},{t:'麺1本ずつ'}], eat:0.3,
+      exp:'巻きすぎると団子になって口に入らないザマス。<b>ひと口分</b>を巻くザマス。'},
+    {type:'choice', target:'pasta', q:'パスタの食べ方は？', opts:[{t:'すすらずに口に運ぶ',ok:1},{t:'音を立ててすする'},{t:'麺を垂らして下から食べる'}], eat:0.3,
       exp:'パスタは<b>すすらない</b>のが洋食のマナーザマス。'},
     {type:'choice', target:'pasta', q:'麺が長くて巻きにくいザマス…', opts:[{t:'少量ずつ巻き直す',ok:1},{t:'ナイフで細かく切る'},{t:'噛み切ってお皿に戻す'}],
       exp:'パスタは<b>切らずに少量ずつ</b>巻くザマス。噛み切って戻すのは論外ザマス。'},
@@ -1000,9 +1000,9 @@ const COURSES = {
       exp:'<b>下段のサンドイッチ → 中段のスコーン → 上段のケーキ</b>が伝統的な順番ザマス。'},
     {type:'choice', target:'cup', q:'ティーカップの持ち方は？', opts:[{t:'取っ手を指でつまむ',ok:1},{t:'取っ手に指を通す'},{t:'両手で包み込む'}],
       exp:'指は通さず、<b>取っ手をつまむ</b>のが英国流ザマス。'},
-    {type:'swipe', target:'cup', q:'テーブルで紅茶を飲むザマス。ソーサーは？', dirs:{up:'ソーサーごと持ち上げる',down:'ソーサーは置いたまま'}, ans:'down',
+    {type:'choice', target:'cup', q:'テーブルで紅茶を飲むザマス。ソーサーは？', opts:[{t:'置いたまま、カップだけ持つ',ok:1},{t:'ソーサーごと持ち上げる'},{t:'ソーサーを頭に乗せる'}],
       exp:'テーブルの席では<b>ソーサーは置いたまま</b>、カップだけを持ち上げるザマス。'},
-    {type:'timing', target:'cup', q:'お砂糖を混ぜるザマス。スプーンをカップに当てず、静かに！', btn:'まぜる', speed:1.25,
+    {type:'choice', target:'cup', q:'お砂糖を混ぜるザマス。スプーンの動かし方は？', opts:[{t:'前後に静かに動かす',ok:1},{t:'カップに当ててカチャカチャ回す'},{t:'勢いよくぐるぐる'}],
       exp:'カチャカチャ音を立てないよう、<b>前後に静かに</b>混ぜるザマス。'},
     {type:'choice', target:'cup', q:'混ぜ終わったスプーンは？', opts:[{t:'ソーサーのカップの向こう側に置く',ok:1},{t:'カップに入れたまま'},{t:'舐めてからテーブルへ'}], eat:.5,
       exp:'スプーンは<b>ソーサーの奥側</b>に置くザマス。'},
@@ -1024,14 +1024,14 @@ const COURSES = {
       exp:'料理は<b>主賓から</b>取るザマス。'},
     {type:'choice', target:'plate', q:'別の料理に行くとき、取り皿は？', opts:[{t:'新しい取り皿に替える',ok:1},{t:'同じお皿に盛り重ねる'},{t:'大皿から直接食べる'}],
       exp:'味が混ざらないよう<b>新しいお皿</b>に替えるザマス。'},
-    {type:'swipe', target:'ramen', q:'ラーメンの器、持ち上げる？置いたまま？', dirs:{up:'持ち上げる',down:'置いたまま'}, ans:'down',
+    {type:'choice', target:'ramen', q:'ラーメンの器、どうするザマス？', opts:[{t:'テーブルに置いたまま',ok:1},{t:'持ち上げる'},{t:'傾けて口をつける'}],
       exp:'中国料理では器は<b>テーブルに置いたまま</b>いただくザマス。'},
     {type:'seq', target:'renge', q:'レンゲの持ち方ザマス。正しい順番で！', items:['柄の溝に人差し指を入れる','親指と中指で柄を挟む','麺をレンゲに乗せる'],
       exp:'レンゲは人差し指を溝に、親指と中指で挟むザマス。'},
-    {type:'timing', target:'ramen', q:'麺はすすりすぎず静かにいただくザマス！', btn:'ちゅるっ', speed:1.35, eat:.5,
-      exp:'レンゲを受け皿にして静かに、ザマス。'},
-    {type:'mash', target:'xlb', q:'小籠包は熱いザマス。フーフーは<b>ちょうど5回</b>！', btn:'フー', done:'パクッ', goal:5, time:7, eat:.67,
-      exp:'冷ましすぎもスープが冷めて台無しザマス。'},
+    {type:'choice', target:'ramen', q:'麺はどうやって食べるザマス？', opts:[{t:'レンゲを受け皿にして静かにいただく',ok:1},{t:'器に口をつけてかき込む'},{t:'麺を高く持ち上げて冷ます'}], eat:0.5,
+      exp:'<b>レンゲを受け皿に</b>して静かに、ザマス。'},
+    {type:'choice', target:'xlb', q:'熱々の小籠包、どう食べるザマス？', opts:[{t:'レンゲに乗せ、皮に穴を開けてスープから',ok:1},{t:'丸ごとひと口で放り込む'},{t:'お箸で真っ二つに切る'}], eat:0.67,
+      exp:'丸ごとはやけどのもと。<b>スープを先に</b>いただくザマス。'},
     {type:'choice', target:'tea', q:'乾杯ザマス！目上の方とグラスを合わせるときの高さは？', opts:[{t:'相手より少し低く',ok:1},{t:'相手より高く掲げる'},{t:'勢いよくぶつける'}],
       exp:'目上の方には<b>少し低い位置</b>で合わせるのが気遣いザマス。'},
     {type:'choice', target:'tea', q:'お茶を注いでもらったザマス。どうする？', opts:[{t:'指でテーブルを軽くトントン',ok:1},{t:'無言で飲む'},{t:'注ぎ返して張り合う'}], eat:.6,
@@ -1046,8 +1046,8 @@ const COURSES = {
       exp:'指でトントンは感謝を表すしぐさ（<b>叩指礼</b>）ザマス。'},
     {type:'seq', target:'xlb', q:'小籠包の食べ方ザマス。正しい順番で！', items:['レンゲに乗せる','皮に小さく穴を開けてスープを飲む','酢じょうゆと生姜でいただく'], eat:.34,
       exp:'いきなり丸ごとかぶると<b>熱いスープでやけど</b>するザマス。'},
-    {type:'timing', target:'xlb', q:'小籠包を持ち上げるザマス。皮を破らないよう、そっと！', btn:'そっと', speed:1.4, eat:.33,
-      exp:'皮の上の方（ひだ）をつまむと破れにくいザマス。'},
+    {type:'choice', target:'xlb', q:'小籠包をせいろから取るとき、どこをつまむ？', opts:[{t:'上のひだ（つまみ）の部分',ok:1},{t:'底の柔らかい部分'},{t:'真ん中に突き刺す'}], eat:0.33,
+      exp:'皮の<b>上のひだ</b>をつまむと破れにくいザマス。'},
     {type:'choice', target:'hashi', q:'中国では、お箸はどう置くザマス？', opts:[{t:'縦向き（自分に向けてまっすぐ）',ok:1},{t:'横向き（手前に平行）'},{t:'お皿に立てる'}],
       exp:'中国料理では<b>お箸は縦向き</b>に置くのが一般的ザマス。'},
     {type:'choice', target:'rayu', q:'ラー油を使いたいザマス', opts:[{t:'小皿に取ってつける',ok:1},{t:'点心に直接たっぷりかける'},{t:'せいろに流し込む'}],
@@ -1056,7 +1056,7 @@ const COURSES = {
       exp:'最後の1個は<b>ひと声かけて</b>から、が大人ザマス。'},
     {type:'choice', target:'teapot', q:'ポットのお茶がなくなったザマス', opts:[{t:'ふたを少しずらして置いておく',ok:1},{t:'ポットを振って音を立てる'},{t:'大声で「お茶！」'}],
       exp:'<b>ふたをずらす</b>のは「お湯を足してください」の合図ザマス。'},
-    {type:'swipe', target:'seiro', q:'食べ終わったせいろはどうするザマス？', dirs:{up:'重ねてテーブルの端へ',down:'あちこちに置いたまま'}, ans:'up', eat:1,
+    {type:'choice', target:'seiro', q:'食べ終わったせいろはどうするザマス？', opts:[{t:'重ねてテーブルの端へ',ok:1},{t:'あちこちに置いたまま'},{t:'床に置く'}], eat:1,
       exp:'空いたせいろは<b>重ねて端へ</b>。お店の人も片付けやすいザマス。'}
    ]},
    { id:'noodle', name:'麺編', layout:'noodle', steps:[
@@ -1064,12 +1064,12 @@ const COURSES = {
       exp:'まずは<b>そのままのスープ</b>を味わうのが作った人への礼儀ザマス。'},
     {type:'choice', target:'renge', q:'レンゲの持ち方は？', opts:[{t:'溝に人差し指を入れ、親指と中指で挟む',ok:1},{t:'グーでしっかり握る'},{t:'スプーンのように下から持つ'}],
       exp:'<b>溝に人差し指</b>、親指と中指で挟むと安定するザマス。'},
-    {type:'swipe', target:'ramen', q:'中華麺の器、持ち上げる？置いたまま？', dirs:{up:'持ち上げる',down:'置いたまま'}, ans:'down',
+    {type:'choice', target:'ramen', q:'中華麺の器、どうするザマス？', opts:[{t:'テーブルに置いたまま',ok:1},{t:'持ち上げる'},{t:'傾けて直接スープを飲む'}],
       exp:'中国料理では器は<b>置いたまま</b>、レンゲを受け皿にするザマス。'},
-    {type:'timing', target:'ramen', q:'麺をレンゲに<b>ひと口分</b>だけ取るザマス！', btn:'とる', speed:1.3, eat:.25,
-      exp:'欲張ってたくさん取るとスープが飛ぶザマス。'},
-    {type:'mash', target:'ramen', q:'熱い麺を冷ますザマス。フーフーは<b>ちょうど3回</b>！', btn:'フー', done:'いただく', goal:3, time:5, eat:.25,
-      exp:'吹きすぎるとスープが飛び散るザマス。'},
+    {type:'choice', target:'ramen', q:'レンゲに取る麺の量は？', opts:[{t:'ひと口分だけ',ok:1},{t:'レンゲからあふれるほど'},{t:'麺1本だけ'}], eat:0.25,
+      exp:'欲張ってたくさん取るとスープが飛ぶザマス。<b>ひと口分</b>ザマス。'},
+    {type:'choice', target:'ramen', q:'熱い麺を冷ますには？', opts:[{t:'レンゲの上で軽く冷ます',ok:1},{t:'器ごと思いきり吹く'},{t:'氷を入れてもらう'}], eat:0.25,
+      exp:'器を強く吹くとスープが飛び散るザマス。<b>レンゲの上で軽く</b>冷ますザマス。'},
     {type:'choice', target:'tare', q:'餃子のタレはどうするザマス？', opts:[{t:'小皿で酢・しょうゆ・ラー油を合わせる',ok:1},{t:'餃子のお皿に直接かける'},{t:'ラーメンのスープで代用'}],
       exp:'タレは<b>小皿で</b>好みに合わせるザマス。'},
     {type:'choice', target:'gyoza', q:'餃子がひと口で食べきれないザマス', opts:[{t:'お箸で持ったまま、ふた口で食べきる',ok:1},{t:'かじったものをお皿に戻す'},{t:'かじったものをタレに戻す'}], eat:.6,
@@ -1088,14 +1088,14 @@ const COURSES = {
       exp:'<b>広げる → 塗る → 乗せる → 包む</b>ザマス。'},
     {type:'choice', target:'sauce', q:'甜麺醤（味噌だれ）の量は？', opts:[{t:'薄く塗る',ok:1},{t:'たっぷり山盛り'},{t:'ダックを浸す'}],
       exp:'たれが多いと<b>皮の香ばしさ</b>が消えるザマス。'},
-    {type:'timing', target:'bing', q:'具がはみ出さないよう、くるっと包むザマス！', btn:'くるっ', speed:1.35, eat:.25,
-      exp:'下側を先に折り込むと、具がこぼれないザマス。'},
+    {type:'choice', target:'bing', q:'包むとき、具がはみ出さないコツは？', opts:[{t:'下側を先に折り込んでから巻く',ok:1},{t:'具を山盛りにする'},{t:'薄餅を何枚も重ねる'}], eat:0.25,
+      exp:'<b>下側を先に折り込む</b>と、具がこぼれないザマス。'},
     {type:'choice', target:'bing', q:'包んだダック、どうやって食べるザマス？', opts:[{t:'手で持って食べてOK',ok:1},{t:'ナイフとフォークで切る'},{t:'お箸でほぐして食べる'}], eat:.25,
       exp:'包んだら<b>手で持って</b>かぶりついてOKザマス。'},
-    {type:'swipe', target:'bing', q:'薄餅を取ったら、せいろのふたは？', dirs:{up:'すぐ閉める',down:'開けっぱなし'}, ans:'up',
+    {type:'choice', target:'bing', q:'薄餅を取ったら、せいろのふたは？', opts:[{t:'すぐ閉める',ok:1},{t:'開けっぱなし'},{t:'ふたをお皿がわりにする'}],
       exp:'薄餅が乾かないよう<b>すぐ閉める</b>ザマス。'},
-    {type:'mash', target:'duck', q:'香ばしい皮をじっくり味わうザマス。<b>ちょうど12回</b>噛むザマス', btn:'もぐもぐ', done:'ごっくん', goal:12, time:8, eat:.33,
-      exp:'皮の香ばしさは噛むほど広がるザマス。'},
+    {type:'choice', target:'duck', q:'大皿に取り箸が添えてあるザマス', opts:[{t:'取り箸で取り、自分のお箸は使わない',ok:1},{t:'自分のお箸で直接取る'},{t:'自分のお箸を逆さにして取る'}], eat:0.33,
+      exp:'大皿からは<b>取り箸</b>で。自分のお箸を逆さにする「逆さ箸」も実はNGザマス。'},
     {type:'choice', target:'tea', q:'「乾杯（カンペイ）！」でもお酒は弱いザマス…', opts:[{t:'「随意（スイイー）」と言って少しだけ飲む',ok:1},{t:'無理して一気に飲み干す'},{t:'グラスを伏せて拒否'}], eat:.6,
       exp:'中国の「乾杯」は飲み干す意味。<b>「随意」</b>と言えば自分のペースでOKザマス。'}
    ]}
@@ -1163,17 +1163,17 @@ function beginStep(){
   const ctrl = $('ctrl'); ctrl.innerHTML = '';
   $('timer').style.visibility = 'visible';
   $('task').innerHTML = s.q;
-  s.limit = s.type==='seq'?11 : s.type==='mash'? s.time : s.type==='timing'? 7 : 7.5;
+  s.limit = s.type==='seq'? 25 : 20;
   if (s.type==='choice'){
-    shuffle(s.opts).forEach(o=>{ const b = btn(o.t); b.onclick = ()=>{ sfx.tap(); resolve(o.ok?'perfect':'miss'); }; ctrl.appendChild(b); });
+    shuffle(s.opts).forEach(o=>{ const b = btn(o.t); tap(b, ()=>{ sfx.tap(); resolve(o.ok?'perfect':'miss'); }); ctrl.appendChild(b); });
   } else if (s.type==='seq'){
     game.seqPos = 0;
     const wrap = document.createElement('div'); wrap.style.cssText='display:flex;flex-direction:column;gap:7px';
-    shuffle(s.items.map((t,i)=>({t,i}))).forEach(o=>{ const b = btn(o.t); b.onclick = ()=>{
-      if (game.resolved) return;
+    shuffle(s.items.map((t,i)=>({t,i}))).forEach(o=>{ const b = btn(o.t); tap(b, ()=>{
+      if (game.resolved || b.disabled) return;
       if (o.i===game.seqPos){ sfx.tap(); b.disabled = true; b.textContent = (o.i+1)+'. '+o.t; game.seqPos++; if (game.seqPos===s.items.length) resolve('perfect'); }
       else { resolve('miss'); }
-    }; wrap.appendChild(b); });
+    }); wrap.appendChild(b); });
     ctrl.appendChild(wrap);
   } else if (s.type==='swipe'){
     ctrl.innerHTML = '<div class="spad" id="spad"><div class="half up"><b>↑</b>'+s.dirs.up+'</div><div class="half dn"><b>↓</b>'+s.dirs.down+'</div><div class="hand">👆</div></div>'+
@@ -1188,34 +1188,43 @@ function beginStep(){
     pad.onpointercancel = ()=>{ st = null; };
   } else if (s.type==='timing'){
     ctrl.innerHTML = '<div class="gauge" id="gauge"><div class="cur" id="cur"></div></div>';
-    const b = btn(s.btn, 'pink big'); b.onclick = ()=>{ sfx.tap(); timingHit(); }; ctrl.appendChild(b);
+    const b = btn(s.btn, 'pink big'); tap(b, ()=>{ sfx.tap(); timingHit(); }); ctrl.appendChild(b);
     $('gauge').onpointerdown = (e)=>{ e.preventDefault(); timingHit(); };
     game.gp = 0;
   } else if (s.type==='mash'){
     game.mash = 0;
-    const cnt = document.createElement('div'); cnt.id = 'mashCount'; cnt.textContent = '0'; ctrl.appendChild(cnt);
+    const cnt = document.createElement('div'); cnt.id = 'mashCount'; cnt.textContent = '0 / '+s.goal; ctrl.appendChild(cnt);
     const row = document.createElement('div'); row.className = 'row';
     const b = btn(s.btn, 'pink big'); b.onpointerdown = (e)=>{ e.preventDefault(); if (game.resolved) return; game.mash++; sfx.mash(game.mash);
       b.classList.add('pressed'); setTimeout(()=>b.classList.remove('pressed'),70);
-      cnt.textContent = (s.goal>10 && game.mash>10) ? '？？' : game.mash;
+      cnt.textContent = game.mash+' / '+s.goal;
       if (game.mash===s.goal+1 && !game.warned){ game.warned = true; kogoto(pick(LINES.overcount), 4); }
       if (s.target) { const d = dishes[s.target]; if (d) d.g.position.y = .01; setTimeout(()=>{ if(d && d.g.parent===tableG) d.g.position.y = 0; }, 60); }
     };
-    const d = btn(s.done, 'purple big'); d.style.flex = '.7'; d.onclick = ()=>mashDone();
+    const d = btn(s.done, 'purple big'); d.style.flex = '.7'; tap(d, ()=>mashDone());
     row.appendChild(b); row.appendChild(d); ctrl.appendChild(row);
-    if (s.goal>10) $('task').innerHTML += '<small>※10回を超えたらカウントは見えないザマス。自分で数えるザマス</small>';
+    $('task').innerHTML += '<small>目標の回数になったら右のボタンで締めるザマス</small>';
   }
+}
+let lastTap = 0, chOpened = 0;
+function tap(el, fn){
+  let sx = 0, sy = 0, down = false;
+  el.addEventListener('pointerdown', e=>{ down = true; sx = e.clientX; sy = e.clientY; });
+  el.addEventListener('pointerup', e=>{ if (!down) return; down = false; if (Math.hypot(e.clientX-sx, e.clientY-sy) > 18) return;
+    if (performance.now()-lastTap < 120) return; lastTap = performance.now(); fn(e); });
+  el.addEventListener('pointercancel', ()=>{ down = false; });
+  el.addEventListener('click', e=>{ if (performance.now()-lastTap < 450) return; lastTap = performance.now(); fn(e); });   // keyboard / fallback
 }
 function btn(text, cls=''){ const b = document.createElement('button'); b.className = 'btn '+cls; b.innerHTML = text; return b; }
 
 function timingHit(){
   if (game.resolved || !game.step || game.step.type!=='timing') return;
   const p = game.gp; const d = Math.abs(p-.5);
-  resolve(d<=.05?'perfect': d<=.22?'near':'miss');
+  resolve(d<=.09?'perfect': d<=.32?'near':'miss');
 }
 function mashDone(){
   if (game.resolved) return; const s = game.step; const diff = Math.abs(game.mash - s.goal);
-  const nearTol = Math.max(1, Math.round(s.goal*.07));
+  const nearTol = Math.max(1, Math.round(s.goal*.15));
   $('mashCount').textContent = game.mash + '回';
   resolve(diff===0?'perfect': diff<=nearTol?'near':'miss', diff===0?null:('（'+game.mash+'回でした）'));
 }
@@ -1223,6 +1232,7 @@ function mashDone(){
 function resolve(kind, extra){
   if (game.resolved) return; game.resolved = true; game.state = 'feedback';
   const s = game.step;
+  if (!extra && kind!=='perfect'){ if (s.type==='choice') extra = '正解：'+s.opts.find(o=>o.ok).t; else if (s.type==='seq') extra = '正解：'+s.items.join(' → '); }
   let line, mood;
   if (kind==='perfect'){ game.score += 100; game.perf++; addAnger(-4); sfx.perfect(); line = pick(LINES.perfect); mood='happy'; }
   else if (kind==='near'){ game.score += 60; game.near++; addAnger(9); sfx.near(); line = pick(LINES.near); mood='scold'; }
@@ -1247,7 +1257,7 @@ function nextStep(){
   if (Math.random()<.4){ kogoto(pick(LINES.nitpick), 7); updateHud(); if (game.ira>=100){ game.state='busy'; bigText('堪忍袋の緒が切れた！',1200); setTimeout(()=>doFlip(true),700); return; } }
   beginStep();
 }
-$('panel').addEventListener('click', ()=>{ if (game.state==='feedback') nextStep(); });
+tap($('panel'), ()=>{ if (game.state==='feedback') nextStep(); });
 
 /* ---------- swipe input ---------- */
 let sw = null;
@@ -1329,13 +1339,13 @@ function showResult(type){
     game._share = '「本日のマナー講座ザマス」'+cname+'コースでランク'+rank+'（'+game.score+'点）「'+title+'」';
   }
   $('rRank').textContent = rank; $('rTitle').textContent = title; $('rSub').innerHTML = sub;
-  $('rTable').innerHTML = '<tr><td>◎ 完璧</td><td>'+game.perf+'</td></tr><tr><td>△ ギリギリ</td><td>'+game.near+'</td></tr><tr><td>× しくじり</td><td>'+game.miss+'</td></tr><tr><td>言われた小言</td><td>'+game.kogoto+'回</td></tr><tr><td>最終イライラ度</td><td>'+Math.round(game.ira)+'%</td></tr>';
+  $('rTable').innerHTML = '<tr><td>◎ 正解</td><td>'+game.perf+'</td></tr><tr><td>× まちがい</td><td>'+game.miss+'</td></tr><tr><td>言われた小言</td><td>'+game.kogoto+'回</td></tr><tr><td>最終イライラ度</td><td>'+Math.round(game.ira)+'%</td></tr>';
   const txt = game._share + '\n#' + HASHTAG;
   $('share').href = 'https://twitter.com/intent/tweet?text='+encodeURIComponent(txt)+(SHARE_URL?'&url='+encodeURIComponent(SHARE_URL):'');
   show('result');
 }
-$('again').onclick = ()=>{ sfx.tap(); startGame(game.kind, game.ch); };
-$('toTitle').onclick = ()=>{ sfx.tap(); toTitle(); };
+tap($('again'), ()=>{ sfx.tap(); startGame(game.kind, game.ch); });
+tap($('toTitle'), ()=>{ sfx.tap(); toTitle(); });
 function toTitle(){
   game.state = 'title'; show('result', false); show('hud', false); show('panel', false); show('flip', false); $('bubble').className='';
   document.querySelectorAll('[data-best]').forEach(el=>{ const cs = COURSES[el.dataset.best].chapters;
@@ -1345,7 +1355,7 @@ function toTitle(){
   clearPhysics(); buildRoom('wa'); buildTable('wa'); resetTeacher('wa');
   show('chapters', false); show('title');
 }
-document.querySelectorAll('.course').forEach(b=>b.onclick = ()=>{ sfx.tap(); try{ speechSynthesis.cancel(); }catch(e){}
+document.querySelectorAll('#title .course').forEach(b=>tap(b, ()=>{ sfx.tap(); try{ speechSynthesis.cancel(); }catch(e){}
   const k = b.dataset.c; const cs = COURSES[k].chapters;
   if (cs.length===1){ startGame(k, cs[0].id); return; }
   $('chHead').textContent = COURSES[k].emoji+' '+COURSES[k].name+'コース';
@@ -1353,10 +1363,10 @@ document.querySelectorAll('.course').forEach(b=>b.onclick = ()=>{ sfx.tap(); try
   cs.forEach(c=>{ const best = store.get('best_'+k+'_'+c.id);
     const bt = document.createElement('button'); bt.className = 'btn course';
     bt.innerHTML = '<span><span class="nm">'+c.name+'</span><span class="bs">全'+c.steps.length+'問　'+(best?'自己ベスト '+best+'点':'未挑戦')+'</span></span>';
-    bt.onclick = ()=>{ sfx.tap(); show('chapters', false); startGame(k, c.id); }; list.appendChild(bt); });
-  show('title', false); show('chapters');
-});
-$('chBack').onclick = ()=>{ sfx.tap(); show('chapters', false); show('title'); };
+    tap(bt, ()=>{ if (performance.now()-chOpened < 350) return; sfx.tap(); show('chapters', false); startGame(k, c.id); }); list.appendChild(bt); });
+  chOpened = performance.now(); show('title', false); show('chapters');
+}));
+tap($('chBack'), ()=>{ sfx.tap(); show('chapters', false); show('title'); });
 $('toTitle').textContent = 'コースを選び直す';
 
 /* =========================================================
@@ -1389,11 +1399,11 @@ function loop(now){
     const left = s.limit - game.stepT;
     $('timer').firstElementChild.style.width = clamp(left/s.limit*100,0,100)+'%';
     if (s.type==='timing'){
-      const sp = s.speed * (1 + game.idx*.04);
-      game.gp = .5 + .5*Math.sin(game.stepT*2.6*sp);
+      const sp = Math.min(1.2, .8 + (s.speed-1)*.5);
+      game.gp = .5 + .5*Math.sin(game.stepT*1.7*sp);
       const cur = $('cur'); if (cur) cur.style.left = (game.gp*100)+'%';
     }
-    if (!game.warned && left < 2.6 && s.type!=='mash'){ game.warned = true; sfx.warn(); kogoto(pick(LINES.warn), 5); updateHud(); }
+    if (!game.warned && left < 6 && s.type!=='mash'){ game.warned = true; sfx.warn(); kogoto(pick(LINES.warn), 5); updateHud(); }
     if (left <= 0){ if (s.type==='mash') mashDone(); else resolve('timeout'); }
     else {
       game.nextNitpick -= dt;
