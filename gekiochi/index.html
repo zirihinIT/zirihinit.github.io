@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>激落！！消しゴムバトル！！</title>
-<meta name="description" content="消しゴムを指で弾いて、相手を机から叩き落とせ！ 鉛筆や定規が転がる机の上で戦う3D消しゴム落としバトル。勝ち抜き戦・ネット対戦・ランクマッチ。">
+<title>激落！！消しゴムバトル！！｜ブラウザで遊べる消しゴム落としゲーム</title>
+<meta name="description" content="スマホ・PCのブラウザですぐ遊べる消しゴム落としゲーム。消しゴムを指で弾いて、相手を机から叩き落とせ！ 鉛筆や定規が転がる机の上で戦う3D消しゴム落としバトル。勝ち抜き戦・友だちと対戦・ランクマッチ。インストール不要・無料。">
 <meta property="og:title" content="激落！！消しゴムバトル！！">
 <meta property="og:description" content="消しゴムを指で弾いて、相手を机から叩き落とせ！">
 <meta property="og:type" content="website">
@@ -17,7 +17,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&text=%E7%8E%8B%E5%B0%86&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=M+PLUS+Rounded+1c:wght@500;800&family=Murecho:wght@900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=20261121">
+<link rel="stylesheet" href="style.css?v=20261122">
 </head>
 <body>
 <canvas id="c"></canvas>
@@ -114,7 +114,17 @@
   <button class="btn red" id="bHost">部屋を作る</button>
   <div class="join"><input id="codeIn" maxlength="4" inputmode="numeric" placeholder="0000"><button class="btn blue" id="bJoin">入る</button></div>
   <div id="netStatus">部屋を作るか、相手から聞いた<br>4ケタのコードで入ってね</div>
+  <div class="row2 hidden" id="invRow"><button class="btn line" id="bInvLine">LINEで招待</button><button class="btn" id="bInvCopy">リンクをコピー</button></div>
   <button class="btn ghost" id="bNetBack">もどる</button>
+</div>
+
+<div id="challenge" class="screen hidden">
+  <div class="chTag" id="chTag">挑戦状</div>
+  <div class="chFrom" id="chFrom"></div>
+  <div class="chMain" id="chMain"></div>
+  <div class="sub" id="chSub"></div>
+  <button class="btn red" id="bChGo">受けて立つ！</button>
+  <button class="btn ghost" id="bChSkip">タイトルへ</button>
 </div>
 
 <div id="howto" class="screen hidden">
@@ -162,6 +172,7 @@
   <button class="btn red" id="bAgain">もう一回！</button>
   <button class="btn" id="bRetry">強敵から再挑戦<small>記録には入りません</small></button>
   <a class="btn blue share" id="bShare" href="https://x.com/intent/post" target="_blank" rel="noopener">結果をポストする</a>
+  <a class="btn line hidden" id="bShareLine" href="https://line.me/R/share" target="_blank" rel="noopener">LINEで挑戦状を送る</a>
   <button class="btn ghost" id="bToTitle">タイトルへ</button>
 </div>
 
@@ -192,6 +203,6 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
-<script src="game.js?v=20261121"></script>
+<script src="game.js?v=20261122"></script>
 </body>
 </html>
