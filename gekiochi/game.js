@@ -931,7 +931,7 @@ const aiming=()=>['dir','power'].includes(game.phase);
 function toast(t,ms=2600,prio=0){const el=$('toast'),now=performance.now();if(prio<(toast.p||0)&&now<(toast.until||0))return;toast.p=prio;toast.until=now+ms;
   el.textContent=t;el.classList.toggle('big',prio>0);el.classList.remove('hidden');clearTimeout(toast.t);toast.t=setTimeout(()=>{el.classList.add('hidden');toast.p=0},ms)}
 function pop(text,cls){const el=$('pop');el.textContent=text;el.className='';void el.offsetWidth;el.className='show '+cls}
-function showScreen(id){if(id==='pickMenu'){pickSel=null;pickRender()}['title','rankName','rankLobby','rankGacha','rankDress','rankQueue','rankVs','rankBoard','pickMenu','netMenu','howto','result'].forEach(s=>$(s).classList.toggle('hidden',s!==id))}
+function showScreen(id){if(id==='pickMenu'){pickSel=null;pickRender()}['title','rankName','rankLobby','rankGacha','rankDress','rankQueue','rankVs','rankBoard','pickMenu','netMenu','howto','result','challenge'].forEach(s=>$(s).classList.toggle('hidden',s!==id))}
 function showPanel(id){['pAim','pWait'].forEach(p=>$(p).classList.toggle('hidden',p!==id))}
 function updateHUD(){
   const names=game.mode==='cpu'?['あなた',GT()?GT().st.name:'CPU']:(game.me===0?['あなた','ライバル']:['ライバル','あなた']);
@@ -1123,7 +1123,7 @@ function resolveTurn(){
   else{game.score[w]++;updateHUD();pop(w===myIdx()?'ナイス激落！':'落とされた…','mid');next=1-w}
   if(w>=0&&game.score[w]>=game.need){const g=GT();
     // 勝ち抜き中に勝ったら、結果画面をはさまずに次の相手へ
-    if(g&&w===myIdx()){if(g.n<=5)stat('gt_win'+g.n);if(g.st.boss){later(()=>pop('強敵撃破！！','mid'),1000);gtReward(g.n)}
+    if(g&&w===myIdx()){if(g.n<=5)stat('gt_win'+g.n);chalCheck(g.n);if(g.st.boss){later(()=>pop('強敵撃破！！','mid'),1000);gtReward(g.n)}
       later(()=>{const r=(!g.cont&&gtRecord(g.n))||g.rec;gtGo(g.n+1,true,g.cont);game.gt.rec=r},g.st.boss?2300:1500)}
     else later(()=>endMatch(w),1700)}
   else later(()=>{game.round++;startRound(next)},1500);
@@ -1140,7 +1140,7 @@ function endMatch(w){
     if(!mine&&g.st.boss)$('bRetry').classList.remove('hidden');
     $('resT').textContent=wins+'人激落！';
     $('resS').textContent=g.n+'人目で敗退\n相手：'+g.st.name;$('bAgain').textContent='1人目からもう一回'
-    if(rec)$('resS').textContent+='\n自己ベスト更新！';if(g.cont)$('resS').textContent+='\n（再挑戦中は記録に入りません）'}
+    if(rec)$('resS').textContent+='\n自己ベスト更新！';const c=game.chal;if(c)$('resS').textContent+=wins>c.n?`\n${c.name}の${c.n}人を超えた！`:`\n${c.name}の記録まで あと${c.n-wins+1}人`;if(g.cont)$('resS').textContent+='\n（再挑戦中は記録に入りません）'}
   $('resRate').classList.add('hidden');if(game.ranked)rkReportEnd(mine);
   setShare(mine);
   bgmPlay(null);const gw=GT();(gw?gw.n>1:mine)?SFX.win():SFX.lose();
@@ -1157,10 +1157,18 @@ function setShare(mine){
   else if(game.mode==='cpu'){const g=game.gt||{n:1},wins=mine?g.n:g.n-1;
     text=wins?`勝ち抜き戦で${wins}人激落させた！（${et}${g.cont?'・再挑戦あり':''}）`:`勝ち抜き戦、1人目で激落させられた…`}
   else text=mine?`ネット対戦でライバルを${sc}で激落させた！`:`ネット対戦でライバルに${sc}で激落させられた…`;
+  // 勝ち抜き戦で1人以上倒したら「挑戦状リンク」にする（踏んだ人はそのまま勝ち抜き戦に入れる）
+  let url=GAME_URL,chal=false;
+  if(game.mode==='cpu'&&!game.ranked){const g=game.gt||{n:1},wins=mine?g.n:g.n-1;
+    if(wins>0){chal=true;url=chalURL(wins,game.types[me]);const c=game.chal;
+      text=(c&&wins>c.n?`${c.name}の${c.n}人を超えて、勝ち抜き戦で${wins}人激落させた！`:`勝ち抜き戦で${wins}人激落させた！（${et}）`)+'\nこの記録、超えられる？👇'}}
   text='「激落！！消しゴムバトル！！」'+text;
-  shareData={text,url:GAME_URL};
+  shareData={text,url};
   // 本文・URL・ハッシュタグを改行で区切って、すべて本文に入れる（url/hashtagsを分けるとXが空白でつなげてしまう）
-  $('bShare').href='https://x.com/intent/post?text='+encodeURIComponent(text+'\n'+GAME_URL+'\n#'+GAME_TAG);
+  $('bShare').href='https://x.com/intent/post?text='+encodeURIComponent(text+'\n'+url+'\n#'+GAME_TAG);
+  $('bShare').textContent=chal?'Xに挑戦状をポスト':'結果をポストする';
+  $('bShareLine').classList.toggle('hidden',!chal);
+  $('bShareLine').href='https://line.me/R/share?text='+encodeURIComponent(text+'\n'+url);
 }
 function toTitle(){
   setStage(0);
@@ -1191,7 +1199,7 @@ function handleEvents(ev){
 const net={peer:null,conn:null};
 function netStatus(h){$('netStatus').innerHTML=h}
 function netSend(o){if(net.conn&&net.conn.open)try{net.conn.send(o)}catch(e){}}
-function netClose(){game.oppSkin=game.oppTitle='';const c=net.conn,p=net.peer;net.conn=null;net.peer=null;try{c&&c.close()}catch(e){}try{p&&p.destroy()}catch(e){}}
+function netClose(){invShow(null);game.oppSkin=game.oppTitle='';const c=net.conn,p=net.peer;net.conn=null;net.peer=null;try{c&&c.close()}catch(e){}try{p&&p.destroy()}catch(e){}}
 function setupConn(c){
   c.on('data',onNet);
   c.on('close',()=>{
@@ -1208,10 +1216,10 @@ function netHost(){stat('net_host');
   const code=String(1000+Math.floor(Math.random()*9000));game.me=0;
   netStatus('部屋を作成中…');
   const peer=new Peer(PEER_PFX+code);net.peer=peer;
-  peer.on('open',()=>netStatus(`部屋コード<br><span class="code">${code}</span><br>相手にこのコードを伝えてね。待機中…`));
+  peer.on('open',()=>{netStatus(`部屋コード<br><span class="code">${code}</span><br>コードか招待リンクを送ってね。待機中…`);invShow(code)});
   peer.on('connection',c=>{
     if(net.conn){c.close();return}net.conn=c;
-    c.on('open',()=>{setupConn(c);netStatus('相手が来た！準備中…')});
+    c.on('open',()=>{invShow(null);setupConn(c);netStatus('相手が来た！準備中…')});
   });
   peer.on('error',e=>{if(e.type==='unavailable-id'){netHost()}else netStatus('エラー：'+e.type)});
 }
@@ -1259,11 +1267,11 @@ const FIREBASE_CONFIG={
 const RK_HOSTS=['zirihinit.github.io','localhost','127.0.0.1'];
 const RK_URL='https://zirihinit.github.io/gekiochi/';
 // ===== 遊ばれた回数（日ごとの合計だけ。誰が遊んだかは記録しない） =====
-const STAT_EV=new Set(["open", "open_new", "howto", "shot1", "gt_start", "gt_win1", "gt_win2", "gt_win3", "gt_win4", "gt_win5", "gt_lose1", "gt_lose2", "gt_lose3", "gt_lose4", "gt_lose5", "gt_lose6", "net_host", "net_join", "net_start", "rank_open", "rank_human", "rank_bot", "rank_end", "gacha", "share", "pick_0", "vsw_0", "vsl_0", "pick_1", "vsw_1", "vsl_1", "pick_2", "vsw_2", "vsl_2", "pick_4", "vsw_4", "vsl_4", "pick_5", "vsw_5", "vsl_5"]);
+const STAT_EV=new Set(["open", "open_new", "howto", "shot1", "gt_start", "gt_win1", "gt_win2", "gt_win3", "gt_win4", "gt_win5", "gt_lose1", "gt_lose2", "gt_lose3", "gt_lose4", "gt_lose5", "gt_lose6", "net_host", "net_join", "net_start", "rank_open", "rank_human", "rank_bot", "rank_end", "gacha", "share", "pick_0", "vsw_0", "vsl_0", "pick_1", "vsw_1", "vsl_1", "pick_2", "vsw_2", "vsl_2", "pick_4", "vsw_4", "vsl_4", "pick_5", "vsw_5", "vsl_5", "src_direct", "src_x", "src_tiktok", "src_yt", "src_line", "src_search", "src_plicy", "src_portal", "src_other", "ch_open", "ch_start", "ch_beat", "ch_share", "inv_make", "inv_open", "inv_join"]);
 const statOnce=new Set();
 function stat(k,once){
   if(!STAT_EV.has(k)||(once&&statOnce.has(k)))return;statOnce.add(k);
-  if(location.hostname!=='zirihinit.github.io'&&!window.__statTest)return;
+  if(!/^https?:$/.test(location.protocol)||['localhost','127.0.0.1',''].includes(location.hostname)){if(!window.__statTest)return}
   const day=new Date(Date.now()+9*3600e3).toISOString().slice(0,10),P='projects/'+FIREBASE_CONFIG.projectId+'/databases/(default)/documents';
   const body={writes:[{transform:{document:P+'/gekiochi_stats/'+day,fieldTransforms:[{fieldPath:k,increment:{integerValue:'1'}}]}}]};
   try{fetch('https://firestore.googleapis.com/v1/'+P+':commit?key='+FIREBASE_CONFIG.apiKey,{method:'POST',keepalive:true,headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).catch(()=>{})}catch(e){}
@@ -1642,6 +1650,7 @@ $('bAgain').onclick=()=>{ac();SFX.click();
   else{game.againMe=true;netSend({t:'again'});$('bAgain').textContent='相手を待っています…';$('bAgain').disabled=true;checkAgain()}};
 // スマホもPCも、文章入りのXの投稿画面を開く（共有シートだとXアプリがURLしか拾わないことがあるため）
 {let nw=false;try{nw=!localStorage.getItem('gekiochiSeen');localStorage.setItem('gekiochiSeen','1')}catch(e){}stat('open');if(nw)stat('open_new')}
+entryFromURL();
 $('bRetry').onclick=()=>{ac();SFX.click();const g=game.gt;if(g)gtGo(g.n,false,true)};
 $('bShare').addEventListener('click',()=>{SFX.click();stat('share')});
 $('bToTitle').onclick=()=>{SFX.click();toTitle()};
@@ -1870,3 +1879,57 @@ function frame(now){
   renderer.render(scene,camera);
 }
 requestAnimationFrame(frame);
+
+// ================= 挑戦状リンク・招待リンク =================
+// ?c=人数.消しゴム.名前 … 勝ち抜き戦の挑戦状。開くと挑戦状画面 → 1タップで勝ち抜き戦へ
+// ?room=1234 … ネット対戦の招待。開くと 1タップでその部屋に入る
+// ?from=tt など … どこから来たかの集計用（名前は数えない、日ごとの合計だけ）
+const BASE_URL='https://zirihinit.github.io/gekiochi/';
+function chalName(){rkAutoName();return (RK.name||'').trim()||'けしごむ'}
+function chalURL(wins,k){return BASE_URL+'?v=2&c='+wins+'.'+safeType(k)+'.'+encodeURIComponent(chalName().slice(0,10))}
+function invURL(code){return BASE_URL+'?v=2&room='+code}
+function chalCheck(n){const c=game.chal;if(!c||c.beat||n<=c.n)return;c.beat=true;stat('ch_beat');
+  later(()=>toast(`${c.name}の記録（${c.n}人）を超えた！！`,2600,1),400)}
+function invShow(code){const r=$('invRow');if(!r)return;r.classList.toggle('hidden',!code);invShow.code=code}
+$('bInvLine').onclick=()=>{SFX.click();const c=invShow.code;if(!c)return;stat('inv_make');
+  window.open('https://line.me/R/share?text='+encodeURIComponent('「激落！！消しゴムバトル！！」で勝負しよう！ タップでそのまま対戦👇\n'+invURL(c)),'_blank','noopener')};
+$('bInvCopy').onclick=async()=>{SFX.click();const c=invShow.code;if(!c)return;stat('inv_make');
+  const t='「激落！！消しゴムバトル！！」で勝負しよう！ タップでそのまま対戦👇\n'+invURL(c);
+  try{await navigator.clipboard.writeText(t);toast('招待リンクをコピーしました')}catch(e){toast('コピーできませんでした。コード '+c+' を伝えてね')}};
+$('bShareLine').addEventListener('click',()=>{SFX.click();stat('ch_share')});
+$('bShare').addEventListener('click',()=>{if(!$('bShareLine').classList.contains('hidden'))stat('ch_share')});
+function srcOf(qs){
+  const f=(qs.get('from')||'').toLowerCase();
+  const map={x:'x',tw:'x',twitter:'x',tt:'tiktok',tiktok:'tiktok',yt:'yt',youtube:'yt',line:'line',plicy:'plicy'};
+  if(map[f])return map[f];
+  if(location.hostname!=='zirihinit.github.io')return /plicy/i.test(location.hostname)?'plicy':'portal';
+  let h='';try{h=document.referrer?new URL(document.referrer).hostname:''}catch(e){}
+  if(!h||h===location.hostname)return 'direct';
+  if(/(^|\.)(t\.co|x\.com|twitter\.com)$/.test(h))return 'x';
+  if(/tiktok/.test(h))return 'tiktok';if(/youtube|youtu\.be/.test(h))return 'yt';if(/line\.me|line-apps/.test(h))return 'line';
+  if(/plicy/.test(h))return 'plicy';if(/google\.|yahoo\.|bing\.|duckduckgo/.test(h))return 'search';
+  return 'other'}
+function entryFromURL(){
+  let qs;try{qs=new URLSearchParams(location.search)}catch(e){return}
+  const src=srcOf(qs);stat('src_'+src,true);
+  const room=(qs.get('room')||'').trim(),c=qs.get('c');
+  // もう一度読み込んだときに同じ画面が出ないように、URLから外しておく
+  if(room||c||qs.get('from'))try{history.replaceState(null,'',location.pathname)}catch(e){}
+  if(/^\d{4}$/.test(room)){stat('inv_open');
+    $('chTag').textContent='対戦の招待';$('chFrom').textContent='友だちが部屋で待っています';
+    $('chMain').textContent='部屋 '+room;$('chSub').textContent='消しゴムを指で弾いて、\n相手を机から落としたら勝ち！';
+    $('bChGo').textContent='対戦する！';
+    $('bChGo').onclick=()=>{ac();SFX.click();stat('inv_join');game.pickFor='net';showScreen('netMenu');$('codeIn').value=room;netJoin()};
+    showScreen('challenge');return}
+  const m=c&&/^(\d{1,3})\.([0-5])\.(.+)$/s.exec(c);
+  if(m){const n=Math.min(999,+m[1]);if(n<1)return;
+    const name=m[3].replace(/[\u0000-\u001f\u007f<>]/g,'').trim().slice(0,10)||'だれか';
+    stat('ch_open');
+    $('chTag').textContent='挑戦状';$('chFrom').textContent=name+' より';
+    $('chMain').textContent=`勝ち抜き戦で\n${n}人激落！`;$('chSub').textContent=`${n+1}人倒せば、あなたの勝ち。\n消しゴムを指で弾いて、相手を机から落とせ！`;
+    $('bChGo').textContent='受けて立つ！';
+    $('bChGo').onclick=()=>{ac();SFX.click();stat('ch_start');game.chal={n,name,beat:false};game.pickFor='cpu';gtGo(1);
+      later(()=>toast(`目標：${n+1}人激落で ${name} 超え！`,2600),300)};
+    showScreen('challenge')}
+}
+$('bChSkip').onclick=()=>{SFX.click();showScreen('title')};
