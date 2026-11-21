@@ -1264,9 +1264,7 @@ const FIREBASE_CONFIG={
   messagingSenderId:"1052102781874",
   appId:"1:1052102781874:web:8a0ccf72dbff509f99d2ab"
 };
-// ランクマッチが使える場所（Firebaseの承認済みドメインと合わせる）
-const RK_HOSTS=['zirihinit.github.io','localhost','127.0.0.1'];
-const RK_URL='https://zirihinit.github.io/gekiochi/';
+// ランクマッチは本家（github.io）でもPLiCyでも遊べる。ファイルを直接開いたときだけ不可
 // ===== 遊ばれた回数（日ごとの合計だけ。誰が遊んだかは記録しない） =====
 const STAT_EV=new Set(["open", "open_new", "howto", "shot1", "gt_start", "gt_win1", "gt_win2", "gt_win3", "gt_win4", "gt_win5", "gt_lose1", "gt_lose2", "gt_lose3", "gt_lose4", "gt_lose5", "gt_lose6", "net_host", "net_join", "net_start", "rank_open", "rank_human", "rank_bot", "rank_end", "gacha", "share", "pick_0", "vsw_0", "vsl_0", "pick_1", "vsw_1", "vsl_1", "pick_2", "vsw_2", "vsl_2", "pick_4", "vsw_4", "vsl_4", "pick_5", "vsw_5", "vsl_5", "src_direct", "src_x", "src_tiktok", "src_yt", "src_line", "src_search", "src_plicy", "src_portal", "src_other", "ch_open", "ch_start", "ch_beat", "ch_share", "inv_make", "inv_open", "inv_join"]);
 const statOnce=new Set();
@@ -1298,10 +1296,10 @@ function loadScript(src){return new Promise((res,rej)=>{const s=document.createE
 async function rkInit(){
   if(RK.db)return true;
   if(!FIREBASE_CONFIG.apiKey){toast('ランクマッチは準備中です（サーバー未設定）');return false}
-  if(!RK_HOSTS.includes(location.hostname)){toast('ランクマッチは公開版で遊べます → '+RK_URL.replace('https://',''));return false}
+  if(!/^https?:$/.test(location.protocol)){toast('ランクマッチはサイト上で遊べます');return false}
   toast('サーバーに接続中…');
   try{
-    if(!window.firebase||!firebase.firestore)for(const f of['app','auth','firestore'])await loadScript(`https://cdn.jsdelivr.net/npm/firebase@${FB_VER}/firebase-${f}-compat.js`);
+    if(!window.firebase||!firebase.firestore)for(const f of['app','auth','firestore'])await loadScript(`lib/firebase-${f}-compat.js?v=${FB_VER}`);
     if(!firebase.apps.length)firebase.initializeApp(FIREBASE_CONFIG);
     const auth=firebase.auth();
     let u=await new Promise(res=>{const un=auth.onAuthStateChanged(x=>{un();res(x)})});
