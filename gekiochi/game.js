@@ -1267,7 +1267,7 @@ const FIREBASE_CONFIG={
 const RK_HOSTS=['zirihinit.github.io','localhost','127.0.0.1'];
 const RK_URL='https://zirihinit.github.io/gekiochi/';
 // ===== 遊ばれた回数（日ごとの合計だけ。誰が遊んだかは記録しない） =====
-const STAT_EV=new Set(["open", "open_new", "howto", "shot1", "gt_start", "gt_win1", "gt_win2", "gt_win3", "gt_win4", "gt_win5", "gt_lose1", "gt_lose2", "gt_lose3", "gt_lose4", "gt_lose5", "gt_lose6", "net_host", "net_join", "net_start", "rank_open", "rank_human", "rank_bot", "rank_end", "gacha", "share", "pick_0", "vsw_0", "vsl_0", "pick_1", "vsw_1", "vsl_1", "pick_2", "vsw_2", "vsl_2", "pick_4", "vsw_4", "vsl_4", "pick_5", "vsw_5", "vsl_5", "src_direct", "src_x", "src_tiktok", "src_yt", "src_line", "src_search", "src_plicy", "src_portal", "src_other", "ch_open", "ch_start", "ch_beat", "ch_share", "inv_make", "inv_open", "inv_join"]);
+const STAT_EV=new Set(["open", "open_new", "howto", "shot1", "gt_start", "gt_win1", "gt_win2", "gt_win3", "gt_win4", "gt_win5", "gt_lose1", "gt_lose2", "gt_lose3", "gt_lose4", "gt_lose5", "gt_lose6", "net_host", "net_join", "net_start", "rank_open", "rank_human", "rank_bot", "rank_end", "gacha", "share", "pick_0", "vsw_0", "vsl_0", "pick_1", "vsw_1", "vsl_1", "pick_2", "vsw_2", "vsl_2", "pick_4", "vsw_4", "vsl_4", "pick_5", "vsw_5", "vsl_5", "src_direct", "src_x", "src_tiktok", "src_yt", "src_line", "src_search", "src_plicy", "src_portal", "src_other", "ch_open", "ch_start", "ch_beat", "ch_share", "inv_make", "inv_open", "inv_join", "rank_inapp", "rank_inapp_try", "rank_fail", "rank_timeout"]);
 const statOnce=new Set();
 function stat(k,once){
   if(!STAT_EV.has(k)||(once&&statOnce.has(k)))return;statOnce.add(k);
@@ -1299,18 +1299,24 @@ async function rkInit(){
   if(!FIREBASE_CONFIG.apiKey){toast('ランクマッチは準備中です（サーバー未設定）');return false}
   if(!RK_HOSTS.includes(location.hostname)){toast('ランクマッチは公開版で遊べます → '+RK_URL.replace('https://',''));return false}
   toast('サーバーに接続中…');
-  try{
+  // アプリ内ブラウザなどで接続が止まったままになることがあるので、15秒で打ち切る
+  let to;const tout=new Promise((_,rej)=>{to=setTimeout(()=>rej(new Error('timeout')),15000)});
+  try{await Promise.race([rkConnect(),tout]);clearTimeout(to);$('toast').classList.add('hidden');return true}
+  catch(e){clearTimeout(to);console.error(e);RK.db=null;const t=e&&e.message==='timeout';stat(t?'rank_timeout':'rank_fail');
+    toast(INAPP?'サーバーにつながりませんでした。「…」→「ブラウザで開く」で遊べます':'サーバーにつながりませんでした',4200);return false}
+}
+async function rkConnect(){
+  {
     if(!window.firebase||!firebase.firestore)for(const f of['app','auth','firestore'])await loadScript(`https://cdn.jsdelivr.net/npm/firebase@${FB_VER}/firebase-${f}-compat.js`);
     if(!firebase.apps.length)firebase.initializeApp(FIREBASE_CONFIG);
     const auth=firebase.auth();
     let u=await new Promise(res=>{const un=auth.onAuthStateChanged(x=>{un();res(x)})});
     if(!u)u=(await auth.signInAnonymously()).user;
-    RK.uid=u.uid;RK.db=firebase.firestore();
-    const d=await RK.db.collection(COL.p).doc(RK.uid).get();RK.prof=d.exists?d.data():null;
+    const db=firebase.firestore();
+    const d=await db.collection(COL.p).doc(u.uid).get();RK.uid=u.uid;RK.db=db;RK.prof=d.exists?d.data():null;
     if(RK.prof&&RK.prof.name&&!RK.name)RK.name=RK.prof.name;
     if(RK.prof){const inv=allInv();MY.skin=inv.includes(RK.prof.skin)?RK.prof.skin:'';MY.title=inv.includes(RK.prof.title)?RK.prof.title:'';mySave()}
-    $('toast').classList.add('hidden');return true;
-  }catch(e){console.error(e);RK.db=null;toast('サーバーにつながりませんでした');return false}
+  }
 }
 const pRef=()=>RK.db.collection(COL.p).doc(RK.uid);
 function sanitizeName(v){return String(v||'').replace(/[\u0000-\u001f\u007f<>]/g,'').trim().slice(0,10)}
@@ -1556,7 +1562,20 @@ $('volPanel').addEventListener('pointerdown',e=>e.stopPropagation());
 document.addEventListener('pointerdown',e=>{if(!e.target.closest('#snd'))$('volPanel').classList.add('hidden')});
 // どこかを最初に触ったら音を起動（スマホは操作するまで音を出せないため）
 addEventListener('pointerdown',()=>ac(),{passive:true});addEventListener('keydown',()=>ac());
-$('bRank').onclick=async()=>{ac();SFX.click();if(!await rkInit())return;stat('rank_open');
+// X・LINE・Instagram・TikTok などのアプリ内ブラウザ（iPhoneは Safari 以外の WebView も）
+const INAPP=(()=>{const u=navigator.userAgent||'';
+  if(/Twitter|TwitterAndroid|\bLine\/|FBAN|FBAV|Instagram|musical_ly|Bytedance|TikTok/i.test(u))return true;
+  return /iPhone|iPad|iPod/.test(u)&&!/Safari\//.test(u)&&!/CriOS|FxiOS|EdgiOS/.test(u)})();
+let inappOk=false;
+function inappGuide(go){stat('rank_inapp');
+  $('chTag').textContent='ご案内';$('chFrom').textContent='';
+  $('chMain').textContent='ブラウザで\n開いてね';
+  $('chSub').textContent='Xなどのアプリの中のブラウザだと、\nランクマッチがうまく動かないことがあります。\n画面の「…」→「ブラウザで開く」を選んでね。\n（勝ち抜き戦はこのまま遊べます）';
+  $('bChGo').textContent='このまま試す';
+  $('bChGo').onclick=()=>{ac();SFX.click();stat('rank_inapp_try');inappOk=true;showScreen('title');go()};
+  showScreen('challenge')}
+$('bRank').onclick=async()=>{ac();SFX.click();if(INAPP&&!inappOk&&!RK.db){inappGuide(()=>$('bRank').click());return}
+  if(!await rkInit())return;stat('rank_open');
   rkAutoName();if(RK.prof&&RK.prof.name&&RK.prof.name!==RK.name)RK.name=RK.prof.name;rkRenderLobby();showScreen('rankLobby')};
 $('bNameOk').onclick=async()=>{const n=sanitizeName($('nameIn').value);if(!n){toast('名前を入れてね');return}
   SFX.click();RK.name=n;RK.autoName=false;try{localStorage.setItem('gekiochiName',n)}catch(e){}
