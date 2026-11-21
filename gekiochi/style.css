@@ -264,3 +264,9 @@ a.btn{display:inline-block;box-sizing:border-box;text-decoration:none;text-align
 .chFrom{font-weight:800;font-size:18px;color:#fff;margin-top:6px}
 #challenge .chMain{font-family:'Dela Gothic One',sans-serif;font-size:clamp(26px,7.5vw,40px);color:#ffd23f;-webkit-text-stroke:4px var(--ink);paint-order:stroke fill;line-height:1.3;white-space:pre-line}
 #challenge .sub{white-space:pre-line}
+/* 共有ボタンが開けない環境（PLiCyなど）用：コピー画面 */
+#copyBox{position:fixed;inset:0;z-index:15;display:flex;align-items:center;justify-content:center;background:rgba(27,20,48,.88);padding:16px;box-sizing:border-box}
+#copyBox.hidden{display:none}
+#copyBox .cbIn{background:#fff;color:var(--ink);border:4px solid var(--ink);border-radius:16px;box-shadow:0 6px 0 var(--ink);padding:16px;display:flex;flex-direction:column;gap:12px;align-items:center;width:min(340px,92vw);box-sizing:border-box}
+#copyBox .cbT{font-weight:800;line-height:1.5}
+#copyTxt{width:100%;height:120px;box-sizing:border-box;font:500 14px 'M PLUS Rounded 1c',sans-serif;border:3px solid var(--ink);border-radius:10px;padding:8px;resize:none;user-select:text;-webkit-user-select:text}

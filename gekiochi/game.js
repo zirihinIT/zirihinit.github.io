@@ -1927,3 +1927,18 @@ function entryFromURL(){
     showScreen('challenge')}
 }
 $('bChSkip').onclick=()=>{SFX.click();showScreen('title')};
+
+// ===== 共有ボタン：新しいタブが開けない環境（PLiCyの埋め込みなど）では、文章をコピーしてもらう =====
+function shareOpen(ev,a,txt){
+  ev.preventDefault();let w=null;
+  try{w=window.open(a.href,'_blank')}catch(e){}
+  if(w){try{w.opener=null}catch(e){}return}
+  $('copyTxt').value=txt;$('copyBox').classList.remove('hidden');
+  setTimeout(()=>{try{$('copyTxt').focus();$('copyTxt').select()}catch(e){}},50)}
+$('bShare').addEventListener('click',ev=>{const d=shareData||{text:'',url:GAME_URL};shareOpen(ev,$('bShare'),d.text+'\n'+d.url+'\n#'+GAME_TAG)});
+$('bShareLine').addEventListener('click',ev=>{const d=shareData||{text:'',url:GAME_URL};shareOpen(ev,$('bShareLine'),d.text+'\n'+d.url)});
+$('bCopy').onclick=async()=>{SFX.click();const t=$('copyTxt');let ok=false;
+  try{await navigator.clipboard.writeText(t.value);ok=true}catch(e){}
+  if(!ok)try{t.focus();t.select();t.setSelectionRange(0,t.value.length);ok=document.execCommand('copy')}catch(e){}
+  toast(ok?'コピーしました！':'文章を長押しして「コピー」してね',2600,1)};
+$('bCopyClose').onclick=()=>{SFX.click();$('copyBox').classList.add('hidden')};
