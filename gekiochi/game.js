@@ -1898,12 +1898,14 @@ function chalURL(wins,k){return BASE_URL+'?v=2&c='+wins+'.'+safeType(k)+'.'+enco
 function invURL(code){return BASE_URL+'?v=2&room='+code}
 function chalCheck(n){const c=game.chal;if(!c||c.beat||n<=c.n)return;c.beat=true;stat('ch_beat');
   later(()=>toast(`${c.name}の記録（${c.n}人）を超えた！！`,2600,1),400)}
-function invShow(code){const r=$('invRow');if(!r)return;r.classList.toggle('hidden',!code);invShow.code=code}
-$('bInvLine').onclick=()=>{SFX.click();const c=invShow.code;if(!c)return;stat('inv_make');
-  window.open('https://line.me/R/share?text='+encodeURIComponent('「激落！！消しゴムバトル！！」で勝負しよう！ タップでそのまま対戦👇\n'+invURL(c)),'_blank','noopener')};
-$('bInvCopy').onclick=async()=>{SFX.click();const c=invShow.code;if(!c)return;stat('inv_make');
-  const t='「激落！！消しゴムバトル！！」で勝負しよう！ タップでそのまま対戦👇\n'+invURL(c);
-  try{await navigator.clipboard.writeText(t);toast('招待リンクをコピーしました')}catch(e){toast('コピーできませんでした。コード '+c+' を伝えてね')}};
+function invShow(code){const r=$('invRow');if(!r)return;r.classList.toggle('hidden',!code);invShow.code=code;if(!code)$('copyBox').classList.add('hidden')}
+const invText=c=>'「激落！！消しゴムバトル！！」で勝負しよう！ タップでそのまま対戦👇\n'+invURL(c);
+$('bInvLine').onclick=ev=>{SFX.click();const c=invShow.code;if(!c)return;stat('inv_make');
+  const a={href:'https://line.me/R/share?text='+encodeURIComponent(invText(c))};shareOpen(ev,a,invText(c))};
+$('bInvCopy').onclick=async()=>{SFX.click();const c=invShow.code;if(!c)return;stat('inv_make');const t=invText(c);let ok=false;
+  try{await navigator.clipboard.writeText(t);ok=true}catch(e){}
+  if(ok)toast('招待リンクをコピーしました');
+  else{$('copyTxt').value=t;$('copyBox').classList.remove('hidden');setTimeout(()=>{try{$('copyTxt').focus();$('copyTxt').select()}catch(e){}},50)}};
 $('bShareLine').addEventListener('click',()=>{SFX.click();stat('ch_share')});
 $('bShare').addEventListener('click',()=>{if(!$('bShareLine').classList.contains('hidden'))stat('ch_share')});
 function srcOf(qs){
