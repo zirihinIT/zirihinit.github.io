@@ -21,7 +21,6 @@
 </head>
 <body>
 <canvas id="c"></canvas>
-<canvas id="fx"></canvas>
 
 <div id="title" class="screen">
   <div id="logoWrap">
@@ -201,8 +200,9 @@
 <div id="hitTag" class="hidden"></div>
 <div id="ghost" class="hidden" aria-hidden="true"><div id="ghostLine"></div><div id="ghostF">👆</div><div id="ghostCap"></div></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
-<script src="game.js?v=20261122"></script>
+<script src="lib/three.min.js"></script>
+<script src="lib/peerjs.min.js"></script>
+<!-- セーブデータ（IndexedDB）を読み込んでから game.js を始める -->
+<script src="save.js?v=20261121b"></script>
 </body>
 </html>

@@ -32,8 +32,8 @@ const ETYPES=[
 // プレイヤーが選べる消しゴム（3番はボス専用）
 const PLAYABLE=[0,1,2,4,5],randType=()=>PLAYABLE[(Math.random()*PLAYABLE.length)|0];
 // 勝ち抜き戦で解放したもの（端末に保存）
-const UNL=new Set();try{(JSON.parse(localStorage.getItem('gekiochiUnlock')||'[]')||[]).forEach(x=>UNL.add(String(x)))}catch(e){}
-function unlock(id){if(UNL.has(id))return false;UNL.add(id);try{localStorage.setItem('gekiochiUnlock',JSON.stringify([...UNL]))}catch(e){}return true}
+const UNL=new Set();try{(JSON.parse(SAVE.getItem('gekiochiUnlock')||'[]')||[]).forEach(x=>UNL.add(String(x)))}catch(e){}
+function unlock(id){if(UNL.has(id))return false;UNL.add(id);try{SAVE.setItem('gekiochiUnlock',JSON.stringify([...UNL]))}catch(e){}return true}
 const goldOpen=()=>UNL.has('e3');
 const STAT_NAMES=['スピード','すべり','弾力','重さ'];
 
@@ -255,7 +255,7 @@ function cpuChoose(s,i,diff){
 // ================= サウンド =================
 let AC=null,muted=false,noiseBuf=null,SEOUT=null;
 // 音量（0〜1）。BGMと効果音は別々に調整できる
-const VOL={bgm:1,se:1};try{const v=JSON.parse(localStorage.getItem('gekiochiVol')||'null');if(v){VOL.bgm=clamp(+v.bgm||0,0,1);VOL.se=clamp(+v.se||0,0,1)}else if(localStorage.getItem('gekiochiBgm')==='0')VOL.bgm=0}catch(e){}
+const VOL={bgm:1,se:1};try{const v=JSON.parse(SAVE.getItem('gekiochiVol')||'null');if(v){VOL.bgm=clamp(+v.bgm||0,0,1);VOL.se=clamp(+v.se||0,0,1)}else if(SAVE.getItem('gekiochiBgm')==='0')VOL.bgm=0}catch(e){}
 muted=VOL.se===0;
 function seOut(a){if(!SEOUT){SEOUT=a.createGain();SEOUT.connect(a.destination)}SEOUT.gain.value=VOL.se;return SEOUT}
 function ac(){
@@ -408,7 +408,8 @@ document.addEventListener('visibilitychange',()=>{if(!AC)return;if(document.hidd
 
 // ================= 3D =================
 const cv=$('c');
-const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true});
+// preserveDrawingBuffer：PLiCyのサムネイル・スクリーンショットが真っ黒にならないように
+const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true,preserveDrawingBuffer:true});
 renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
 renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 renderer.outputEncoding=THREE.sRGBEncoding;
@@ -645,7 +646,7 @@ const TITLES={
   t9:{name:'伝説の消しゴム',rar:3},
   t10:{name:'激落王を倒した者',rar:4},t11:{name:'勝ち抜きの鬼',rar:4}};
 const PRIZES=Object.assign({},SKINS,TITLES),safeSkin=v=>SKINS[v]?v:'',safeTitle=v=>TITLES[v]?v:'';
-const MY={skin:'',title:''};try{MY.skin=safeSkin(localStorage.getItem('gekiochiSkin'));MY.title=safeTitle(localStorage.getItem('gekiochiTitle'))}catch(e){}
+const MY={skin:'',title:''};try{MY.skin=safeSkin(SAVE.getItem('gekiochiSkin'));MY.title=safeTitle(SAVE.getItem('gekiochiTitle'))}catch(e){}
 const skinOf=i=>i===(game.mode==='cpu'?0:game.me)?MY.skin:safeSkin(game.oppSkin),titleOf=i=>i===(game.mode==='cpu'?0:game.me)?MY.title:safeTitle(game.oppTitle);
 function applyLooks(types){
   types.forEach((k,i)=>{const T=Object.assign({},ETYPES[k],k!==3?SKINS[skinOf(i)]:null),m=eMesh[i],E=ETYPES[k];m.anim=T.anim|0;T.label=E.label;
@@ -959,14 +960,14 @@ function stageOf(n){
   return{name:GT_NAMES[(n-1-Math.floor(n/5))%GT_NAMES.length],k:n<=4?fixed[n-1]:randType(),need:1,
     cfg:{n:Math.round(lerp(40,300,t)),na:lerp(0.2,0.02,t),np:lerp(0.16,0.022,t)}}}
 const GT=()=>game.mode==='cpu'&&!game.ranked?game.gt:null,cpuName=()=>GT()?GT().st.name:'CPU';
-let gtBest=0;try{gtBest=+localStorage.getItem('gekiochiBest')||0}catch(e){}
+let gtBest=0;try{gtBest=+SAVE.getItem('gekiochiBest')||0}catch(e){}
 function gtBestText(){$('bestTxt').textContent=gtBest?'自己ベスト：'+gtBest+'人激落':'どこまで勝ち抜ける？'}
 const allInv=()=>{const a=rkInv();UNL.forEach(x=>{if(PRIZES[x]&&!a.includes(x))a.push(x)});return a};
 // ボスを倒すと解放されるもの
 const GT_REWARDS={5:{id:'t10',name:'称号「激落王を倒した者」'},10:{id:'e3',name:'おうごん消しゴム'},15:{id:'t11',name:'称号「勝ち抜きの鬼」'},20:{id:'x7',name:'スキン「王冠」'}};
 function gtReward(n){const R=GT_REWARDS[n];if(!R||!unlock(R.id))return;
   later(()=>{toast('🎉 解放！ '+R.name+(R.id==='e3'?'\n消しゴム選択で使えるよ':'\nきせかえで使えるよ'),4200,1);SFX.max()},1500)}
-function gtRecord(wins){if(wins<=gtBest)return false;gtBest=wins;try{localStorage.setItem('gekiochiBest',wins)}catch(e){}gtBestText();return true}
+function gtRecord(wins){if(wins<=gtBest)return false;gtBest=wins;try{SAVE.setItem('gekiochiBest',wins)}catch(e){}gtBestText();return true}
 function gtGo(n,keep,cont){if(n===1)stat('gt_start');game.oppSkin=game.oppTitle='';const st=stageOf(n);game.gt={n,st,won:false,cont:!!cont};game.me=0;game.ranked=null;startMatch('cpu',(Math.random()*1e9)|0,0,[game.myType,st.k],st.need,keep)}
 function startMatch(mode,seed,first,types,need,keepBgm){
   {const g=mode==='cpu'&&!game.ranked?game.gt:null;setStage(g?(g.n-1)%3:((seed>>>0)%3));}
@@ -1005,10 +1006,10 @@ function beginTurn(){
 }
 // 打ち方は1つのボタンで「ストレート→ループ→カーブ↪→カーブ↩」と切り替え（次のターンも引き継ぐ）
 const SHOT_MODES=[{type:0,curve:1,name:'ストレート'},{type:1,curve:1,name:'ループ'},{type:2,curve:1,name:'カーブ↪'},{type:2,curve:-1,name:'カーブ↩'}];
-let shotMode=0;try{shotMode=clamp(+localStorage.getItem('gekiochiShot')||0,0,3)}catch(e){}
+let shotMode=0;try{shotMode=clamp(+SAVE.getItem('gekiochiShot')||0,0,3)}catch(e){}
 function applyShotMode(anim){const m=SHOT_MODES[shotMode];game.shot.type=m.type;game.shot.curve=m.curve;
   document.querySelectorAll('#typeRow button').forEach((b,i)=>{b.className=i===shotMode?'on':'';if(anim&&i===shotMode){void b.offsetWidth;b.classList.add('pulse')}});
-  try{localStorage.setItem('gekiochiShot',shotMode)}catch(e){}}
+  try{SAVE.setItem('gekiochiShot',shotMode)}catch(e){}}
 function cycleShot(){if(!isMyTurn()||!aiming())return;shotMode=(shotMode+1)%SHOT_MODES.length;applyShotMode(true);SFX.click()}
 function setShotMode(i){if(!isMyTurn()||!aiming())return;shotMode=i;applyShotMode(true);SFX.click()}
 // 互換用（撮影スクリプトなどから呼ばれる）
@@ -1020,8 +1021,8 @@ function curveLabel(){}
 // 引っぱって弾く：左右で向き、下に引っぱるとパワー、離すと発射
 const PULL_MAX=()=>Math.min(innerWidth,innerHeight)*0.36;
 // ===== 指のお手本（弾けた回数が2回になるまで、自分の番に出す） =====
-const TUT={n:0};try{TUT.n=+localStorage.getItem('gekiochiTut')||0}catch(e){}
-function tutCount(){TUT.n++;try{localStorage.setItem('gekiochiTut',TUT.n)}catch(e){}}
+const TUT={n:0};try{TUT.n=+SAVE.getItem('gekiochiTut')||0}catch(e){}
+function tutCount(){TUT.n++;try{SAVE.setItem('gekiochiTut',TUT.n)}catch(e){}}
 const _tv=new THREE.Vector3();
 function tutUpdate(){const el=$('ghost');
   const on=TUT.n<2&&game.phase==='dir'&&isMyTurn()&&!drag&&!game.kbCharge&&matchMedia('(pointer:coarse)').matches;
@@ -1282,15 +1283,15 @@ const TIERS=[
   {min:1550,name:'学級委員',col:'#f5b800'},{min:1650,name:'生徒会長',col:'#ff8a1a'},{min:1750,name:'校長先生',col:'#ff4b3e'},{min:1900,name:'激落王',col:'#a64bff'}];
 const tierOf=r=>{let t=TIERS[0];for(const x of TIERS)if(r>=x.min)t=x;return t};
 const RK={db:null,uid:null,prof:null,name:'',q:null,qtk:0};
-try{RK.name=localStorage.getItem('gekiochiName')||''}catch(e){}
+try{RK.name=SAVE.getItem('gekiochiName')||''}catch(e){}
 // 名前がまだなければ仮の名前を付ける（あとで「名前を変える」から変更できる）
-function rkAutoName(){if(RK.name)return;RK.name='けしごむ'+String(1000+((Math.random()*9000)|0));RK.autoName=true;try{localStorage.setItem('gekiochiName',RK.name)}catch(e){}}
+function rkAutoName(){if(RK.name)return;RK.name='けしごむ'+String(1000+((Math.random()*9000)|0));RK.autoName=true;try{SAVE.setItem('gekiochiName',RK.name)}catch(e){}}
 const rkRating=()=>RK.prof&&typeof RK.prof.rating==='number'?RK.prof.rating:1500;
 // 消しカス（初回だけ100＝1回ぶん持っている）と、当てた景品
 const GACHA_COST=100,KASU_WIN=30,KASU_LOSE=10,KASU_DUP=20;
 const rkKasu=()=>RK.prof&&Number.isInteger(RK.prof.kasu)?RK.prof.kasu:100,rkInv=()=>RK.prof&&Array.isArray(RK.prof.inv)?RK.prof.inv.filter(x=>PRIZES[x]):[];
 const rkBase=()=>Object.assign({name:RK.name,rating:1500,wins:0,losses:0,games:0},RK.prof||{},{name:RK.name,updated:Date.now()});
-function mySave(){try{localStorage.setItem('gekiochiSkin',MY.skin);localStorage.setItem('gekiochiTitle',MY.title)}catch(e){}}
+function mySave(){try{SAVE.setItem('gekiochiSkin',MY.skin);SAVE.setItem('gekiochiTitle',MY.title)}catch(e){}}
 async function rkSaveProf(patch){const d=Object.assign(rkBase(),patch);RK.prof=d;try{await pRef().set(d);return true}catch(e){console.warn(e);return false}}
 const safeType=k=>[0,1,2,3,4,5].includes(k|0)?k|0:0;
 function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=()=>rej(new Error('load '+src));document.head.appendChild(s)})}
@@ -1545,7 +1546,7 @@ document.querySelectorAll('#typeRow button').forEach(b=>{b.addEventListener('poi
 function volRender(){$('volBgm').value=Math.round(VOL.bgm*100);$('volSe').value=Math.round(VOL.se*100);
   $('volBgmN').textContent=Math.round(VOL.bgm*100);$('volSeN').textContent=Math.round(VOL.se*100);
   $('volBtn').textContent=VOL.bgm||VOL.se?'🔊':'🔇'}
-function volSave(){try{localStorage.setItem('gekiochiVol',JSON.stringify(VOL))}catch(e){}}
+function volSave(){try{SAVE.setItem('gekiochiVol',JSON.stringify(VOL))}catch(e){}}
 volRender();
 $('volBtn').onclick=e=>{e.stopPropagation();ac();$('volPanel').classList.toggle('hidden')};
 for(const[id,k]of[['volBgm','bgm'],['volSe','se']]){const el=$(id);
@@ -1559,7 +1560,7 @@ addEventListener('pointerdown',()=>ac(),{passive:true});addEventListener('keydow
 $('bRank').onclick=async()=>{ac();SFX.click();if(!await rkInit())return;stat('rank_open');
   rkAutoName();if(RK.prof&&RK.prof.name&&RK.prof.name!==RK.name)RK.name=RK.prof.name;rkRenderLobby();showScreen('rankLobby')};
 $('bNameOk').onclick=async()=>{const n=sanitizeName($('nameIn').value);if(!n){toast('名前を入れてね');return}
-  SFX.click();RK.name=n;RK.autoName=false;try{localStorage.setItem('gekiochiName',n)}catch(e){}
+  SFX.click();RK.name=n;RK.autoName=false;try{SAVE.setItem('gekiochiName',n)}catch(e){}
   if(RK.prof){RK.prof.name=n;pRef().update({name:n}).catch(e=>console.warn(e))}
   const af=rkReady.after;rkReady.after=null;
   if(af==='gacha')gachaOpen();else if(af==='title'){dressRender();showScreen('rankDress')}else{rkRenderLobby();showScreen('rankLobby')}};
@@ -1584,7 +1585,7 @@ $('bNet').onclick=()=>{ac();SFX.click();game.pickFor='net';showScreen('pickMenu'
 const CARDC={0:'#ffd23f',1:'#5cc8ff',2:'#ff8fb8',3:'#ffe27a',4:'#d8cfb8',5:'#ffb066'};
 const PICK_LIST=[0,1,2,4,5,3];
 const canPick=k=>PLAYABLE.includes(k)||(k===3&&goldOpen());
-try{const t=+localStorage.getItem('gekiochiType');if(canPick(t))game.myType=t}catch(e){}
+try{const t=+SAVE.getItem('gekiochiType');if(canPick(t))game.myType=t}catch(e){}
 const hexC=k=>'#'+ETYPES[k].body.toString(16).padStart(6,'0');
 $('cards').innerHTML=PICK_LIST.map(k=>`<button class="card" role="radio" data-k="${k}" style="--c:${CARDC[k]};--b:${hexC(k)}"><div class="ic"><div class="eras k${k}" data-l=""></div></div><div class="tn">${ETYPES[k].short}</div></button>`).join('');
 let pickSel=null;
@@ -1598,13 +1599,13 @@ pickRender();
 document.querySelectorAll('#cards .card').forEach(b=>b.onclick=()=>{ac();pickSel=+b.dataset.k;if(canPick(pickSel))game.myType=pickSel;pickRender();
   if(!canPick(pickSel)){SFX.buzz();return}
   ({1:()=>SFX.flick(0.3),2:()=>SFX.boing(6),4:()=>SFX.flick(0.15),5:()=>SFX.boing(3)}[game.myType]||(()=>SFX.click()))()});
-$('bPickOk').onclick=()=>{ac();SFX.click();try{localStorage.setItem('gekiochiType',game.myType)}catch(e){}
+$('bPickOk').onclick=()=>{ac();SFX.click();try{SAVE.setItem('gekiochiType',game.myType)}catch(e){}
   if(game.pickFor==='rank')rkStartQueue();else if(game.pickFor==='cpu')gtGo(1);else{showScreen('netMenu');netStatus('部屋を作るか、相手から聞いた<br>4ケタのコードで入ってね')}};
 $('bPickBack').onclick=()=>{SFX.click();if(game.pickFor==='rank'){rkRenderLobby();showScreen('rankLobby')}else showScreen('title')};
 $('bHow').onclick=()=>{ac();SFX.click();openHowto(null)};
 // ===== あそびかた（スライド） =====
 let howSeen=false,howNext=null,hwIdx=0;
-try{howSeen=localStorage.getItem('gekiochiHow')==='1'}catch(e){}
+try{howSeen=SAVE.getItem('gekiochiHow')==='1'}catch(e){}
 const HW_N=document.querySelectorAll('#hwTrack .hwSlide').length;
 $('hwDots').innerHTML='<i></i>'.repeat(HW_N);
 function hwGo(i){hwIdx=clamp(i,0,HW_N-1);$('hwTrack').style.transform=`translateX(${-100*hwIdx}%)`;
@@ -1614,7 +1615,7 @@ function hwGo(i){hwIdx=clamp(i,0,HW_N-1);$('hwTrack').style.transform=`translate
 function openHowto(next){stat('howto');howNext=next||null;hwGo(0);
   $('bHowGo').classList.toggle('hidden',!howNext);$('bHowBack').classList.toggle('hidden',!!howNext);
   document.querySelector('.hwMore').open=false;showScreen('howto')}
-function closeHowto(){howSeen=true;try{localStorage.setItem('gekiochiHow','1')}catch(e){}
+function closeHowto(){howSeen=true;try{SAVE.setItem('gekiochiHow','1')}catch(e){}
   const n=howNext;howNext=null;if(n)n();else showScreen('title')}
 $('hwPrev').onclick=()=>{SFX.click();hwGo(hwIdx-1)};$('hwNext').onclick=()=>{SFX.click();hwGo(hwIdx+1)};
 $('bHowBack').onclick=()=>{SFX.click();closeHowto()};
@@ -1649,7 +1650,7 @@ $('bAgain').onclick=()=>{ac();SFX.click();
   if(game.mode==='cpu'){const g=game.gt;gtGo(g&&g.won?g.n+1:1)}
   else{game.againMe=true;netSend({t:'again'});$('bAgain').textContent='相手を待っています…';$('bAgain').disabled=true;checkAgain()}};
 // スマホもPCも、文章入りのXの投稿画面を開く（共有シートだとXアプリがURLしか拾わないことがあるため）
-{let nw=false;try{nw=!localStorage.getItem('gekiochiSeen');localStorage.setItem('gekiochiSeen','1')}catch(e){}stat('open');if(nw)stat('open_new')}
+{let nw=false;try{nw=!SAVE.getItem('gekiochiSeen');SAVE.setItem('gekiochiSeen','1')}catch(e){}stat('open');if(nw)stat('open_new')}
 entryFromURL();
 $('bRetry').onclick=()=>{ac();SFX.click();const g=game.gt;if(g)gtGo(g.n,false,true)};
 $('bShare').addEventListener('click',()=>{SFX.click();stat('share')});
@@ -1775,12 +1776,18 @@ function updateCamera(dt){
 }
 
 // ================= 集中線 =================
-const fxc=$('fx'),fxg=fxc.getContext('2d');
+// 集中線・ゴムひも・流線は画面に出さない2Dキャンバスに描いて、3Dの上に1枚の板として重ねる（canvasタグは1つだけ）
+const fxc=document.createElement('canvas'),fxg=fxc.getContext('2d');let FXR=1,fxOn=false;
+const fxTex=new THREE.CanvasTexture(fxc);fxTex.encoding=THREE.sRGBEncoding;fxTex.minFilter=fxTex.magFilter=THREE.LinearFilter;fxTex.generateMipmaps=false;
+const fxScene=new THREE.Scene(),fxCam=new THREE.OrthographicCamera(-1,1,1,-1,0,1);
+fxScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2),new THREE.MeshBasicMaterial({map:fxTex,transparent:true,depthTest:false,depthWrite:false,toneMapped:false})));
 let burst=null;
 function startBurst(wx,wy,wz,p){const v=new THREE.Vector3(wx,wy,wz).project(camera);
   burst={t:0,dur:0.55+p*0.25,x:(v.x*0.5+0.5)*fxc.width,y:(-v.y*0.5+0.5)*fxc.height,p,seed:(Math.random()*1e6)|0}}
 function drawFX(rdt){
-  const w=fxc.width,h=fxc.height;fxg.clearRect(0,0,w,h);
+  const pull=drag&&game.phase==='power'&&isMyTurn();
+  if(!burst&&!pull&&speedFx<0.05){fxOn=false;return}
+  fxOn=true;const w=fxc.width,h=fxc.height;fxg.clearRect(0,0,w,h);
   // 弾いた瞬間の集中線
   if(burst){
     burst.t+=rdt;const k=1-burst.t/burst.dur;
@@ -1802,7 +1809,7 @@ function drawFX(rdt){
   }
   // 引っぱっている間のゴムひも（モンスト風）
   if(drag&&game.phase==='power'&&isMyTurn()){
-    const pr=window.devicePixelRatio||1,x0=drag.x0*pr,y0=drag.y0*pr,x1=drag.x*pr,y1=drag.y*pr,p=game.shot.power;
+    const pr=FXR,x0=drag.x0*pr,y0=drag.y0*pr,x1=drag.x*pr,y1=drag.y*pr,p=game.shot.power;
     const dx=x1-x0,dy=y1-y0,L=Math.hypot(dx,dy)||1,nx=-dy/L,ny=dx/L,hw=(16+p*30)*pr;
     fxg.lineJoin='round';fxg.beginPath();fxg.moveTo(x0,y0);fxg.lineTo(x1+nx*hw,y1+ny*hw);fxg.lineTo(x1-nx*hw,y1-ny*hw);fxg.closePath();
     fxg.fillStyle=p>0.9?'rgba(255,75,62,.92)':p>0.6?'rgba(255,210,63,.92)':'rgba(255,255,255,.9)';fxg.fill();
@@ -1813,11 +1820,11 @@ function drawFX(rdt){
   const cx=w/2,cy=h*0.45,m=Math.hypot(cx,cy),n=10+(50*speedFx|0);
   for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,r1=m*(0.42+Math.random()*0.3),r2=r1+m*(0.25+Math.random()*0.6);
     fxg.strokeStyle=Math.random()<0.25?`rgba(255,220,90,${0.5*speedFx})`:`rgba(255,255,255,${0.55*speedFx})`;
-    fxg.lineWidth=(1+Math.random()*5*speedFx)*(window.devicePixelRatio||1);fxg.beginPath();fxg.moveTo(cx+Math.cos(a)*r1,cy+Math.sin(a)*r1);fxg.lineTo(cx+Math.cos(a)*r2,cy+Math.sin(a)*r2);fxg.stroke()}
+    fxg.lineWidth=(1+Math.random()*5*speedFx)*FXR;fxg.beginPath();fxg.moveTo(cx+Math.cos(a)*r1,cy+Math.sin(a)*r1);fxg.lineTo(cx+Math.cos(a)*r2,cy+Math.sin(a)*r2);fxg.stroke()}
 }
 
 // ================= メインループ =================
-function resize(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();const pr=window.devicePixelRatio||1;fxc.width=w*pr;fxc.height=h*pr}
+function resize(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();FXR=Math.min(1.5,window.devicePixelRatio||1);fxc.width=Math.round(w*FXR);fxc.height=Math.round(h*FXR);fxTex.dispose()}
 addEventListener('resize',resize);resize();
 
 function syncMeshes(dt){
@@ -1877,6 +1884,7 @@ function frame(now){
   $('gfill').style.height=(game.shot.power*100).toFixed(1)+'%';$('gauge').classList.toggle('hot',game.shot.power>0.85);
   updateParts(rdt*ts);updateCamera(rdt);syncMeshes(rdt*ts);updateAimViz();updateFinger(rdt);drawFX(rdt);updateTimer();
   renderer.render(scene,camera);
+  if(fxOn){fxTex.needsUpdate=true;renderer.autoClear=false;renderer.render(fxScene,fxCam);renderer.autoClear=true}
 }
 requestAnimationFrame(frame);
 
