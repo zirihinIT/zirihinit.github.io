@@ -94,7 +94,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#3a2433;font-family:'M
 @keyframes hot{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}
 
 /* ---------- overlays ---------- */
-.screen{position:fixed;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px;
+.screen{position:fixed;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:18px;
   background:radial-gradient(circle at 50% 30%,rgba(255,240,250,.92),rgba(240,210,230,.96));overflow:auto;touch-action:pan-y}
 .logo{font-family:'Dela Gothic One';text-align:center;color:var(--purple);line-height:1.05;
   text-shadow:3px 3px 0 #fff,-3px 3px 0 #fff,3px -3px 0 #fff,-3px -3px 0 #fff,0 7px 0 var(--pink)}
@@ -124,6 +124,16 @@ a.btn{text-decoration:none;text-align:center;display:block}
 #toast{position:fixed;left:50%;top:150px;transform:translateX(-50%);z-index:9;background:#ffe9a8;border:2px solid var(--ink);border-radius:10px;
   font-size:12px;font-weight:800;padding:4px 10px;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
 #toast.show{opacity:1}
+.screen>:first-child{margin-top:auto}
+.screen>:last-child{margin-bottom:auto}
+/* 他のゲームへ */
+.guide{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;max-width:340px;margin-top:16px;padding:11px 12px;
+  border:3px solid var(--ink);border-radius:14px;background:#fff3c4;color:var(--ink);box-shadow:0 4px 0 var(--ink);
+  font-family:inherit;font-weight:800;font-size:15px;letter-spacing:.04em;text-decoration:none;touch-action:manipulation}
+.guide span{font-size:18px;line-height:1}
+#result .guide{max-width:320px}
+.guide:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.guide:focus-visible{outline:3px solid var(--pink);outline-offset:3px}
 #loading{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;z-index:30;background:#3a2433}
 </style>
 </head>
@@ -166,6 +176,7 @@ a.btn{text-decoration:none;text-align:center;display:block}
     ・右上の<b>ちゃぶ台返し</b>を長押しで、いつでも講座をぶち壊せる<br>
     ・イライラが満タンになると……勝手に返す
   </div>
+  <a class="guide" href="https://zirihinit.github.io/games/">他のゲームをあそぶ<span aria-hidden="true">→</span></a>
 </div>
 
 <!-- chapters -->
@@ -188,6 +199,7 @@ a.btn{text-decoration:none;text-align:center;display:block}
     <button class="btn" id="toTitle">コースを選び直す</button>
     <a class="btn purple" id="share" target="_blank" rel="noopener">𝕏 で結果をシェア</a>
   </div>
+  <a class="guide" href="https://zirihinit.github.io/games/">他のゲームをあそぶ<span aria-hidden="true">→</span></a>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
