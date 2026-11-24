@@ -27,6 +27,7 @@
   --plate:#f6f6f2;
   --stop:#d8392e;
   --wakaba:#2f9a57;
+  --guide:#1d5fae;
   --dim:#9aa0a8;
   --f-display:'Dela Gothic One','Hiragino Kaku Gothic StdN','Yu Gothic',sans-serif;
   --f-body:'Zen Kaku Gothic New','Hiragino Sans','Yu Gothic',system-ui,sans-serif;
@@ -201,6 +202,23 @@ a.btn{display:flex;align-items:center;justify-content:center;text-decoration:non
 .minis{display:flex;gap:8px;width:100%}
 .mini{flex:1;font:900 13px var(--f-body);padding:8px 4px;border-radius:5px;border:2px solid #6a6d72;background:rgba(20,21,24,.75);color:var(--plate);cursor:pointer}
 .mini:active{transform:translateY(1px)}
+/* 他のゲーム（青い案内標識） */
+.guide{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:10px 12px 11px;border-radius:6px;background:var(--guide);color:var(--plate);border:3px solid var(--plate);box-shadow:0 0 0 2px var(--guide),0 5px 0 2px #000;font:900 15px var(--f-body);text-decoration:none;letter-spacing:.04em;margin-top:2px}
+.guide span{font-family:var(--f-display);font-size:18px;line-height:1}
+.guide:active{transform:translateY(3px);box-shadow:0 0 0 2px var(--guide),0 2px 0 2px #000}
+.guide:focus-visible{outline:3px solid var(--sign);outline-offset:4px}
+/* 背の低い画面ではタイトルを詰める */
+@media (max-height:760px){
+  #titleOv .card{gap:9px}
+  .tsign{width:68px;height:68px;margin:8px 0 2px}
+  .tsign svg{width:40px;height:40px}
+  h1 .k{font-size:36px}
+  h1 .u{font-size:22px;margin-top:6px}
+  .how{font-size:12.5px;line-height:1.5;padding:7px 12px}
+  .mode{padding:6px 4px 7px}
+  #titleOv .btn{padding:10px 10px 11px}
+  #titleOv .guide{padding:8px 12px 9px}
+}
 @media (prefers-reduced-motion:reduce){#warn.show,#toast.on{animation-duration:.01s}}
 </style>
 <style>
@@ -248,6 +266,7 @@ body{margin:0;font-size:14px}
     <div class="btns"><button class="btn" id="startBtn">発進する</button></div>
     <div class="btns"><button class="btn sub" id="zukanBtn1">かもしれない図鑑</button><button class="btn sub" id="rankBtn1">ランキング</button></div>
     <div class="bestline">自己ベスト <b id="bestV">0</b> m</div>
+    <a class="guide" href="https://zirihinit.github.io/games/">他のゲームをあそぶ<span aria-hidden="true">→</span></a>
   </div>
 </div>
 
@@ -268,6 +287,7 @@ body{margin:0;font-size:14px}
     </form>
     <div class="btns"><button class="btn" id="againBtn">もう一度</button><a class="btn share" id="shareBtn" href="https://x.com/intent/post" target="_blank" rel="noopener">結果をポストする</a></div>
     <div class="minis"><button class="mini" id="titleBtn">タイトルに戻る</button><button class="mini" id="zukanBtn2">図鑑</button><button class="mini" id="rankBtn2">ランキング</button></div>
+    <a class="guide" href="https://zirihinit.github.io/games/">他のゲームをあそぶ<span aria-hidden="true">→</span></a>
   </div>
 </div>
 
