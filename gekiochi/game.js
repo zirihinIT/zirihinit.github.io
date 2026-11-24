@@ -1374,12 +1374,12 @@ async function rkStartQueue(){
   q.timer=setInterval(()=>{if(RK.q!==q)return;const sec=((Date.now()-q.t0)/1000)|0;
     $('qTime').textContent=`${(sec/60)|0}:${String(sec%60).padStart(2,'0')}`;
     if(q.state==='waiting'){
-      if(sec>12)$('qSub').textContent='相手のはばを広げて探し中…';
-      if(sec>=(q.botSec||(q.botSec=RK_BOT_SEC-6+Math.random()*12))){rkFallbackBot(q);return}}
-    if(q.state==='waiting'){if(sec%8===0)q.ref.update({hb:Date.now()}).catch(()=>{});if(sec%3===0)rkTryClaim(q)}},1000);
+      if(sec>5)$('qSub').textContent='相手のはばを広げて探し中…';
+      if(sec>=(q.botSec||(q.botSec=RK_BOT_SEC-2+Math.random()*4))){rkFallbackBot(q);return}}
+    if(q.state==='waiting'){if(sec%8===0)q.ref.update({hb:Date.now()}).catch(()=>{});if(sec%2===0)rkTryClaim(q)}},1000);
   rkTryClaim(q);
 }
-const RK_BOT_SEC=30;
+const RK_BOT_SEC=10;   // 人が見つからなければ8〜12秒でライバル戦へ
 // 待ち行列から安全に抜けてからCPU戦へ（抜ける直前に人とマッチしていたらそちらを優先）
 async function rkFallbackBot(q){
   if(!q||RK.q!==q||q.state!=='waiting'||q.botting)return;q.botting=true;
@@ -1414,7 +1414,7 @@ async function rkTryClaim(q){
     const now=Date.now(),myR=rkRating(),list=[];
     snap.forEach(d=>list.push(d.data()));
     const cands=list.filter(x=>x&&x.uid!==RK.uid&&x.v===3&&x.ts<q.ts&&now-x.hb<25000&&
-      Math.abs(x.rating-myR)<=150+10*Math.max(now-x.ts,now-q.ts)/1000).sort((a,b)=>a.ts-b.ts);
+      Math.abs(x.rating-myR)<=200+60*Math.max(now-x.ts,now-q.ts)/1000).sort((a,b)=>a.ts-b.ts);
     for(const c of cands){
       if(RK.q!==q||q.state!=='waiting')return;
       const cRef=RK.db.collection(COL.q).doc(c.uid),mRef=RK.db.collection(COL.m).doc();
