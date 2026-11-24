@@ -23,6 +23,11 @@
   canvas{display:block;width:100%;height:100%}
   .ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#fff;pointer-events:none}
   .ov.on{pointer-events:auto}
+  #otherGames{position:absolute;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:5;display:flex;align-items:center;gap:8px;white-space:nowrap;padding:11px 22px;border-radius:999px;background:#5a3a2a;color:#fff;border:3px solid #fff;box-shadow:0 4px 0 rgba(0,0,0,.3);font-weight:bold;font-size:16px;text-decoration:none}
+  #otherGames span{font-size:18px;line-height:1}
+  #otherGames:active{transform:translateX(-50%) translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.3)}
+  #otherGames:focus-visible{outline:3px solid #ffe066;outline-offset:3px}
+  #otherGames.hidden{display:none}
   .hidden{display:none}
   #title h1{margin:0 0 6px;font-size:clamp(26px,8.5vw,40px);line-height:1.15;color:#fff;text-shadow:0 3px 0 #c2456a,0 0 12px rgba(0,0,0,.35);letter-spacing:.02em}
   #title h1 small{display:block;font-size:.55em;color:#ffe066;text-shadow:0 2px 0 #9a6a00}
@@ -58,6 +63,8 @@
     <div class="blink">← → で スタート</div>
   </div>
 
+  <a id="otherGames" href="https://zirihinit.github.io/games/">他のゲームをあそブー<span aria-hidden="true">→</span></a>
+
   <div id="result" class="ov hidden">
     <div id="resultBox">
       <div class="why" id="rWhy"></div>
@@ -79,6 +86,8 @@ const ctx = cv.getContext('2d');
 const wrap = document.getElementById('wrap');
 const titleEl = document.getElementById('title');
 const resultEl = document.getElementById('result');
+const otherGamesEl = document.getElementById('otherGames');
+otherGamesEl.addEventListener('pointerdown', e => e.stopPropagation());
 
 let W = 0, H = 0, DPR = 1, SH = 80, TW = 72, PR = 34, baseY = 0;
 function resize(){
@@ -156,6 +165,7 @@ function start(){
   mode = 'play';
   reset();
   titleEl.classList.add('hidden');
+  otherGamesEl.classList.add('hidden');
   resultEl.classList.add('hidden'); resultEl.classList.remove('on');
 }
 
@@ -232,6 +242,7 @@ function showResult(){
   const txt = `ブタをおだてて ${score}m 登らせた！【称号：${rankOf(score)}】\n#ブタもおだてりゃ木に登る #クソゲー`;
   document.getElementById('share').href = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(txt) + '&url=' + encodeURIComponent('https://zirihinit.github.io/games/butaki/');
   resultEl.classList.remove('hidden'); resultEl.classList.add('on');
+  otherGamesEl.classList.remove('hidden');
   lockUntil = performance.now() + 500;
 }
 document.getElementById('retry').addEventListener('click', e => { e.stopPropagation(); audio(); start(); });
