@@ -96,8 +96,36 @@
   .tag.tランキング{background:#fff0a8}.tag.tリズム{background:#e8dcff}
   .play{display:inline-flex;align-items:center;gap:4px;font-family:var(--display);font-size:14px;background:var(--yellow);
     border:var(--line);border-radius:999px;padding:5px 14px 6px;white-space:nowrap}
-  .card.flash{animation:flash .9s ease 2}
-  @keyframes flash{50%{box-shadow:0 0 0 6px var(--pink),var(--shadow)}}
+  .card[hidden]{display:none}
+
+  /* ---------- ガチャ ---------- */
+  .gm{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:20px;
+    background:rgba(29,27,34,.55);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);animation:fade .2s}
+  .gm[hidden]{display:none}
+  @keyframes fade{from{opacity:0}}
+  .gm-box{position:relative;width:min(440px,100%);background:var(--paper);border:var(--line);border-radius:20px;
+    box-shadow:8px 8px 0 var(--ink);padding:18px 18px 20px;text-align:center;animation:boxin .35s cubic-bezier(.2,1.6,.4,1)}
+  @keyframes boxin{from{transform:scale(.6) rotate(-4deg);opacity:0}}
+  .gm-x{position:absolute;top:-14px;right:-14px;width:42px;height:42px;border-radius:50%;border:var(--line);
+    background:#fff;font-size:22px;font-weight:900;cursor:pointer;box-shadow:3px 3px 0 var(--ink);color:var(--ink)}
+  .gm-head{font-family:var(--display);font-weight:900;font-size:22px;margin-bottom:12px}
+  .gm-head.spin{animation:shake .12s infinite}
+  @keyframes shake{25%{transform:rotate(-3deg)}75%{transform:rotate(3deg)}}
+  .gm-pic{position:relative;border:var(--line);border-radius:14px;overflow:hidden;background:#000;aspect-ratio:1200/630}
+  .gm-pic img{height:100%;object-fit:cover}
+  .gm-pic.spin img{filter:blur(1.5px) saturate(1.4)}
+  .gm-pic.hit{animation:hit .5s cubic-bezier(.2,1.8,.4,1)}
+  @keyframes hit{0%{transform:scale(.85)}60%{transform:scale(1.06)}}
+  .gm-res{margin-top:14px;display:flex;flex-direction:column;align-items:center;gap:6px;min-height:140px}
+  .gm-res[data-on="0"]{visibility:hidden}
+  .gm-res h3{font-family:var(--display);font-weight:900;font-size:22px;line-height:1.25}
+  .gm-res .catch{font-weight:900;color:var(--red);font-size:15px}
+  .gm-btns{display:flex;gap:10px;margin-top:8px;width:100%}
+  .gm-btns>*{flex:1;justify-content:center;font-size:16px;padding:10px 12px;min-height:48px;cursor:pointer;color:var(--ink)}
+  .gm-again{font:inherit;font-weight:900;background:#fff;border:var(--line);border-radius:999px}
+  .confetti{position:absolute;left:50%;top:38%;width:10px;height:14px;border:2px solid var(--ink);border-radius:2px;
+    pointer-events:none;animation:pop 1s cubic-bezier(.1,.7,.3,1) forwards}
+  @keyframes pop{to{transform:translate(var(--x),var(--y)) rotate(var(--r));opacity:0}}
 
   /* ---------- フッター ---------- */
   footer{text-align:center;color:var(--sub);font-size:12px;padding:48px 16px 40px}
@@ -159,12 +187,14 @@
    ゲームを追加するときは、この配列のいちばん上に1つ足すだけ。
    先頭のゲームが「最新作」として大きく表示されます。
    tags: 3D / 2D / リズム / 対戦 / ランキング（自由に追加OK）
+   hidden: true をつけると一覧に出さない（公開前のゲーム用）
    ========================================================= */
 const GAMES = [
   {
     title: "空飛ぶ車の駐車場",
     url: "./games/skypark/", img: "./games/skypark/ogp.png",
     catch: "かっこよく停めろ！",
+    hidden: true, // ← まだ公開しない（消すと一覧に出る）
     desc: "ジェットを噴かして空飛ぶ車を駐車。横風・鳥・雷・ドローン・UFOが邪魔してくる全8ステージ。",
     tags: ["2D"],
   },
@@ -207,9 +237,10 @@ const GAMES = [
 
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const tagsHTML = g => `<div class="tags">${g.tags.map(t => `<span class="tag t${esc(t)}">${esc(t)}</span>`).join("")}</div>`;
+const LIST = GAMES.filter(g => !g.hidden);   // 公開中のゲームだけ
 
 // 最新作
-const h = GAMES[0], hero = document.getElementById("hero");
+const h = LIST[0], hero = document.getElementById("hero");
 hero.href = h.url;
 hero.innerHTML = `
   <div class="pic"><img src="${esc(h.img)}" alt="${esc(h.title)}" fetchpriority="high"><span class="new">NEW!</span></div>
@@ -221,11 +252,11 @@ hero.innerHTML = `
     <span class="play">▶ 今すぐ遊ぶ</span>
   </div>`;
 
-document.getElementById("count").textContent = `全${GAMES.length}本`;
+document.getElementById("count").textContent = `全${LIST.length}本`;
 
 // 一覧
 const grid = document.getElementById("grid");
-grid.innerHTML = GAMES.map((g, i) => `
+grid.innerHTML = LIST.map((g, i) => `
   <a class="card" href="${esc(g.url)}" data-tags="${esc(g.tags.join(","))}" data-i="${i}">
     <div class="pic"><img src="${esc(g.img)}" alt="${esc(g.title)}" loading="lazy"></div>
     <div class="body">
@@ -239,33 +270,108 @@ grid.innerHTML = GAMES.map((g, i) => `
 
 // 絞り込み（タグはゲームから自動で集める）
 const order = ["3D", "2D", "リズム", "対戦", "ランキング"];
-const allTags = [...new Set(GAMES.flatMap(g => g.tags))]
+const allTags = [...new Set(LIST.flatMap(g => g.tags))]
   .sort((a, b) => (order.indexOf(a) + 1 || 99) - (order.indexOf(b) + 1 || 99));
 const tools = document.getElementById("tools");
 tools.innerHTML = ["すべて", ...allTags].map((t, i) =>
   `<button class="chip" data-tag="${esc(t)}" aria-pressed="${i === 0}">${esc(t)}</button>`).join("")
   + `<button class="chip gacha" id="gacha">🎲 迷ったらガチャ</button>`;
 
+let curTag = "すべて";
 tools.addEventListener("click", e => {
   const b = e.target.closest(".chip");
   if (!b) return;
-  if (b.id === "gacha") return gacha();
-  tools.querySelectorAll(".chip[data-tag]").forEach(c => c.setAttribute("aria-pressed", c === b));
-  const t = b.dataset.tag;
+  if (b.id === "gacha") return openGacha();
+  curTag = b.dataset.tag;
+  tools.querySelectorAll(".chip[data-tag]").forEach(c => c.setAttribute("aria-pressed", String(c === b)));
   grid.querySelectorAll(".card").forEach(c => {
-    c.hidden = !(t === "すべて" || c.dataset.tags.split(",").includes(t));
+    c.hidden = !(curTag === "すべて" || c.dataset.tags.split(",").includes(curTag));
   });
 });
 
-// ランダムで1本光らせる
-function gacha() {
-  const cards = [...grid.querySelectorAll(".card:not([hidden])")];
-  if (!cards.length) return;
-  const c = cards[Math.floor(Math.random() * cards.length)];
-  cards.forEach(x => x.classList.remove("flash"));
-  c.scrollIntoView({ behavior: "smooth", block: "center" });
-  void c.offsetWidth; c.classList.add("flash");
+/* ---------- ガチャ（絞り込み中ならその中から） ---------- */
+document.body.insertAdjacentHTML("beforeend", `
+  <div class="gm" id="gm" hidden role="dialog" aria-modal="true" aria-label="ガチャ">
+    <div class="gm-box">
+      <button class="gm-x" id="gmX" aria-label="とじる">×</button>
+      <div class="gm-head" id="gmHead">🎲 ガチャ中…</div>
+      <div class="gm-pic" id="gmPic"><img id="gmImg" alt=""></div>
+      <div class="gm-res" id="gmRes" data-on="0"></div>
+    </div>
+  </div>`);
+const gm = document.getElementById("gm"), gmHead = document.getElementById("gmHead"),
+      gmPic = document.getElementById("gmPic"), gmImg = document.getElementById("gmImg"),
+      gmRes = document.getElementById("gmRes");
+let rolling = 0;
+
+function pool() {
+  return LIST.filter(g => curTag === "すべて" || g.tags.includes(curTag));
 }
+function openGacha() {
+  gm.hidden = false;
+  document.body.style.overflow = "hidden";
+  roll();
+}
+function closeGacha() {
+  rolling++;
+  gm.hidden = true;
+  document.body.style.overflow = "";
+}
+function roll() {
+  const games = pool();
+  if (!games.length) return;
+  games.forEach(g => { new Image().src = g.img; });   // 先読み
+  const id = ++rolling;
+  const pick = games[Math.floor(Math.random() * games.length)];
+  gmRes.dataset.on = "0";
+  gmHead.textContent = "🎲 ガチャ中…";
+  gmHead.classList.add("spin");
+  gmPic.classList.remove("hit");
+  gmPic.classList.add("spin");
+  let k = Math.floor(Math.random() * games.length), delay = 55, t = 0;
+  const step = () => {
+    if (id !== rolling) return;
+    if (t > 1600 || games.length === 1) return land(pick);
+    k = (k + 1) % games.length;
+    gmImg.src = games[k].img;
+    t += delay; delay *= 1.13;
+    setTimeout(step, delay);
+  };
+  step();
+}
+function land(g) {
+  gmImg.src = g.img; gmImg.alt = g.title;
+  gmHead.classList.remove("spin");
+  gmHead.textContent = "🎉 これに決定！";
+  gmPic.classList.remove("spin");
+  void gmPic.offsetWidth; gmPic.classList.add("hit");
+  gmRes.innerHTML = `
+    ${tagsHTML(g)}
+    <h3>${esc(g.title)}</h3>
+    <div class="catch">${esc(g.catch)}</div>
+    <div class="gm-btns">
+      <button class="gm-again" id="gmAgain">🎲 もう一回</button>
+      <a class="play" href="${esc(g.url)}">▶ 遊ぶ</a>
+    </div>`;
+  gmRes.dataset.on = "1";
+  document.getElementById("gmAgain").onclick = roll;
+  confetti();
+}
+function confetti() {
+  const box = gm.querySelector(".gm-box");
+  const colors = ["#ffd400", "#ff4d4d", "#3d8bff", "#ff7eb3", "#2fc28a", "#9b6bff"];
+  for (let i = 0; i < 26; i++) {
+    const c = document.createElement("i");
+    c.className = "confetti";
+    const a = Math.random() * Math.PI * 2, d = 120 + Math.random() * 160;
+    c.style.cssText = `background:${colors[i % colors.length]};--x:${Math.cos(a) * d}px;--y:${Math.sin(a) * d - 60}px;--r:${Math.random() * 720 - 360}deg`;
+    box.appendChild(c);
+    setTimeout(() => c.remove(), 1100);
+  }
+}
+document.getElementById("gmX").onclick = closeGacha;
+gm.addEventListener("click", e => { if (e.target === gm) closeGacha(); });
+addEventListener("keydown", e => { if (e.key === "Escape" && !gm.hidden) closeGacha(); });
 </script>
 </body>
 </html>
