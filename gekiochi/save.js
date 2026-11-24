@@ -3,7 +3,7 @@
 // 起動時に全部読み込んでから game.js を始めるので、ゲーム側は SAVE.getItem / SAVE.setItem をそのまま使える。
 // ※ データベース名は一度決めたら絶対に変えない（変えると、それまでのセーブデータが読めなくなる）
 (function(){
-  const DB_NAME='plicy_gekiochi_ghvl41yr',STORE='kv',GAME_JS='game.js?v=20261121b';
+  const DB_NAME='plicy_gekiochi_ghvl41yr',STORE='kv',GAME_JS='game.js?v=20261124';
   const cache=new Map();let db=null;
   const SAVE=window.SAVE={
     getItem(k){return cache.has(k)?cache.get(k):null},
