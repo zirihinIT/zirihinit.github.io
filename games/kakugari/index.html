@@ -58,6 +58,13 @@ canvas{display:block}
 .rules .r{color:#ff8a8a}
 .btn{font:inherit;font-size:20px;padding:10px 26px;background:#e00;color:#fff;border:4px solid #000;box-shadow:5px 5px 0 #000;border-radius:12px;margin-top:12px;cursor:pointer;text-shadow:2px 2px 0 #000}
 .btn:active{transform:translate(3px,3px);box-shadow:2px 2px 0 #000}
+.more{display:block;width:min(86vw,320px);margin:10px auto 0;padding:9px 0;text-align:center;background:#ffe14a;color:#111;border:3px solid #000;border-radius:999px;box-shadow:4px 4px 0 #000;font-size:16px;text-decoration:none;pointer-events:auto}
+.more:active{transform:translate(3px,3px);box-shadow:1px 1px 0 #000}
+#finalCard .album{max-width:300px;margin:4px auto 2px}
+#finalCard .big{font-size:clamp(30px,10vw,40px)}
+#finalCard .rank{margin:0 0 2px}
+#finalCard .btn{font-size:17px;padding:8px 20px;margin-top:6px}
+#finalCard .more{margin-top:10px;padding:7px 0;font-size:15px}
 .btn.k{background:#111;border-color:#fff;box-shadow:5px 5px 0 #e00;font-size:17px;text-decoration:none;display:inline-block}
 .btn.g{background:#1a9c3a}
 .best{color:#ffe14a;font-size:14px;margin-top:8px;text-shadow:2px 2px 0 #000}
@@ -122,6 +129,7 @@ canvas{display:block}
       <button class="btn" id="startBtn">開 店 ッ ！</button>
       <div class="best" id="bestTxt"></div>
       <div class="marq"><span>本日のメニュー：角刈り ／ 角刈り（大盛り） ／ 角刈り（つゆだく） ／ 角刈り以外はお断り ／ 当店は創業以来すべての角を90.0°で納品しております ／ 甘えた角刈りを見つけた方には角刈り1回無料 ／ 型抜き中の事故について当店は一切責任を負いません</span></div>
+      <a class="more" href="../">［他のゲームをあそぶ］</a>
     </div>
   </div>
 
@@ -825,7 +833,7 @@ async function showFinal(){
   const url=location.href.split('#')[0];
   const txt=`「角刈り一丁ッ！」で ${score}点（100点満点）\n称号：【${rk}】\n${results.map(r=>icons[r.type]).join('')}\n#角刈り一丁ッ`;
   const xurl=`https://twitter.com/intent/tweet?text=${encodeURIComponent(txt)}&url=${encodeURIComponent(url)}`;
-  $('#finalCard').innerHTML=`<h2>━ 本日の営業終了 ━</h2><div class="small">写真をタップで拡大</div>
+  $('#finalCard').innerHTML=`<h2>━ 本日の営業終了 ━ <span style="font-size:11px;color:#555;letter-spacing:0">（写真タップで拡大）</span></h2>
     <div class="album">${album}</div>
     <div class="small">5人の平均</div><div class="big">${score}<span style="font-size:.45em"> / 100点</span></div>
     ${nb?'<div style="color:#c00;font-size:14px">★ 最高記録更新 ★</div>':''}
@@ -833,7 +841,8 @@ async function showFinal(){
     <div style="font-size:13px">${cm}</div>
     <div style="display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap">
     <a class="btn k" href="${xurl}" target="_blank" rel="noopener">𝕏 でポスト</a>
-    <button class="btn" id="againBtn">もう一回！</button></div>`;
+    <button class="btn" id="againBtn">もう一回！</button></div>
+    <a class="more" href="../">［他のゲームをあそぶ］</a>`;
   screen('final');
   document.querySelectorAll('#finalCard .ph').forEach(f=>f.addEventListener('click',()=>{
     const r=results[+f.dataset.i];const vt={perfect:'スポォン！完璧通過',pass:'通過',trip:'はみ出して転倒',boko:'スカスカで店長ボコられ'}[r.type];
