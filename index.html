@@ -203,7 +203,7 @@ const GAMES = [
     url: "./games/nekopunching/", img: "./games/nekopunching/ogp.png",
     catch: "部屋から、世界まで。",
     desc: "三毛猫が目の前の物をパンチして大きくなる。部屋→家→町→県→日本→アジア→全世界、クリアまでのタイムを競う。",
-    tags: ["破壊", "タイムアタック", "動物"],
+    tags: ["アクション"],
   },
   {
     title: "空飛ぶ車の駐車場",
@@ -211,52 +211,52 @@ const GAMES = [
     catch: "かっこよく停めろ！",
     hidden: true, // ← まだ公開しない（消すと一覧に出る）
     desc: "ジェットを噴かして空飛ぶ車を駐車。横風・鳥・雷・ドローン・UFOが邪魔してくる全8ステージ。",
-    tags: ["操作テク", "ステージ制"],
+    tags: ["アクション"],
   },
   {
     title: "角刈り一丁ッ！",
     url: "./games/kakugari/", img: "./games/kakugari/ogp.png",
     catch: "90度ジャストに刈り上げろ！",
     desc: "指でスライドして刈り、退店時は角刈りの型抜き。はみ出したら転び、スカスカなら店長がボコられる。",
-    tags: ["タイミング", "日常あるある"],
+    tags: ["日常あるある"],
   },
   {
     title: "激落！！消しゴムバトル！！",
     url: "./gekiochi/", img: "./gekiochi/ogp.png",
     catch: "弾いて机から叩き落とせ！",
     desc: "消しゴムを指で弾く3D対戦。CPU戦・友達とネット対戦・ランクマッチ。",
-    tags: ["物理", "対戦", "ランキング", "日常あるある"],
+    tags: ["アクション", "対戦", "日常あるある"],
   },
   {
     title: "本日のマナー講座ザマス",
     url: "./games/zamasu/", img: "./games/zamasu/ogp.png",
     catch: "怒られずに食べきれるか!?",
     desc: "マナー講師の目を盗んで完食せよ。和洋中 全12編。ムカついたらちゃぶ台返し💥",
-    tags: ["操作テク", "ステージ制", "日常あるある"],
+    tags: ["日常あるある"],
   },
   {
     title: "ブタもおだてりゃ木に登る",
     url: "./games/butaki/", img: "./games/butaki/ogp.png",
     catch: "どこまで登れるブー？",
     desc: "木こりをよけて、おだてられながらブタが木を登り続ける。←→かタップで操作。",
-    tags: ["よけゲー", "エンドレス", "動物"],
+    tags: ["アクション", "エンドレス"],
   },
   {
     title: "かもしれない運転",
     url: "./games/kamoshirenai/", img: "./games/kamoshirenai/ogp.png",
     catch: "「かもしれない」をよけ続けろ",
     desc: "迫りくる「かもしれない」をよけて、何m生き残れるか。最高320km/h。",
-    tags: ["よけゲー", "エンドレス", "ランキング"],
+    tags: ["アクション", "エンドレス"],
   },
 ];
 
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 /* タグの種類（この順番で絞り込みボタンが並ぶ。色は種類ごと） */
 const TAG_GROUPS = {
-  play:  ["よけゲー", "タイミング", "操作テク", "物理", "破壊"],   // 遊び方
-  style: ["エンドレス", "タイムアタック", "ステージ制"],          // 遊びの形
-  mode:  ["対戦", "ランキング"],                                  // モード
-  theme: ["動物", "日常あるある"],                                // テーマ
+  play:  ["アクション"],
+  style: ["エンドレス"],
+  mode:  ["対戦"],
+  theme: ["日常あるある"],
 };
 const groupOf = t => Object.keys(TAG_GROUPS).find(k => TAG_GROUPS[k].includes(t)) || "play";
 const ORDER = Object.values(TAG_GROUPS).flat();
