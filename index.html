@@ -67,12 +67,16 @@
     border:var(--line);border-radius:8px;padding:3px 10px 4px;transform:rotate(6deg);box-shadow:3px 3px 0 var(--ink)}
 
   /* ---------- 絞り込み ---------- */
+  .listhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:28px 0 12px}
+  .listhead .label{margin:0}
   .tools{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:16px}
   .chip{font:inherit;font-size:14px;font-weight:800;color:var(--ink);background:#fff;border:var(--line);border-radius:999px;
     padding:7px 14px;min-height:40px;cursor:pointer;transition:transform .08s}
   .chip[aria-pressed="true"]{background:var(--ink);color:#fff}
   .chip:active{transform:scale(.95)}
-  .gacha{margin-left:auto;background:var(--pink)}
+  .gacha{background:var(--pink);flex-shrink:0}
+  .chip.g-play{background:#dcebff}.chip.g-style{background:#ece2ff}.chip.g-mode{background:#ffe08a}.chip.g-theme{background:#d6f5e6}
+  .chip[aria-pressed="true"]{background:var(--ink);color:#fff}
 
   /* ---------- 一覧 ---------- */
   .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
@@ -92,8 +96,7 @@
 
   .tags{display:flex;flex-wrap:wrap;gap:5px}
   .tag{font-size:11.5px;font-weight:800;border:2px solid var(--ink);border-radius:6px;padding:1px 7px;background:#fff}
-  .tag.t3D{background:#d9e8ff}.tag.t2D{background:#ffe1ee}.tag.t対戦{background:#ffd9d9}
-  .tag.tランキング{background:#fff0a8}.tag.tリズム{background:#e8dcff}
+  .tag.g-play{background:#dcebff}.tag.g-style{background:#ece2ff}.tag.g-mode{background:#ffe08a}.tag.g-theme{background:#d6f5e6}
   .play{display:inline-flex;align-items:center;gap:4px;font-family:var(--display);font-size:14px;background:var(--yellow);
     border:var(--line);border-radius:999px;padding:5px 14px 6px;white-space:nowrap}
   .card[hidden]{display:none}
@@ -148,7 +151,9 @@
     .card .foot{flex-direction:column;align-items:stretch}
     .card .play{justify-content:center;font-size:13px}
     .tag{font-size:10.5px;padding:0 5px}
-    .gacha{margin-left:0}
+    .tools{flex-wrap:nowrap;overflow-x:auto;margin:0 -16px 14px;padding:2px 16px 6px;scrollbar-width:none}
+    .tools::-webkit-scrollbar{display:none}
+    .chip{flex-shrink:0}
     .hello p{word-break:keep-all}
         .tools{gap:6px}
     .chip{font-size:13px;padding:6px 11px;min-height:38px}
@@ -174,7 +179,10 @@
   <span class="label">🔥 最新作</span>
   <a class="hero" id="hero"></a>
 
-  <span class="label">🎮 ぜんぶのゲーム</span>
+  <div class="listhead">
+    <span class="label">🎮 ぜんぶのゲーム</span>
+    <button class="chip gacha" id="gacha">🎲 迷ったらガチャ</button>
+  </div>
   <div class="tools" id="tools"></div>
   <div class="grid" id="grid"></div>
 
@@ -186,7 +194,7 @@
 /* =========================================================
    ゲームを追加するときは、この配列のいちばん上に1つ足すだけ。
    先頭のゲームが「最新作」として大きく表示されます。
-   tags: 3D / 2D / リズム / 対戦 / ランキング（自由に追加OK）
+   tags: 下の TAG_GROUPS にあるタグから選ぶ（新しいタグは TAG_GROUPS にも足す）
    hidden: true をつけると一覧に出さない（公開前のゲーム用）
    ========================================================= */
 const GAMES = [
@@ -195,7 +203,7 @@ const GAMES = [
     url: "./games/nekopunching/", img: "./games/nekopunching/ogp.png",
     catch: "部屋から、世界まで。",
     desc: "三毛猫が目の前の物をパンチして大きくなる。部屋→家→町→県→日本→アジア→全世界、クリアまでのタイムを競う。",
-    tags: ["3D"],
+    tags: ["アクション"],
   },
   {
     title: "空飛ぶ車の駐車場",
@@ -203,47 +211,56 @@ const GAMES = [
     catch: "かっこよく停めろ！",
     hidden: true, // ← まだ公開しない（消すと一覧に出る）
     desc: "ジェットを噴かして空飛ぶ車を駐車。横風・鳥・雷・ドローン・UFOが邪魔してくる全8ステージ。",
-    tags: ["2D"],
+    tags: ["アクション"],
   },
   {
     title: "角刈り一丁ッ！",
     url: "./games/kakugari/", img: "./games/kakugari/ogp.png",
     catch: "90度ジャストに刈り上げろ！",
     desc: "指でスライドして刈り、退店時は角刈りの型抜き。はみ出したら転び、スカスカなら店長がボコられる。",
-    tags: ["3D"],
+    tags: ["アクション", "日常あるある"],
   },
   {
     title: "激落！！消しゴムバトル！！",
     url: "./gekiochi/", img: "./gekiochi/ogp.png",
     catch: "弾いて机から叩き落とせ！",
     desc: "消しゴムを指で弾く3D対戦。CPU戦・友達とネット対戦・ランクマッチ。",
-    tags: ["3D", "対戦", "ランキング"],
+    tags: ["アクション", "対戦", "日常あるある"],
   },
   {
     title: "本日のマナー講座ザマス",
     url: "./games/zamasu/", img: "./games/zamasu/ogp.png",
     catch: "怒られずに食べきれるか!?",
     desc: "マナー講師の目を盗んで完食せよ。和洋中 全12編。ムカついたらちゃぶ台返し💥",
-    tags: ["3D"],
+    tags: ["知識", "日常あるある"],
   },
   {
     title: "ブタもおだてりゃ木に登る",
     url: "./games/butaki/", img: "./games/butaki/ogp.png",
     catch: "どこまで登れるブー？",
     desc: "木こりをよけて、おだてられながらブタが木を登り続ける。←→かタップで操作。",
-    tags: ["2D"],
+    tags: ["アクション", "エンドレス"],
   },
   {
     title: "かもしれない運転",
     url: "./games/kamoshirenai/", img: "./games/kamoshirenai/ogp.png",
     catch: "「かもしれない」をよけ続けろ",
     desc: "迫りくる「かもしれない」をよけて、何m生き残れるか。最高320km/h。",
-    tags: ["2D", "ランキング"],
+    tags: ["アクション", "エンドレス"],
   },
 ];
 
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const tagsHTML = g => `<div class="tags">${g.tags.map(t => `<span class="tag t${esc(t)}">${esc(t)}</span>`).join("")}</div>`;
+/* タグの種類（この順番で絞り込みボタンが並ぶ。色は種類ごと） */
+const TAG_GROUPS = {
+  play:  ["アクション", "知識"],
+  style: ["エンドレス"],
+  mode:  ["対戦"],
+  theme: ["日常あるある"],
+};
+const groupOf = t => Object.keys(TAG_GROUPS).find(k => TAG_GROUPS[k].includes(t)) || "play";
+const ORDER = Object.values(TAG_GROUPS).flat();
+const tagsHTML = g => `<div class="tags">${g.tags.map(t => `<span class="tag g-${groupOf(t)}">${esc(t)}</span>`).join("")}</div>`;
 const LIST = GAMES.filter(g => !g.hidden);   // 公開中のゲームだけ
 
 // 最新作
@@ -276,19 +293,17 @@ grid.innerHTML = LIST.map((g, i) => `
   </a>`).join("");
 
 // 絞り込み（タグはゲームから自動で集める）
-const order = ["3D", "2D", "リズム", "対戦", "ランキング"];
 const allTags = [...new Set(LIST.flatMap(g => g.tags))]
-  .sort((a, b) => (order.indexOf(a) + 1 || 99) - (order.indexOf(b) + 1 || 99));
+  .sort((a, b) => (ORDER.indexOf(a) + 1 || 99) - (ORDER.indexOf(b) + 1 || 99));
 const tools = document.getElementById("tools");
 tools.innerHTML = ["すべて", ...allTags].map((t, i) =>
-  `<button class="chip" data-tag="${esc(t)}" aria-pressed="${i === 0}">${esc(t)}</button>`).join("")
-  + `<button class="chip gacha" id="gacha">🎲 迷ったらガチャ</button>`;
+  `<button class="chip${i ? " g-" + groupOf(t) : ""}" data-tag="${esc(t)}" aria-pressed="${i === 0}">${esc(t)}</button>`).join("");
+document.getElementById("gacha").onclick = () => openGacha();
 
 let curTag = "すべて";
 tools.addEventListener("click", e => {
   const b = e.target.closest(".chip");
   if (!b) return;
-  if (b.id === "gacha") return openGacha();
   curTag = b.dataset.tag;
   tools.querySelectorAll(".chip[data-tag]").forEach(c => c.setAttribute("aria-pressed", String(c === b)));
   grid.querySelectorAll(".card").forEach(c => {
