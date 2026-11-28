@@ -218,7 +218,7 @@ const GAMES = [
     url: "./games/kakugari/", img: "./games/kakugari/ogp.png",
     catch: "90度ジャストに刈り上げろ！",
     desc: "指でスライドして刈り、退店時は角刈りの型抜き。はみ出したら転び、スカスカなら店長がボコられる。",
-    tags: ["日常あるある"],
+    tags: ["アクション", "日常あるある"],
   },
   {
     title: "激落！！消しゴムバトル！！",
@@ -232,7 +232,7 @@ const GAMES = [
     url: "./games/zamasu/", img: "./games/zamasu/ogp.png",
     catch: "怒られずに食べきれるか!?",
     desc: "マナー講師の目を盗んで完食せよ。和洋中 全12編。ムカついたらちゃぶ台返し💥",
-    tags: ["日常あるある"],
+    tags: ["知識", "日常あるある"],
   },
   {
     title: "ブタもおだてりゃ木に登る",
@@ -253,7 +253,7 @@ const GAMES = [
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 /* タグの種類（この順番で絞り込みボタンが並ぶ。色は種類ごと） */
 const TAG_GROUPS = {
-  play:  ["アクション"],
+  play:  ["アクション", "知識"],
   style: ["エンドレス"],
   mode:  ["対戦"],
   theme: ["日常あるある"],
